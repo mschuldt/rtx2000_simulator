@@ -1,0 +1,563 @@
+\ /* towers.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY towers.hnd" EVALUATE ;
+
+\ #define maxcells 	 18
+\ #define    stackrange	3
+\ #define true  1
+\ #define false 0
+
+DECIMAL
+\ load GNUTOOL.4
+load GNUinst.4
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\  int   stack[stackrange+1];
+\ struct element    cellspace[maxcells+1];
+\ int    freelist,  movesdone;
+VARIABLE movesdone   4   CELL- ALLOT
+VARIABLE freelist   4   CELL- ALLOT
+VARIABLE cellspace   76   CELL- ALLOT
+VARIABLE stack   8   CELL- ALLOT
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Towers.\n"); }
+   ." Error in Towers." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+: Error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Towers.\n"); }
+   ." Error in Towers." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+\ static void Makenull (s)
+ 64 FRAME_SIZE ! 
+ : Makenull  ( FUNC )   ( 3  top> empty )
+\ 	{
+ ( #4 dummy reload )  ( 4  top> empty )
+
+\ 	stack[s]=0;
+ 2*               ( 9  top> #64d )
+ [ stack ] SYMBOL_+  ( 10  top> #66d )
+ [ 0 ] LIT_SWAP  ( 11  top> #67d )
+ !                ( 11  top> #67x #0x )
+\ 	};
+   ;  ( END )   
+
+( RTX 2000 code generation)
+
+\ static int Getelement ()
+ 64 FRAME_SIZE ! 
+ : Getelement  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int temp;
+
+\ 	if ( freelist>0 )
+ freelist  ( SYMBOL)    ( 8  top> empty )
+ @                ( 8  top> #0x )
+ 0>               ( 8  top> #0x )
+ [ 005 ] BRANCHZ   ( 9  top> #0x )
+\ 	    {
+
+\ 	    temp = freelist;
+ freelist  ( SYMBOL)    ( 12  top> empty )
+ @                ( 12  top> #0x )
+
+\ 	    freelist = cellspace[freelist].next;
+ DUP           ( #64)  ( 16  top> #64 )
+ 2*               ( 16  top> #0x #64 )
+ 2*               ( 16  top> #0x #64 )
+ [ cellspace ] SYMBOL_+  ( 17  top> #69d #64 )
+ 2  ( LIT)       ( 18  top> #70d #64 )
+ +                ( 18  top> #0x #0x #64 )
+ @                ( 18  top> #0x #64 )
+ freelist  ( SYMBOL)    ( 18  top> #0x #64 )
+ !                ( 18  top> #0x #0x #64 )
+ exit
+\ 	    }
+ [ 006 ] BRANCH    ( 19  top> empty )
+
+\ 	else
+
+ [ 005 ] LABEL     ( 21  top> empty )
+
+\ 	    Error("out of space   ");
+\ *$LC2  ( SYMBOL)    ( 24  top> empty )
+\ ( #4 Calling Arg )  ( 26  top> #4 )
+ -64 FP+!  ( Link)   ( 26  top> empty )
+   Error  ( CALL)    ( 26  top> empty )
+ 64 FP+!  ( Unlink)  ( 26  top> empty )
+ [ 006 ] LABEL     ( 29  top> empty )
+
+\ 	return (temp);
+ 0          ( 31  top> empty )
+\ 	};
+   ;  ( END )   
+
+
+
+( RTX 2000 code generation)
+
+\ static void Push(i,s) int i, s;
+ 64 FRAME_SIZE ! 
+ : Push  ( FUNC )   ( 3  top> empty )
+\ 	{
+\         int errorfound, localel;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> ##5 )
+
+\ 	errorfound=false;
+ 0  ( LIT)       ( 9  top> ##4 ##5 )
+
+\ 	if ( stack[s] > 0 )
+ 1_pick ++    ( ##4)  ( 12  top> ##2 ##4 ##5 )
+ 2*               ( 12  top> #0x  ##2 ##4 ##5 )
+ [ stack ] SYMBOL_+  ( 13  top> #69d ##2 ##4 ##5  )
+ @                ( 16  top> #70x ##2 ##4 ##5 )
+ 0>               ( 16  top> #0x  ##2 ##4 ##5 )
+
+ [ 008 ] BRANCHZ   ( 17  top> #0x  ##2 ##4 ##5 )
+
+\ 	    if ( cellspace[stack[s]].discsize<=i )
+ 1_pick ++   ( #4)    ( 20  top>  ##2 ##4 ##5  )
+ 2*               ( 20  top> ##4 ##2 ##4 ##5  )
+ [ stack ] SYMBOL_+  ( 21  top> #74d ##2 ##4 ##5  )
+ @                ( 24  top> #75d ##2 ##4 ##5  )
+ 2*               ( 24  top> #0x  ##2 ##4 ##5 )
+ 2*               ( 24  top> #0x  ##2 ##4 ##5 )
+ [ cellspace ] SYMBOL_+  ( 25  top> #78d ##2 ##4 ##5  )
+ @                ( 26  top> #79d ##2 ##4 ##5  )
+ 3_pick ++   ( #5)    ( 27  top> #80x  ##2 ##4 ##5 )
+ <=               ( 28  top> #0x #80x  ##2 ##4 ##5 )
+ [ 108 ] BRANCHZ   ( 28  top> #0x  ##2 ##4 ##5 )
+
+\ 		{
+\ 		errorfound=true;
+ 1  ( LIT)       ( 33  top> ##2 ##4 ##5 )
+ 1_PUT           ( 36  top> ##2' ##2 ##4 ##5  )
+
+\ 		Error("disc size error");
+ -64 FP+!  ( Link)   ( 36  top> empty )
+   Error  ( CALL)    ( 36  top> empty )
+ 64 FP+!  ( Unlink)  ( 36  top> empty )
+
+\ 		};
+ [ 008 ] LABEL     ( 40  top>  ##2 ##4 ##5  )
+ [ 108 ] LABEL     ( 40  top>  ##2 ##4 ##5  )
+
+\ 	if ( ! errorfound )
+ [ 0010 ] BRANCHNZ  ( 44  top>  ##2 ##4 ##5 )
+
+\ 	    {
+\ 	    localel=Getelement();
+   Getelement  ( CALL)    ( 49  top>  ##4 ##5  )
+
+\ 	    cellspace[localel].next=stack[s];
+ 0_pick ++   ( #67)   ( 53  top> #67 ##4 ##5  )
+ 2*               ( 53  top> #0x #67  ##4 ##5 )
+ 2*               ( 53  top> #0x #67 ##4 ##5  )
+ [ cellspace ] SYMBOL_+  ( 54  top> #83d #67  ##4 ##5 )
+ 2_pick ++   ( #4)    ( 56  top> #84 #67  ##4 ##5 )
+ 2*               ( 56  top> ##4x #84 #67  ##4 ##5 )
+ [ stack ] SYMBOL_+  ( 57  top> #86d #84 #67  ##4 ##5 )
+ @_SWAP           ( 58  top> #87d #84d #67  ##4 ##5 )
+ 2  ( LIT)       ( 58  top> #84x #0x #67  ##4 ##5 )
+ +                ( 58  top> #0x #0x #0x #67  ##4 ##5 )
+ !                ( 58  top> #0x #0x #67  ##4 ##5 )
+
+\ 	    stack[s]=localel;
+ 1_pick ++   ( #4)    ( 61  top> #67  ##4 ##5 )
+ 2*               ( 61  top> ##4x #67  ##4 ##5 )
+ [ stack ] SYMBOL_+  ( 62  top> #89d #67  ##4 ##5 )
+ 1_pick ++    ( #67)  ( 63  top> #90d #67  ##4 ##5 )
+ SWAP !           ( 63  top> #0x #90d #67  ##4 ##5 )
+
+\ 	    cellspace[localel].discsize=i;
+ 2*               ( 66  top> #67d  ##4 ##5 )
+ 2*               ( 66  top> #0x  ##4 ##5 )
+ [ cellspace ] SYMBOL_+  ( 67  top> #92d  ##4 ##5 )
+ 2_pick ++   ( #5) SWAP  ( 68  top> #93d  ##4 ##5 )
+ !                ( 68  top> #93x ##5x  ##4 ##5 )
+\ 	    }
+ [ 0010 ] LABEL     ( 70  top>  ##4 ##5  )
+
+  drop ( #4)
+  drop ( #5)
+
+\ 	};
+   ;  ( END )   
+
+
+ ( 71  top> empty )
+
+( RTX 2000 code generation)
+
+\ static void Init (s,n) int s, n;
+ 64 FRAME_SIZE ! 
+ : Init  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int discctr;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> ##4 )
+
+ OVER          ( ##4)  ( 10  top> ##3 ##4 )
+
+\ 	Makenull(s);
+ ( #4 Calling Arg )     ( 28  top>  ##4 ##3 ##4 )
+   Makenull  ( CALL)    ( 12  top>  ##4 ##3 ##4  )
+
+\ 	for ( discctr = n; discctr >= 1; discctr-- )
+ 0_pick ++                  ( 46  top> ##5 ##4 )
+ 0>                     ( 46  top> #66x ##5 ##4 )
+ [ 0016 ] BRANCHZ       ( 48  top> #0x  ##5 ##4 )
+ ( LOOP_BEGIN)          ( 17  top>  ##5 ##4  )
+
+   SWAP 4 U!       ( 24  top>  ##5 ##4  )
+
+\ 	    Push(discctr,s);
+ [ 0015 ] LABEL         ( 34  top>  ##5  )
+
+ [ 5 ] DUP_U!           ( 24  top>  ##5  )
+ 4 U@                   ( 25  top>  ##5 )
+ ( #5 Calling Arg )     ( 28  top> #5 #4 )
+ ( #4 Calling Arg )     ( 28  top> #4 )
+   Push  ( CALL)        ( 28  top> empty )
+ -1  ( LIT)             ( 33  top> empty )
+ 5 U@ +                 ( 20  top> #0x )
+ 0_pick ++   ( #5)          ( 20  top> ##5   )
+ 0>                     ( 20  top> #66x ##5 )
+ [ 0015 ] BRANCHNZ      ( 21  top> #0x ##5 )
+
+  drop  ( #5) exit
+\ 	};
+ ( LOOP_END)      ( 39  top> empty )
+ [ 0016 ] LABEL     ( 47  top> ##5 ##4  )
+ drop drop
+   ;  ( END )   
+
+
+( RTX 2000 code generation)
+
+\ static int Pop (s) int s;
+ 64 FRAME_SIZE ! 
+ : Pop  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	 int temp, temp1;
+ ( #4 dummy reload )  ( 4  top> empty )
+
+\ 	if ( stack[s] > 0 )
+ 0_pick ++    ( ##2)       ( 9  top> ##2 )
+ 2*                    ( 9  top> #0x ##2 )
+ [ stack ] SYMBOL_+    ( 10  top> #68d ##2 )
+ @                     ( 13  top> #69x  ##2 )
+ 0>                    ( 13  top> #0x ##2  )
+ [ 0018 ] BRANCHZ      ( 14  top> #0x  ##2 )
+\ 	    {
+
+\ 	    temp1 = cellspace[stack[s]].discsize;
+ 0_pick ++   ( #2)          ( 18  top>  ##2 )
+ 2*                     ( 18  top> ##2x  ##2 )
+ [ stack ] SYMBOL_+     ( 19  top> #73d ##2  )
+ @                      ( 22  top> #74d ##2  )
+
+\ 	    temp = cellspace[stack[s]].next;
+ 2*                     ( 22  top> #0x ##2  )
+ 2*                     ( 22  top> #0x ##2  )
+ [ cellspace ] SYMBOL_+ ( 23  top> #77d ##2  )
+ @                      ( 24  top> #78d ##2  )
+ 1_pick ++   ( #2)          ( 27  top> #66 ##2  )
+ 2*                     ( 27  top> ##2x #66 ##2  )
+ [ stack ] SYMBOL_+     ( 28  top> #80d #66  ##2 )
+ @                      ( 31  top> #81d #66 ##2  )
+
+\ 	    cellspace[stack[s]].next=freelist;
+ 2*                     ( 31  top> #0x #66 ##2  )
+ 2*                     ( 31  top> #0x #66 ##2  )
+ [ cellspace ] SYMBOL_+ ( 32  top> #84d #66 ##2  )
+ 2  ( LIT)              ( 33  top> #85d #66 ##2  )
+ +                      ( 33  top> #0x #0x #66 ##2  )
+ @                      ( 33  top> #0x #66 ##2  )
+ 2_pick ++   ( #2)          ( 36  top> #65 #66 ##2  )
+ 2*                     ( 36  top> ##2x #65 #66 ##2  )
+ [ stack ] SYMBOL_+     ( 37  top> #87d #65 #66 ##2  )
+ @                      ( 40  top> #88d #65 #66 ##2  )
+ 2*                     ( 40  top> #0x #65 #66 ##2  )
+ 2*                     ( 40  top> #0x #65 #66 ##2  )
+ [ cellspace ] SYMBOL_+ ( 41  top> #91d #65 #66 ##2  )
+ freelist  ( SYMBOL)    ( 42  top> #92d #65 #66 ##2  )
+ @_SWAP                 ( 42  top> #0x #92d #65 #66  ##2 )
+ 2  ( LIT)              ( 42  top> #92x #0x #65 #66 ##2  )
+ +                      ( 42  top> #0x #0x #0x #65 #66  ##2 )
+ !                      ( 42  top> #0x #0x #65 #66 ##2  )
+
+\ 	    freelist=stack[s];
+ 2_pick ++   ( #2)          ( 45  top> #65 #66  ##2 )
+ 2*                     ( 45  top> ##2x #65 #66 ##2  )
+ [ stack ] SYMBOL_+     ( 46  top> #94d #65 #66  ##2 )
+ @                      ( 47  top> #95d #65 #66  ##2 )
+ freelist  ( SYMBOL)    ( 47  top> #0x #65 #66  ##2 )
+ !                      ( 47  top> #0x #0x #65 #66  ##2 )
+
+\ 	    stack[s]=temp;
+ 2_pick ++   ( #2)          ( 50  top> #65 #66 ##2  )
+ 2*               ( 50  top> ##2x #65 #66 ##2  )
+ [ stack ] SYMBOL_+  ( 51  top> #97d #65 #66  ##2 )
+ !                ( 52  top> #98d #65d #66 ##2  )
+\ 	    return (temp1);
+ NIP                ( 56  top> #66d ##2 )
+ EXIT ( [ 0017 ] BRANCH )  ( 56  top> #66d )
+\ 	    }
+
+\ 	else
+\ 	    Error("nothing to pop ");
+ [ 0018 ] LABEL     ( 60  top>  ##2  )
+  DROP
+
+\ *$LC4  ( SYMBOL)    ( 63  top> empty )
+\ ( #4 Calling Arg )  ( 65  top> #4 )
+ -64 FP+!  ( Link)   ( 65  top> empty )
+   Error  ( CALL)    ( 65  top> empty )
+ 64 FP+!  ( Unlink)  ( 65  top> empty )
+\ 	};
+ EXIT  [ 0017 ] LABEL     ( 72  top> empty )
+   ;  ( END )   
+
+ ( 72  top> empty )
+
+
+( RTX 2000 code generation)
+
+\ static void Move (s1,s2) int s1, s2;
+ 64 FRAME_SIZE ! 
+ : Move  ( FUNC )   ( 3  top> empty )
+\ 	{
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+
+\ 	Push(Pop(s1),s2);
+ 2 U!            ( 10  top> #65 #64d )
+ ( #4 Calling Arg )  ( 13  top> #4 )
+   Pop  ( CALL)    ( 13  top> empty )
+ 2 U@            ( 18  top> #66d )
+ ( #5 Calling Arg )  ( 21  top> #5 #4 )
+ ( #4 Calling Arg )  ( 21  top> #4 )
+   Push  ( CALL)    ( 21  top> empty )
+
+\ 	movesdone=movesdone+1;
+ 1  ( LIT)       ( 25  top> empty )
+ movesdone  ( SYMBOL)    ( 25  top> #0x )
+ +!               ( 25  top> #0x #0x )
+\ 	};
+   ;  ( END )   
+
+ ( 26  top> empty )
+
+
+( RTX 2000 code generation)
+
+\ static void tower(i,j,k) int i,j,k;
+ 64 FRAME_SIZE ! 
+ : tower  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int other;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> ##4 )
+ ( #6 dummy reload )  ( 6  top> ##3 ##4 )
+
+\ 2 U!            ( 10  top> ##2 ##3 ##4 )
+\ 3 U!            ( 11  top> ##3 ##4 )
+\ 4 U!            ( 11  top> ##4 )
+
+\ 	if ( k==1 )
+ 0_pick ++   ( #2)          ( 11  top> ##2 ##3 ##4 )
+ 1  ( LIT)              ( 11  top> ##2x  ##2 ##3 ##4 )
+ -                      ( 12  top> #68x ##2x  ##2 ##3 ##4 )
+ [ 0022 ] BRANCHNZ      ( 12  top> #0x  ##2 ##3 ##4 )
+
+\ 	    Move(i,j);
+ DROP                   ( 15  top>  ##2 ##3 ##4  )
+ ( #5 Calling Arg )     ( 19  top>  ##3 ##4 )
+ ( #4 Calling Arg )     ( 19  top> #4 )
+ -64 FP+!  ( Link)   ( 19  top> empty )
+   Move  ( CALL)    ( 19  top> empty )
+ 64 FP+!  ( Unlink)  ( 19  top> empty )
+ EXIT         ( [ 0023 ] BRANCH )  ( 21  top> empty )
+
+\ 	else
+ [ 0022 ] LABEL     ( 23  top>   ##2 ##3 ##4  )
+
+\ 	    {
+
+\ 	    other=6-i-j;
+ 6  ( LIT)              ( 26  top> empty  ##2 ##3 ##4 )
+ 2_pick ++   ( #3)          ( 26  top> #0x  ##2 ##3 ##4 )
+ -                      ( 26  top> ##3x #0x  ##2 ##3 ##4 )
+ 3_pick ++   ( #4)          ( 27  top> #69d  ##2 ##3 ##4 )
+ -                      ( 27  top> ##4x #0x  ##2 ##3 ##4 )
+ [ 8 ] DUP_U!           ( 37  top> #67  ##2 ##3 ##4 )
+ SWAP  2 U!  SWAP  3 U!
+ OVER  4 U!             ( 31  top> #67  ##4 )
+
+\ 	    tower(i,other,k-1);
+ 2 U@            ( 33  top> #5 #4 )
+ 1  ( LIT)       ( 33  top> ##2x #5 #4 )
+ -                ( 33  top> #0x ##2x #5 #4 )
+ ( #6 Calling Arg )  ( 54  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 54  top> #5 #4 )
+ ( #4 Calling Arg )  ( 54  top> #4 )
+ -64 FP+!  ( Link)   ( 37  top> empty )
+ recurse \   tower  ( CALL)    ( 37  top> empty )
+ 64 FP+!  ( Unlink)  ( 37  top> empty )
+
+\ 	    Move(i,j);
+ 4 U@            ( 40  top> empty )
+ 3 U@            ( 41  top> #4 )
+ ( #5 Calling Arg )  ( 44  top> #5 #4 )
+ ( #4 Calling Arg )  ( 44  top> #4 )
+ -64 FP+!  ( Link)   ( 44  top> empty )
+   Move  ( CALL)    ( 44  top> empty )
+ 64 FP+!  ( Unlink)  ( 44  top> empty )
+
+\ 	    tower(other,j,k-1);
+ 8 U@            ( 48  top> empty )
+ 3 U@            ( 49  top> #4 )
+ 2 U@            ( 50  top> #5 #4 )
+ 1  ( LIT)       ( 50  top> ##2x #5 #4 )
+ -                ( 50  top> #0x ##2x #5 #4 )
+ ( #6 Calling Arg )  ( 54  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 54  top> #5 #4 )
+ ( #4 Calling Arg )  ( 54  top> #4 )
+ -64 FP+!  ( Link)   ( 54  top> empty )
+ recurse \   tower  ( CALL)    ( 54  top> empty )
+ 64 FP+!  ( Unlink)  ( 54  top> empty )
+
+\ 	    }
+\ 	};
+ EXIT  [ 0023 ] LABEL     ( 56  top> empty )
+   ;  ( END )   
+
+ ( 57  top> empty )
+
+( RTX 2000 code generation)
+
+\ void main ()    { /* Towers */
+ 64 FRAME_SIZE ! 
+ : main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\     int i, iter;
+
+\     for (iter = 0 ; iter < 35 ; iter++ )
+ 0  ( LIT)       ( 6  top> empty )
+ [ 0033 ADD_INDEX ] >R   ( 102  top> #65 )
+ ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+
+\    {
+ [ 0033 ] LABEL     ( 84  top> empty )
+
+\     for ( i=1; i <= maxcells; i++ )
+ 1  ( LIT)       ( 14  top> empty )
+ [ 0031 ADD_INDEX ] >R   ( 96  top> #64 )
+ ( TYPE 1 LOOP BEGIN)  ( 15  top> empty )
+ [ 0031 ] LABEL     ( 30  top> empty )
+
+\ 	cellspace[i].next=i-1;
+ [ 0031 ]  INDEX  ( 22  top> empty )
+ 2*               ( 22  top> #64x )
+ 2*               ( 22  top> #0x )
+ [ cellspace ] SYMBOL_+  ( 23  top> #69d )
+ [ 0031 ]  INDEX  ( 25  top> #70d )
+ 1  ( LIT)       ( 25  top> #64x #70d )
+ -                ( 25  top> #0x #64x #70d )
+ SWAP             ( 25  top> #0x #70d )
+ 2  ( LIT)       ( 25  top> #70x #0x )
+ +                ( 25  top> #0x #0x #0x )
+ !                ( 25  top> #0x #0x )
+ R>               ( 29  top> empty )
+ 1  ( LIT)       ( 29  top> #64x )
+ +                ( 29  top> #0x #64x )
+ DUP_>R           ( 18  top> #64 )
+ 18  ( LIT)       ( 18  top> #64x )
+ U>               ( 19  top> #67x #64x )
+ [ 0031 ] BRANCHZ   ( 19  top> #0x )
+ [ 0031 DROP_INDEX ] R>DROP  ( 35  top> empty )
+
+ [ 0034 ] LABEL     ( 97  top> empty )
+
+\     freelist=maxcells;
+ 18  ( LIT)       ( 38  top> empty )
+ freelist  ( SYMBOL)    ( 38  top> #0x )
+ !                ( 38  top> #0x #0x )
+
+\     Init(1,14);
+ 1  ( LIT)       ( 41  top> empty )
+ 14  ( LIT)       ( 42  top> #4 )
+ ( #5 Calling Arg )  ( 45  top> #5 #4 )
+ ( #4 Calling Arg )  ( 45  top> #4 )
+ -64 FP+!  ( Link)   ( 45  top> empty )
+   Init  ( CALL)    ( 45  top> empty )
+ 64 FP+!  ( Unlink)  ( 45  top> empty )
+
+\     Makenull(2);
+ 2  ( LIT)       ( 48  top> empty )
+ ( #4 Calling Arg )  ( 50  top> #4 )
+   Makenull  ( CALL)    ( 50  top> empty )
+
+\     Makenull(3);
+ 3  ( LIT)       ( 54  top> empty )
+ ( #4 Calling Arg )  ( 56  top> #4 )
+   Makenull  ( CALL)    ( 56  top> empty )
+
+\     movesdone=0;
+ 0  ( LIT)       ( 59  top> empty )
+ movesdone  ( SYMBOL)    ( 59  top> #0x )
+ !                ( 59  top> #0x #0x )
+
+\     tower(1,2,14);
+ 1  ( LIT)       ( 62  top> empty )
+ 2  ( LIT)       ( 63  top> #4 )
+ 14  ( LIT)       ( 64  top> #5 #4 )
+ ( #6 Calling Arg )  ( 68  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 68  top> #5 #4 )
+ ( #4 Calling Arg )  ( 68  top> #4 )
+ -64 FP+!  ( Link)   ( 68  top> empty )
+   tower  ( CALL)    ( 68  top> empty )
+ 64 FP+!  ( Unlink)  ( 68  top> empty )
+
+\     if ( movesdone != 16383 )
+ movesdone  ( SYMBOL)    ( 71  top> empty )
+ @                ( 71  top> #0x )
+ 16383  ( LIT)       ( 73  top> #72x )
+ -                ( 74  top> #73x #72x )
+ [ 0027 ] BRANCHZ   ( 74  top> #0x )
+
+\ 	do_error();
+ -64 FP+!  ( Link)   ( 77  top> empty )
+   do_error  ( CALL)    ( 77  top> empty )
+ 64 FP+!  ( Unlink)  ( 77  top> empty )
+
+ [ 0027 ] LABEL     ( 82  top> empty )
+ R>               ( 83  top> empty )
+ 1  ( LIT)       ( 83  top> #65x )
+ +                ( 83  top> #0x #65x )
+ DUP_>R           ( 10  top> #65 )
+ dup .  34  ( LIT)       ( 10  top> #65x )
+ U>               ( 11  top> #66x #65x )
+\    }
+ [ 0033 ] BRANCHZ   ( 11  top> #0x )
+ [ 0033 DROP_INDEX ] R>DROP  ( 89  top> empty )
+ EXIT  [ 0035 ] LABEL     ( 103  top> empty )
+\     }; /* Towers */
+   ;  ( END )   
+
+.( max 34)
+cr
+

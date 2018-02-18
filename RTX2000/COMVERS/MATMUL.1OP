@@ -1,0 +1,271 @@
+\ /* matmul.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+\ gcc_compiled.:
+( RTX 2000 code generation)
+EMPTY
+
+: XY " DOS XY matmul.1op" EVALUATE ;
+
+DECIMAL
+
+\ load GNUTOOL.4
+load GNUinst.4
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ int seed ;
+
+VARIABLE seed   4   CELL- ALLOT
+
+\ #define ROWSIZE 40
+\  
+\     /* Intmm, Mm */
+\ int ima[ROWSIZE+1][ROWSIZE+1],
+\     imb[ROWSIZE+1][ROWSIZE+1],
+\     imr[ROWSIZE+1][ROWSIZE+1];
+
+VARIABLE imr   3364   CELL- ALLOT
+
+VARIABLE imb   3364   CELL- ALLOT
+
+VARIABLE ima   3364   CELL- ALLOT
+
+\ gcc_compiled.:
+
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 109630 /0)  : Initrand  ( FUNC )   ( 3  top> empty )
+( 1096D0 /109630)  9219  ( LIT)       ( 6  top> empty )
+( 1096F8 /1096D0)  seed  ( SYMBOL)    ( 6  top> #0x )
+( 109720 /1096F8)  !                ( 6  top> #0x #0x )
+( 109778 /109720)    ;  ( END )   
+
+ ( 6  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 10A980 /0)  : Rand  ( FUNC )   ( 3  top> empty )
+( 10AA70 /10A980)  seed  ( SYMBOL)    ( 6  top> empty )
+( 10AA98 /10AA70)  @                ( 6  top> #0x )
+( 10AAD8 /10AA98)  1309  ( LIT)       ( 6  top> #0x )
+( 10AB18 /10AAD8)  *                ( 6  top> #0x #0x )
+( 10AD30 /10AB18)  13849  ( LIT)       ( 8  top> #64d )
+( 10AD88 /10AD30)  +                ( 8  top> #0x #0x )
+( 10AF78 /10AD88)  seed  ( SYMBOL)    ( 10  top> #0x )
+( 10AFA0 /10AF78)  TUCK_! ( #0)    ( 10  top> #0x #0x )
+( 10B020 /10AFA0)    ;  ( END )   
+
+ ( 11  top> #2 )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 10B390 /0)  : Initmatrix  ( FUNC )   ( 3  top> empty )
+( 10E448 /10B390)  ( #4 dummy reload )  ( 4  top> empty )
+( 112588 /10E448)  2 U!            ( 4  top> #64 )
+( 10E518 /112588)  1  ( LIT)       ( 8  top> empty )
+( 10C598 /10E518)  [ 0011 ADD_INDEX ] >R   ( 72  top> #66 )
+( 10C770 /10C598)  ( TYPE 1 LOOP BEGIN)  ( 9  top> empty )
+( 10C798 /10C770)  [ 0011 ] LABEL     ( 54  top> empty )
+( 10C810 /10C798)  1  ( LIT)       ( 15  top> empty )
+( 10C950 /10C810)  3 U!            ( 66  top> #67 )
+( 10CAD0 /10C950)  [ 0011 ]  INDEX  ( 69  top> empty )
+( 10CBF8 /10CAD0)  82  ( LIT)       ( 69  top> #0x )
+( 10CC50 /10CBF8)  *                ( 69  top> #0x #0x )
+( 10CD18 /10CC50)  2 U@  +         ( 70  top> #71d )
+( 10D0E0 /10CD18)  4 U!            ( 16  top> #72 )
+( 10D270 /10D0E0)  ( LOOP_BEGIN)    ( 16  top> empty )
+( 10D298 /10D270)  [ 0010 ] LABEL     ( 43  top> empty )
+( 10E6D0 /10D298)  -64 FP+!  ( Link)   ( 25  top> empty )
+( 10E6F8 /10E6D0)    Rand  ( CALL)    ( 25  top> empty )
+( 10E720 /10E6F8)  64 FP+!  ( Unlink)  ( 25  top> #2x )
+( 10E7E0 /10E720)  3 U@            ( 31  top> #70 )
+( 10E928 /10E7E0)  0_PICK       ( #67)  ( 31  top> #67x #70 )
+( 10E980 /10E928)  2*               ( 31  top> #0x #67x #70 )
+( 10EAE8 /10E980)  4 U@  +         ( 32  top> #73d #67x #70 )
+( 10F1F0 /10EAE8)  2_PICK       ( #70)  ( 33  top> #74 #67x #70 )
+( 10F290 /10F1F0)  120  ( LIT)       ( 33  top> #0x #74 #67x #70 )
+( 10F348 /10F290)  /                ( 33  top> #0x #0x #74 #67x #70 )
+( 10F868 /10F348)  120  ( LIT)       ( 34  top> #75d #74 #67x #70 )
+( 10F938 /10F868)  *                ( 34  top> #0x #0x #74 #67x #70 )
+( 10FE30 /10F938)  3_PICK ++ ( LAST #70)  ( 35  top> #76d #74 #67x #70d )
+( 10FF00 /10FE30)  SWAP-            ( 35  top> #0x #76d #74 #67x #70d )
+( 110740 /10FF00)  60  ( LIT)       ( 37  top> #77d #74d #67x #70d )
+( 110840 /110740)  -                ( 37  top> #0x #0x #74d #67x #70d )
+( 110958 /110840)  SWAP !           ( 37  top> #0x #74d #67x #70d )
+( 1117C0 /110958)  1  ( LIT)       ( 42  top> #0x #70d )
+( 111860 /1117C0)  +                ( 42  top> #0x #67x #70d )
+( 111C60 /111860)  [ 3 ] DUP_U!         ( 19  top> #67 #70d )
+( 111CB8 /111C60)  NIP              ( 19  top> #67 #70d )
+( 111D20 /111CB8)  40  ( LIT)       ( 19  top> #67x )
+( 111D60 /111D20)  >                ( 20  top> #69x #67x )
+( 111DF8 /111D60)  [ 0010 ] BRANCHZ   ( 20  top> #0x )
+( 111E38 /111DF8)  ( LOOP_END)      ( 48  top> empty )
+( 111E60 /111E38)  [ 0012 ] LABEL     ( 67  top> empty )
+( 111E88 /111E60)  R>               ( 53  top> empty )
+( 111FB0 /111E88)  1  ( LIT)       ( 53  top> #0x )
+( 112008 /111FB0)  +                ( 53  top> #0x #66x )
+( 1121A8 /112008)  DUP_>R   ( #66 )  ( 12  top> #66 )
+( 112210 /1121A8)  40  ( LIT)       ( 12  top> #66x )
+( 112250 /112210)  U>               ( 13  top> #68x #66x )
+( 1122E8 /112250)  [ 0011 ] BRANCHZ   ( 13  top> #0x )
+( 112328 /1122E8)  [ 0011 DROP_INDEX ] R>DROP  ( 59  top> empty )
+( 112350 /112328)  EXIT  [ 0013 ] LABEL     ( 73  top> empty )
+( 112378 /112350)    ;  ( END )   
+
+ ( 61  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 113610 /0)  : Innerproduct  ( FUNC )   ( 3  top> empty )
+( 113688 /113610)  ( #4 dummy reload )  ( 4  top> empty )
+( 113770 /113688)  ( #5 dummy reload )  ( 5  top> #64 )
+( 1138B8 /113770)  ( #6 dummy reload )  ( 6  top> #65 #64 )
+( 113A60 /1138B8)  ( #7 dummy reload )  ( 7  top> #66 #65 #64 )
+( 11A3E0 /113A60)  2 U!            ( 7  top> #67 #66 #65 #64 )
+( 113B58 /11A3E0)  [ 2 ] MEM_ARG@  ( 8  top> #66 #65 #64 )
+( 11A468 /113B58)  3 U!            ( 8  top> #68 #66 #65 #64 )
+( 114420 /11A468)  0  ( LIT)       ( 12  top> #66 #65 #64 )
+( 1144D8 /114420)  3_PICK  ++   ( #64)  ( 12  top> #0x #66 #65 #64 )
+( 10D478 /1144D8)  !                ( 12  top> #0x #0x #66 #65 #64 )
+( 11A508 /10D478)  4 U!            ( 12  top> #66 #65 #64 )
+( 11A588 /11A508)  5 U!            ( 12  top> #65 #64 )
+( 11A628 /11A588)  6 U!            ( 12  top> #64 )
+( 10D6D0 /11A628)  1  ( LIT)       ( 14  top> empty )
+( 10DAE0 /10D6D0)  7 U!            ( 46  top> #69 )
+( 10DFD8 /10DAE0)  2 U@            ( 49  top> empty )
+( 10E100 /10DFD8)  82  ( LIT)       ( 49  top> #67dx )
+( 10E158 /10E100)  *                ( 49  top> #0x #0x )
+( 10E220 /10E158)  5 U@  +         ( 50  top> #71d )
+( 11A668 /10E220)  8 U!            ( 50  top> #72 )
+( 114738 /11A668)  3 U@            ( 51  top> empty )
+( 114A40 /114738)  2*               ( 51  top> #68dx )
+( 114C80 /114A40)  9 U!            ( 15  top> #77 )
+( 114F68 /114C80)  ( LOOP_BEGIN)    ( 15  top> empty )
+( 114F90 /114F68)  [ 0018 ] LABEL     ( 34  top> empty )
+( 114FB8 /114F90)  7 U@            ( 22  top> empty )
+( 1150A0 /114FB8)  0_PICK       ( #69)  ( 22  top> #69x )
+( 1150E0 /1150A0)  2*               ( 22  top> #0x #69x )
+( 115200 /1150E0)  8 U@  +         ( 23  top> #73d #69x )
+( 1157F0 /115200)  1_PICK       ( #69)  ( 24  top> #74 #69x )
+( 115878 /1157F0)  82  ( LIT)       ( 24  top> #0x #74 #69x )
+( 115918 /115878)  *                ( 24  top> #0x #0x #74 #69x )
+( 115A70 /115918)  4 U@  +         ( 25  top> #75d #74 #69x )
+( 116148 /115A70)  9 U@  +         ( 27  top> #76d #74 #69x )
+( 116DE8 /116148)  @_SWAP           ( 28  top> #78d #74d #69x )
+( 116EE8 /116DE8)  @_SWAP           ( 28  top> #74x #0x #69x )
+( 117248 /116EE8)  *                ( 28  top> #0x #0x #69x )
+( 1175B8 /117248)  [ 6 ]  U@_SWAP  ( 29  top> #79d #69x )
+( 117B90 /1175B8)  1_PICK ++    ( #64)  ( 29  top> #79d #64x #69x )
+( 117CD8 /117B90)  @ +              ( 29  top> #0x #0x #64x #69x )
+( 118600 /117CD8)  SWAP !           ( 30  top> #80d #64x #69x )
+( 119010 /118600)  1  ( LIT)       ( 33  top> #0x )
+( 119158 /119010)  +                ( 33  top> #0x #69x )
+( 119F50 /119158)  [ 7 ] DUP_U!         ( 18  top> #69 )
+( 119FB8 /119F50)  40  ( LIT)       ( 18  top> #69x )
+( 119FF8 /119FB8)  >                ( 19  top> #70x #69x )
+( 11A090 /119FF8)  [ 0018 ] BRANCHZ   ( 19  top> #0x )
+( 11A0D0 /11A090)  ( LOOP_END)      ( 39  top> empty )
+( 11A0F8 /11A0D0)  EXIT  [ 0019 ] LABEL     ( 47  top> empty )
+( 11A120 /11A0F8)    ;  ( END )   
+
+ ( 41  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 11B6D8 /0)  : main  ( FUNC )   ( 3  top> empty )
+( 11B750 /11B6D8)  1  ( LIT)       ( 6  top> empty )
+( 11B890 /11B750)  [ 0032 ADD_INDEX ] >R   ( 105  top> #66 )
+( 11BA10 /11B890)  ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+( 11BA38 /11BA10)  [ 0032 ] LABEL     ( 84  top> empty )
+( 11BD28 /11BA38)  -64 FP+!  ( Link)   ( 15  top> empty )
+( 11BD50 /11BD28)    Initrand  ( CALL)    ( 15  top> empty )
+( 11BD78 /11BD50)  64 FP+!  ( Unlink)  ( 15  top> empty )
+( 11BDF0 /11BD78)  ima  ( SYMBOL)    ( 18  top> empty )
+( 11BE58 /11BDF0)  ( #4 Calling Arg )  ( 20  top> #4 )
+( 11BE98 /11BE58)  -64 FP+!  ( Link)   ( 20  top> empty )
+( 11BEC0 /11BE98)    Initmatrix  ( CALL)    ( 20  top> empty )
+( 11BEE8 /11BEC0)  64 FP+!  ( Unlink)  ( 20  top> empty )
+( 11BF60 /11BEE8)  imb  ( SYMBOL)    ( 24  top> empty )
+( 11BFC8 /11BF60)  ( #4 Calling Arg )  ( 26  top> #4 )
+( 11C008 /11BFC8)  -64 FP+!  ( Link)   ( 26  top> empty )
+( 11C030 /11C008)    Initmatrix  ( CALL)    ( 26  top> empty )
+( 11C058 /11C030)  64 FP+!  ( Unlink)  ( 26  top> empty )
+( 11C498 /11C058)  1  ( LIT)       ( 30  top> #64 )
+( 112650 /11C498)  [ 0031 ADD_INDEX ] >R   ( 101  top> #64 )
+( 1127D0 /112650)  ( TYPE 1 LOOP BEGIN)  ( 31  top> empty )
+( 1127F8 /1127D0)  [ 0031 ] LABEL     ( 73  top> empty )
+( 112870 /1127F8)  1  ( LIT)       ( 37  top> empty )
+( 1129B0 /112870)  2 U!            ( 96  top> #65 )
+( 112B30 /1129B0)  [ 0031 ]  INDEX  ( 99  top> empty )
+( 112C58 /112B30)  82  ( LIT)       ( 99  top> #0x )
+( 112CB0 /112C58)  *                ( 99  top> #0x #0x )
+( 112D78 /112CB0)  3 U!            ( 38  top> #70 )
+( 112E10 /112D78)  ( LOOP_BEGIN)    ( 38  top> empty )
+( 112E38 /112E10)  [ 0030 ] LABEL     ( 62  top> empty )
+( 112E60 /112E38)  2 U@            ( 44  top> empty )
+( 112F48 /112E60)  0_PICK       ( #65)  ( 44  top> #65x )
+( 112F88 /112F48)  2*               ( 44  top> #0x #65x )
+( 113260 /112F88)  [ imr ] SYMBOL_+  ( 45  top> #71d #65x )
+( 11C948 /113260)  1 U@            ( 48  top> #72 #65x )
+( 11CB50 /11C948)  ROT \ 2_PICK       ( #65)  ( 48  top> #29x #72 #65x )
+( 11CBD8 /11CB50)  SWAP             ( 48  top> #0x #29x #72 (#65x )
+( 11CC78 /11CBD8)  8  ( LIT)       ( 48  top> #0x #0x #72 (#65x )
+( 11CD30 /11CC78)  +                ( 48  top> #0x #0x #0x #72 (#65x )
+( 11CE00 /11CD30)  !                ( 48  top> #0x #0x #72 (#65x )
+( 11CEB8 /11CE00)  3 U@  +         ( 49  top> #72d (#65x )
+( 11D570 /11CEB8)  ima  ( SYMBOL)    ( 50  top> #4 (#65x ) \ WARNING -- stack argument problem!
+
+( 11D898 /11D570)  imb  ( SYMBOL)    ( 51  top> #5 #4 (#65x )
+( 11F938 /11D898)  \ 4 U!            ( 51  top> #6 #5 #4 (#65x )
+( 11FA08 /11F938)  \ 5 U!            ( 51  top> #5 #4 (#65x )
+( 11FAC0 /11FA08)  \ 6 U!            ( 51  top> #4 (#65x ) \ WARNING -- stack argument problem!
+
+( 11DA50 /11FAC0)  [ 0031 ]  INDEX  ( 52  top> (#65x )
+( 11DE50 /11DA50)  \ 7 U!            ( 57  top> #7 (#65x ) \ WARNING -- stack argument problem!
+
+\    ( 11E4C8 /11DE50)  DROP             ( 57  top> #65x )
+( 11E508 /11E4C8)  -64 FP+!  ( Link)   ( 57  top> empty )
+( 11E530 /11E508)    Innerproduct  ( CALL)    ( 57  top> empty )
+( 11E558 /11E530)  64 FP+!  ( Unlink)  ( 57  top> empty )
+( 11E850 /11E558)  2 U@            ( 61  top> empty )
+( 11E978 /11E850)  1  ( LIT)       ( 61  top> #0x )
+( 11E9D0 /11E978)  +                ( 61  top> #0x #65x )
+( 11EB70 /11E9D0)  [ 2 ] DUP_U!         ( 41  top> #65 )
+( 11EBD8 /11EB70)  40  ( LIT)       ( 41  top> #65x )
+( 11EC18 /11EBD8)  >                ( 42  top> #69x #65x )
+( 11ECB0 /11EC18)  [ 0030 ] BRANCHZ   ( 42  top> #0x )
+( 11ECF0 /11ECB0)  ( TYPE 1 LOOP END)  ( 67  top> empty )
+( 11ED18 /11ECF0)  [ 0033 ] LABEL     ( 97  top> empty )
+( 11ED40 /11ED18)  R>               ( 72  top> empty )
+( 11EE68 /11ED40)  1  ( LIT)       ( 72  top> #0x )
+( 11EEC0 /11EE68)  +                ( 72  top> #0x #64x )
+( 11F060 /11EEC0)  DUP_>R   ( #64 )  ( 34  top> #64 )
+( 11F0C8 /11F060)  40  ( LIT)       ( 34  top> #64x )
+( 11F108 /11F0C8)  U>               ( 35  top> #68x #64x )
+( 11F1A0 /11F108)  [ 0031 ] BRANCHZ   ( 35  top> #0x )
+( 11F1E0 /11F1A0)  [ 0031 DROP_INDEX ] R>DROP  ( 78  top> empty )
+( 11F208 /11F1E0)  [ 0034 ] LABEL     ( 102  top> empty )
+( 11F230 /11F208)  R>               ( 83  top> empty )
+( 11F358 /11F230)  1  ( LIT)       ( 83  top> #0x )
+( 11F3B0 /11F358)  +                ( 83  top> #0x #66x )
+( 11F550 /11F3B0)  DUP_>R   ( #66 )  ( 10  top> #66 )
+( 11F5C8 /11F550)  24  ( LIT)       ( 10  top> #66x )
+( 11F608 /11F5C8)  U>               ( 11  top> #67x #66x )
+( 11F6A0 /11F608)  [ 0032 ] BRANCHZ   ( 11  top> #0x )
+( 11F6E0 /11F6A0)  [ 0032 DROP_INDEX ] R>DROP  ( 89  top> empty )
+( 11F708 /11F6E0)  EXIT  [ 0035 ] LABEL     ( 106  top> empty )
+( 11F730 /11F708)    ;  ( END )   
+
+ ( 91  top> empty )
+

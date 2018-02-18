@@ -1,0 +1,130 @@
+\ /* Eratosthenes Siee Prime Number Program in C from Byte January 1983 */
+
+EMPTY
+: XY " DOS XY SIEVE.1op " EVALUATE ;
+
+load GNUTOOL.4
+\ load GNUinst.4
+
+\ char flags [size+1];
+VARIABLE flags   8192   CELL- ALLOT
+\ #define true 1
+\ #define false 0
+\ #define size 8190
+
+DECIMAL
+ #REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\ 	printf(" Error in Sieve.\n"); }
+  ." Error in Sieve."   CR 
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+ 64 FRAME_SIZE ! 
+
+\ void main()
+: main  ( FUNC )   ( 3  top> empty )
+\   {
+\     int prime, count, iter;
+\     register i,k;
+ #REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+( 10A268 /10A1B8)  1  ( LIT)       ( 6  top> empty )
+( 10D420 /10A268)  [ 0019 ADD_INDEX ] >R   ( 137  top> #66 )
+( 10D5A0 /10D420)  ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+( 10D5C8 /10D5A0)  [ 0019 ] LABEL     ( 99  top> empty )
+( 10D640 /10D5C8)  0  ( LIT)       ( 14  top> empty )
+( 1127B8 /10D640)  2 U!            ( 16  top> #65 )
+
+\ hand-added loop code
+( 10D728 /1127B8)  0  ( LIT)       ( 16  top> empty )
+( 10D8E0 /10D728)  >R \ 3 U!            ( 131  top> #67 )
+( 10DAB8 /10D8E0)  ( TYPE 1 LOOP BEGIN)  ( 17  top> empty )
+( 10DAE0 /10DAB8)  [ 009 ] LABEL     ( 30  top> empty )
+( 10DB08 /10DAE0)  flags  ( SYMBOL)    ( 24  top> empty )
+( 10DB30 /10DB08)  R> SWAP \  [ 3 ]  U@_SWAP  ( 24  top> #71x )
+( 10DC78 /10DB30)  OVER_+    ( #67 )  ( 24  top> #71x #67x )
+( 10DF30 /10DC78)  [ 1 ] LIT_SWAP  ( 25  top> #72d #67x )
+( 10E028 /10DF30)  C!               ( 25  top> #72x #0x #67x )
+( 10E2F0 /10E028)  1  ( LIT)       ( 29  top> #0x )
+( 10E360 /10E2F0)  +                ( 29  top> #0x #67x )
+( 10E588 /10E360)  DUP_>R  \ [ 3 ] DUP_U!         ( 20  top> #67 )
+( 10E648 /10E588)  8190  ( LIT)       ( 20  top> #67x )
+( 10E688 /10E648)  >                ( 21  top> #70x #67x )
+( 10E720 /10E688)  [ 009 ] BRANCHZ   ( 21  top> #0x )
+( 10E760 /10E720)  R>DROP ( LOOP_END)      ( 35  top> empty )
+
+( 10E788 /10E760)  [ 0023 ] LABEL     ( 132  top> empty )
+( 10E800 /10E788)  0  ( LIT)       ( 38  top> empty )
+( 10E940 /10E800)  [ 0018 ADD_INDEX ] >R   ( 125  top> #67 )
+( 10EAC0 /10E940)  ( TYPE 1 LOOP BEGIN)  ( 39  top> empty )
+( 10EAE8 /10EAC0)  [ 0018 ] LABEL     ( 88  top> empty )
+( 10EB10 /10EAE8)  flags  ( SYMBOL)    ( 47  top> empty )
+( 10EB38 /10EB10)  [ 0018 ]  INDEX +  ( 47  top> #71x )
+( 10EFA8 /10EB38)  C@               ( 48  top> #75d #67x )
+( 10F458 /10EFA8)  [ 0012 ] BRANCHZ   ( 51  top> #0x )
+( 10F498 /10F458)  [ 0018 ]  INDEX  ( 54  top> empty )
+( 10F588 /10F498)  0_PICK         ( #67)  ( 54  top> #67x )
+( 10F5C8 /10F588)  2*               ( 54  top> #0x #67x )
+( 10F8A0 /10F5C8)  3  ( LIT)       ( 56  top> #78d #67x )
+( 10F910 /10F8A0)  +                ( 56  top> #0x #0x #67x )
+( 10FBC8 /10F910)  SWAP             ( 58  top> #64 #67x )
+( 10FC38 /10FBC8)  OVER_+    ( #64 )  ( 58  top> #0x #64 )
+( 10FF98 /10FC38)  [ 4 ] DUP_U!         ( 119  top> #68 #64 )
+( 110020 /10FF98)  SWAP             ( 119  top> #68 #64 )
+( 110128 /110020)  5 U!            ( 119  top> #64 #68 )
+( 110150 /110128)  8190  ( LIT)       ( 119  top> #68x )
+( 110190 /110150)  <=               ( 121  top> #81x #68x )
+( 110228 /110190)  [ 0021 ] BRANCHZ   ( 121  top> #0x )
+( 110268 /110228)  ( LOOP_BEGIN)    ( 60  top> empty )
+( 110290 /110268)  [ 0017 ] LABEL     ( 74  top> empty )
+( 1102B8 /110290)  flags  ( SYMBOL)    ( 67  top> empty )
+( 1102E0 /1102B8)  [ 4 ]  U@_SWAP  ( 67  top> #71x )
+( 110428 /1102E0)  OVER_+    ( #68 )  ( 67  top> #71x #68x )
+( 1106F0 /110428)  [ 0 ] LIT_SWAP  ( 68  top> #83d #68x )
+( 1107E8 /1106F0)  C!               ( 68  top> #83x #0x #68x )
+( 110950 /1107E8)  5 U@  +         ( 72  top> #68x )
+( 110E80 /110950)  [ 4 ] DUP_U!         ( 63  top> #68 )
+( 110F40 /110E80)  8190  ( LIT)       ( 63  top> #68x )
+( 110F80 /110F40)  >                ( 64  top> #81x #68x )
+( 111018 /110F80)  [ 0017 ] BRANCHZ   ( 64  top> #0x )
+( 111058 /111018)  ( LOOP_END)      ( 79  top> empty )
+( 111080 /111058)  [ 0021 ] LABEL     ( 120  top> empty )
+( 1111D0 /111080)  1  ( LIT)       ( 82  top> empty )
+( 1112F0 /1111D0)  2 U@ +   2 U!  ( 86  top> #0x )
+( 111330 /1112F0)  [ 0012 ] LABEL     ( 86  top> empty )
+( 111358 /111330)  R>               ( 87  top> empty )
+( 111480 /111358)  1  ( LIT)       ( 87  top> #0x )
+( 1114D8 /111480)  +                ( 87  top> #0x #67x )
+( 111678 /1114D8)  DUP_>R   ( #67 )  ( 42  top> #67 )
+( 1116E0 /111678)  8190  ( LIT)       ( 42  top> #67x )
+( 111720 /1116E0)  U>               ( 43  top> #73x #67x )
+( 1117B8 /111720)  [ 0018 ] BRANCHZ   ( 43  top> #0x )
+( 1117F8 /1117B8)  [ 0018 DROP_INDEX ] R>DROP  ( 93  top> empty )
+( 111820 /1117F8)  [ 0022 ] LABEL     ( 126  top> empty )
+( 111848 /111820)  R>               ( 98  top> empty )
+( 111970 /111848)  1  ( LIT)       ( 98  top> #0x )
+( 1119C8 /111970)  +                ( 98  top> #0x #66x )
+( 111B68 /1119C8)  DUP_>R   ( #66 )  ( 10  top> #66 )
+( 111BD0 /111B68)  349  ( LIT)       ( 10  top> #66x )
+( 111C10 /111BD0)  U>               ( 11  top> #69x #66x )
+( 111CA8 /111C10)  [ 0019 ] BRANCHZ   ( 11  top> #0x )
+( 111CE8 /111CA8)  [ 0019 DROP_INDEX ] R>DROP  ( 104  top> empty )
+( 111D10 /111CE8)  [ 0024 ] LABEL     ( 138  top> empty )
+( 111D38 /111D10)  2 U@            ( 108  top> empty )
+( 111E60 /111D38)  1899  ( LIT)       ( 108  top> #65x )
+( 111EA0 /111E60)  -                ( 109  top> #85x #65x )
+( 111F38 /111EA0)  [ 0020 ] BRANCHZ   ( 109  top> #0x )
+( 112240 /111F38)  -64 FP+!  ( Link)   ( 111  top> empty )
+( 112268 /112240)    do_error  ( CALL)    ( 111  top> empty )
+( 112290 /112268)  64 FP+!  ( Unlink)  ( 111  top> empty )
+( 112588 /112290)  EXIT  [ 0020 ] LABEL     ( 113  top> empty )
+( 1125B0 /112588)    ;  ( END )   
+
+ ( 114  top> empty )
+

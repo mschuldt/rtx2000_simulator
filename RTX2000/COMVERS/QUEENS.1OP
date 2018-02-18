@@ -1,0 +1,401 @@
+
+\ /* queens.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY queens.1OP" EVALUATE ;
+
+DECIMAL
+\ load GNUTOOL.4
+load GNUINST.4
+
+\ #define true -1
+\ #define false 0
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ int tries ;
+VARIABLE tries   4   CELL- ALLOT
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ static void do_error() {
+64 frame_size !
+ : do_error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Queens.\n"); }
+ ." Error in Queens." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+ 64 FRAME_SIZE ! 
+
+\ static void Try(i, q, a, b, c, x) int i, *q, a[], b[], c[], x[];
+( 10D3D8 /0)  : Try  ( FUNC )   ( 3  top> empty )
+\             {
+\             int     j;
+( 10C240 /10D3D8)  ( #4 dummy reload )  ( 4  top> empty )
+( 10F408 /10C240)  ( #5 dummy reload )  ( 5  top> #64 )
+( 10F538 /10F408)  ( #6 dummy reload )  ( 6  top> #65 #64 )
+( 10F6E0 /10F538)  ( #7 dummy reload )  ( 7  top> #66 #65 #64 )
+
+( 123CE0 /10F6E0)  2 U!            ( 7  top> #67 #66 #65 #64 )
+\  ( 10F7D8 /123CE0)  UBR@             ( 8  top> #66 #65 #64 )
+\  ( 10FAE0 /10F7D8)  0_pick ++  ( #30)  ( 8  top> #30x #66 #65 #64 )
+\  ( 10FB80 /10FAE0)  8  ( LIT)       ( 8  top> #0x #30x #66 #65 #64 )
+\  ( 10FC38 /10FB80)  +                ( 8  top> #0x #0x #30x #66 #65 #64 )
+\  ( 10FD08 /10FC38)  @_SWAP           ( 8  top> #0x #30x #66 #65 #64 )
+\  ( 1102C8 /10FD08)  10  ( LIT)       ( 9  top> #0x #68 #66 #65 #64 )
+\  ( 110398 /1102C8)  +                ( 9  top> #0x #0x #68 #66 #65 #64 )
+\  ( 110480 /110398)  @                ( 9  top> #0x #68 #66 #65 #64 )
+[ 2 ] mem_arg@
+[ 3 ] mem_arg@
+
+
+
+\             tries += 1 ;
+( 1110B0 /110480)  1  ( LIT)       ( 15  top> #69 #68 #66 #65 #64 )
+( 1112C8 /1110B0)  tries  ( SYMBOL)    ( 15  top> #0x #69 #68 #66 #65 #64 )
+( 1113C8 /1112C8)  +!               ( 15  top> #0x #0x #69 #68 #66 #65 #64 )
+
+( 123D68 /1113C8)  3 U!            ( 15  top> #69 #68 #66 #65 #64 )
+( 123E20 /123D68)  4 U!            ( 15  top> #68 #66 #65 #64 )
+
+\             j = 0;
+( 111770 /123E20)  0  ( LIT)       ( 17  top> #66 #65 #64 )
+( 123A70 /111770)  5 U!            ( 17  top> #70 #66 #65 #64 )
+( 123EC0 /123A70)  6 U!            ( 17  top> #66 #65 #64 )
+
+\             *q = false;
+( 111BE0 /123EC0)  0  ( LIT)       ( 19  top> #65 #64 )
+( 111CC8 /111BE0)  1_pick ++    ( #65)  ( 19  top> #0x #65 #64 )
+( 111DC8 /111CC8)  !                ( 19  top> #0x #0x #65 #64 )
+
+\             while ( (! *q) && (j != 8) )
+( 1125A0 /111DC8)  [ 7 ] DUP_U!         ( 141  top> #65 #64 )
+( 1125F8 /1125A0)  SWAP             ( 141  top> #65 #64 )
+( 112638 /1125F8)  8 U!            ( 141  top> #64 #65 )
+( 112660 /112638)  @                ( 141  top> #65x )
+( 112738 /112660)  [ 0010 ] BRANCHNZ  ( 143  top> #0x )
+( 112778 /112738)  ( LOOP_BEGIN)    ( 21  top> empty )
+( 1127A0 /112778)  [ 009 ] LABEL     ( 128  top> empty )
+
+( 1127C8 /1127A0)  5 U@            ( 28  top> empty )
+( 1128F0 /1127C8)  8  ( LIT)       ( 28  top> #70x )
+( 112930 /1128F0)  -                ( 29  top> #75x #70x )
+( 1129C8 /112930)  [ 004 ] BRANCHZ   ( 29  top> #0x )
+
+\                 { j = j + 1;
+( 112A08 /1129C8)  5 U@            ( 33  top> empty )
+( 112B30 /112A08)  1  ( LIT)       ( 33  top> #0x )
+( 112B88 /112B30)  +                ( 33  top> #0x #70x )
+
+\                 *q = false;
+( 112C90 /112B88)  7 U@            ( 35  top> #70 )
+( 112D28 /112C90)  [ 0 ] LIT_SWAP  ( 35  top> #65x #70 )
+( 112DF0 /112D28)  !                ( 35  top> #0x #0x #70 )
+
+\                 if ( b[j] && a[i+j] && c[i-j+7] )
+( 112FD8 /112DF0)  0_PICK       ( #70)  ( 37  top> #70 )
+( 113030 /112FD8)  2*               ( 37  top> #0x #70 )
+( 113198 /113030)  2 U@  +         ( 38  top> #77d #70 )
+( 113808 /113198)  SWAP             ( 41  top> #78d #70 )
+( 1139F8 /113808)  5 U!            ( 41  top> #70 #78d )
+( 113A60 /1139F8)  @                ( 41  top> #78x )
+( 113B78 /113A60)  [ 003 ] BRANCHZ   ( 42  top> #0x )
+( 113BB8 /113B78)  8 U@            ( 43  top> empty )
+( 113BE0 /113BB8)  5 U@  +         ( 43  top> #64x )
+( 114050 /113BE0)  0_PICK       ( #81)  ( 44  top> #81 )
+( 1140C0 /114050)  2*               ( 44  top> #0x #81 )
+( 114270 /1140C0)  6 U@  +         ( 45  top> #82d #81 )
+( 1149F0 /114270)  SWAP             ( 48  top> #83d #81 )
+( 114BD0 /1149F0)  9 U!            ( 48  top> #81 #83d )
+( 114D00 /114BD0)  @                ( 48  top> #83x )
+( 114E18 /114D00)  [ 103 ] BRANCHZ   ( 49  top> #0x )
+( 114E58 /114E18)  8 U@            ( 50  top> empty )
+( 114E80 /114E58)  [ 5 ]  U@_SWAP  ( 50  top> #64x )
+( 114FC8 /114E80)  SWAP-            ( 50  top> #64x #70x )
+( 1152F0 /114FC8)  0_PICK       ( #86)  ( 51  top> #86 )
+( 115360 /1152F0)  2*               ( 51  top> #0x #86 )
+( 1155A0 /115360)  4 U@  +         ( 52  top> #87d #86 )
+( 115DE0 /1155A0)  SWAP             ( 56  top> #88d #86 )
+( 115FC0 /115DE0)  10 U!            ( 56  top> #86 #88d )
+( 1160F0 /115FC0)  14  ( LIT)       ( 56  top> #88x )
+( 116130 /1160F0)  +                ( 56  top> #0x #88x )
+( 116188 /116130)  @                ( 56  top> #0x )
+( 1162A0 /116188)  [ 203 ] BRANCHZ   ( 57  top> #0x )
+
+\                     {
+
+\                     x[i] = j;
+( 1162E0 /1162A0)  8 U@            ( 60  top> empty )
+( 1163C8 /1162E0)  0_PICK       ( #64)  ( 60  top> #64x )
+( 116408 /1163C8)  2*               ( 60  top> #0x #64x )
+( 116528 /116408)  3 U@  +         ( 61  top> #92d #64x )
+( 1168F8 /116528)  5 U@            ( 62  top> #93d #64x )
+( 116AC0 /1168F8)  0_pick ++    ( #70)  ( 62  top> #70x #93d #64x )
+( 116B60 /116AC0)  ROT              ( 62  top> #0x #70x #93d #64x )
+( 116C18 /116B60)  !                ( 62  top> #93x #0x #70x #64x )
+
+\                     b[j] = false;
+( 117008 /116C18)  2*               ( 64  top> #0x #64x )
+( 117248 /117008)  2 U@  +         ( 65  top> #94d #64x )
+( 117BC8 /117248)  [ 0 ] LIT_SWAP  ( 66  top> #95d #64x )
+( 117DB0 /117BC8)  !                ( 66  top> #95x #0x #64x )
+
+\                     a[i+j] = false;
+( 117FB0 /117DB0)  9 U@            ( 69  top> #64x )
+( 118420 /117FB0)  2*               ( 69  top> #0x #64x )
+( 118748 /118420)  6 U@  +         ( 70  top> #97d #64x )
+( 1193E0 /118748)  [ 0 ] LIT_SWAP  ( 71  top> #98d #64x )
+( 119660 /1193E0)  !                ( 71  top> #98x #0x #64x )
+
+\                     c[i-j+7] = false;
+( 1198F0 /119660)  10 U@            ( 74  top> #64x )
+( 119EC8 /1198F0)  2*               ( 74  top> #0x #64x )
+( 11A400 /119EC8)  4 U@  +         ( 75  top> #100d #64x )
+( 11B540 /11A400)  14  ( LIT)       ( 77  top> #101d #64x )
+( 11B6C0 /11B540)  +                ( 77  top> #0x #101d #64x )
+( 11B850 /11B6C0)  0  ( LIT)       ( 77  top> #0x #64x )
+( 11BBB8 /11B850)  SWAP !           ( 77  top> #0x #0x #64x )
+
+\                     if ( i < 8 )
+( 11CDC8 /11BBB8)  7  ( LIT)       ( 80  top> #64x )
+( 11CE08 /11CDC8)  <=               ( 81  top> #103x #64x )
+( 11CEA0 /11CE08)  [ 006 ] BRANCHZ   ( 81  top> #0x )
+
+\                         {
+
+\                           Try(i+1,q,a,b,c,x);
+( 11D1A8 /11CEA0)  4 U@            ( 86  top> empty )
+\ ( 11D1D0 /11D1A8)  [ 1 ]  U@_SWAP  ( 86  top> #68x )
+\ ( 11D370 /11D1D0)  1_pick ++    ( #29)  ( 86  top> #68x #29x )
+\ ( 11D3E0 /11D370)  8  ( LIT)       ( 86  top> #0x #0x #29x )
+\ ( 11D468 /11D3E0)  +                ( 86  top> #0x #0x #0x #29x )
+\ ( 11D508 /11D468)  !                ( 86  top> #0x #0x #29x )
+ [ 2 ] MEM_ARG!  ( 86  top> #68x )
+
+\ ( 11D5A0 /11D508)  [ 3 ]  U@_SWAP  ( 87  top> #29x )
+\ ( 11D8B0 /11D5A0)  10  ( LIT)       ( 87  top> #29x #0x )
+\ ( 11D950 /11D8B0)  +                ( 87  top> #0x #0x #0x )
+\ ( 11DA08 /11D950)  !                ( 87  top> #0x #0x )
+  3 U@  [ 3 ] MEM_ARG!  ( 86  top> #68x )
+ 
+
+( 11DAA8 /11DA08)  8 U@            ( 88  top> empty )
+( 11DD38 /11DAA8)  1  ( LIT)       ( 88  top> #0x )
+( 11DDD8 /11DD38)  +                ( 88  top> #0x #0x )
+( 11DF30 /11DDD8)  7 U@            ( 89  top> #4 )
+( 11E210 /11DF30)  6 U@            ( 90  top> #5 #4 )
+( 11E5B8 /11E210)  2 U@            ( 91  top> #6 #5 #4 )
+( 11EA18 /11E5B8)  ( #7 Calling Arg )  ( 96  top> #7 #6 #5 #4 )
+( 11EC60 /11EA18)  ( #6 Calling Arg )  ( 96  top> #6 #5 #4 )
+( 11EE48 /11EC60)  ( #5 Calling Arg )  ( 96  top> #5 #4 )
+( 11EFD0 /11EE48)  ( #4 Calling Arg )  ( 96  top> #4 )
+( 11F200 /11EFD0)  -64 FP+!  ( Link)   ( 96  top> empty )
+recurse \ ( 11F228 /11F200)    Try  ( CALL)    ( 96  top> empty )
+( 11F250 /11F228)  64 FP+!  ( Unlink)  ( 96  top> empty )
+
+\                         if ( ! *q )
+( 11F540 /11F250)  7 U@            ( 101  top> empty )
+( 11F650 /11F540)  @                ( 101  top> #65x )
+( 11F728 /11F650)  [ 303 ] BRANCHNZ  ( 102  top> #0x )
+
+\                             { b[j] = true;
+( 11F768 /11F728)  5 U@            ( 105  top> empty )
+( 11F890 /11F768)  2*               ( 105  top> #0x )
+( 11F9B0 /11F890)  2 U@  +         ( 106  top> #107d )
+( 11FF10 /11F9B0)  [ -1 ] LIT_SWAP  ( 107  top> #108d )
+( 120038 /11FF10)  !                ( 107  top> #108x #0x )
+
+\                             a[i+j] = true;
+( 120178 /120038)  9 U@            ( 110  top> empty )
+( 120408 /120178)  2*               ( 110  top> #81dx )
+( 120600 /120408)  6 U@  +         ( 111  top> #110d )
+( 120E78 /120600)  [ -1 ] LIT_SWAP  ( 112  top> #111d )
+( 121030 /120E78)  !                ( 112  top> #111x #0x )
+
+\                             c[i-j+7] = true;
+( 121200 /121030)  10 U@            ( 115  top> empty )
+( 121600 /121200)  2*               ( 115  top> #86dx )
+( 1219B8 /121600)  4 U@  +         ( 116  top> #113d )
+( 122678 /1219B8)  14  ( LIT)       ( 118  top> #114d )
+( 122790 /122678)  +                ( 118  top> #0x #114d )
+( 1228C0 /122790)  -1  ( LIT)       ( 118  top> #0x )
+( 122B68 /1228C0)  SWAP !           ( 118  top> #0x #0x )
+\                             }
+\                         }
+( 123368 /122B68)  [ 403 ] BRANCH    ( 120  top> empty )
+( 123390 /123368)  [ 006 ] LABEL     ( 122  top> empty )
+
+\                     else { *q = true;  
+( 1233E0 /123390)  7 U@            ( 125  top> empty )
+( 123448 /1233E0)  [ -1 ] LIT_SWAP  ( 125  top> #65x )
+( 1234E0 /123448)  !                ( 125  top> #0x #0x )
+
+\                          }
+\                     }
+( 1235A0 /1234E0)  [ 003 ] LABEL     ( 22  top> empty )
+( 1235A0 /1234E0)  [ 103 ] LABEL     ( 22  top> empty )
+( 1235A0 /1234E0)  [ 203 ] LABEL     ( 22  top> empty )
+( 1235A0 /1234E0)  [ 303 ] LABEL     ( 22  top> empty )
+( 1235A0 /1234E0)  [ 403 ] LABEL     ( 22  top> empty )
+
+( 1235C8 /1235A0)  7 U@            ( 25  top> empty )
+( 1236D8 /1235C8)  @                ( 25  top> #65x )
+( 1237B0 /1236D8)  [ 009 ] BRANCHZ   ( 26  top> #0x )
+( 1237F0 /1237B0)  ( LOOP_END)      ( 133  top> empty )
+( 123818 /1237F0)  [ 0010 ] LABEL     ( 142  top> empty )
+\                 }
+\             };
+( 123840 /123818)  EXIT  [ 004 ] LABEL     ( 134  top> empty )
+( 123868 /123840)    ;  ( END )   
+
+ ( 135  top> empty )
+
+( RTX 2000 code generation)
+
+192 FRAME_SIZE ! 
+
+( 124FF0 /0)  : Doit  ( FUNC )   ( 3  top> empty )
+( 125068 /124FF0)  -7  ( LIT)       ( 6  top> empty )
+( 1251A8 /125068)  2 U!            ( 93  top> #64 )
+( 125328 /1251A8)  ( LOOP_BEGIN)    ( 8  top> empty )
+( 125350 /125328)  [ 0017 ] LABEL     ( 47  top> empty )
+( 125378 /125350)  2 U@            ( 16  top> empty )
+( 125448 /125378)  0>               ( 16  top> #64x )
+( 1254E0 /125448)  [ 0014 ] BRANCHZ   ( 17  top> #0x )
+( 125520 /1254E0)  2 U@            ( 19  top> empty )
+( 10D4C8 /125520)  8  ( LIT)       ( 19  top> #64x )
+( 10D508 /10D4C8)  <=               ( 20  top> #68x #64x )
+( 10D5A0 /10D508)  [ 0114 ] BRANCHZ   ( 20  top> #0x )
+( 10D5E0 /10D5A0)  2 U@            ( 21  top> empty )
+( 10D708 /10D5E0)  2*               ( 21  top> #0x )
+( 10D828 /10D708)  UBR@ +           ( 22  top> #69d )
+( 10DE98 /10D828)  [ -1 ] LIT_SWAP  ( 24  top> #70d )
+( 10DFC0 /10DE98)  28  ( LIT)       ( 24  top> #70x #0x )
+( 10E078 /10DFC0)  -                ( 24  top> #0x #0x #0x )
+( 10E148 /10E078)  !                ( 24  top> #0x #0x )
+( 10E390 /10E148)  [ 0014 ] LABEL     ( 25  top> empty )
+( 10E390 /10E148)  [ 0114 ] LABEL     ( 25  top> empty )
+( 10E3B8 /10E390)  2 U@            ( 28  top> empty )
+( 125660 /10E3B8)  1  ( LIT)       ( 28  top> #64x )
+( 1256A0 /125660)  >                ( 29  top> #72x #64x )
+( 1256F8 /1256A0)  [ 0015 ] BRANCHZ   ( 29  top> #0x )
+( 125738 /1256F8)  2 U@            ( 30  top> empty )
+( 125860 /125738)  2*               ( 30  top> #0x )
+( 125980 /125860)  UBR@ +           ( 31  top> #73d )
+( 125FF0 /125980)  [ -1 ] LIT_SWAP  ( 33  top> #74d )
+( 126118 /125FF0)  64  ( LIT)       ( 33  top> #74x #0x )
+( 1261D0 /126118)  -                ( 33  top> #0x #0x #0x )
+( 1262A0 /1261D0)  !                ( 33  top> #0x #0x )
+( 1264E8 /1262A0)  [ 0015 ] LABEL     ( 34  top> empty )
+( 126510 /1264E8)  2 U@            ( 37  top> empty )
+( 126648 /126510)  7  ( LIT)       ( 37  top> #64x )
+( 126688 /126648)  <=               ( 38  top> #76x #64x )
+( 126720 /126688)  [ 0016 ] BRANCHZ   ( 38  top> #0x )
+( 126760 /126720)  2 U@            ( 39  top> empty )
+( 126888 /126760)  2*               ( 39  top> #0x )
+( 1269A8 /126888)  UBR@ +           ( 40  top> #77d )
+( 127018 /1269A8)  [ -1 ] LIT_SWAP  ( 42  top> #78d )
+( 127140 /127018)  82  ( LIT)       ( 42  top> #78x #0x )
+( 1271F8 /127140)  -                ( 42  top> #0x #0x #0x )
+( 1272C8 /1271F8)  !                ( 42  top> #0x #0x )
+( 127510 /1272C8)  [ 0016 ] LABEL     ( 43  top> empty )
+( 127538 /127510)  2 U@            ( 46  top> empty )
+( 127660 /127538)  1  ( LIT)       ( 46  top> #0x )
+( 1276B8 /127660)  +                ( 46  top> #0x #64x )
+( 127858 /1276B8)  [ 2 ] DUP_U!         ( 11  top> #64 )
+( 1278C0 /127858)  16  ( LIT)       ( 11  top> #64x )
+( 127900 /1278C0)  >                ( 12  top> #66x #64x )
+( 127998 /127900)  [ 0017 ] BRANCHZ   ( 12  top> #0x )
+( 1279D8 /127998)  ( TYPE 1 LOOP END)  ( 52  top> empty )
+( 127A00 /1279D8)  [ 0019 ] LABEL     ( 94  top> empty )
+
+
+
+ UBR@             ( 60  top> empty )
+ 96  ( LIT)       ( 60  top> #30x )
+ -                ( 60  top> #0x #30x )
+ [ 2 ] MEM_ARG!  ( 60  top> #0x )
+ UBR@             ( 62  top> empty )
+ 116  ( LIT)       ( 62  top> #30x )
+ -                ( 62  top> #0x #30x )
+ [ 3 ] MEM_ARG!  ( 62  top> #0x )
+ 1  ( LIT)       ( 63  top> empty )
+ UBR@             ( 64  top> #4 )
+ 120  ( LIT)       ( 64  top> #30x #4 )
+ -                ( 64  top> #0x #30x #4 )
+ UBR@             ( 65  top> #5 #4 )
+ 64  ( LIT)       ( 65  top> #30x #5 #4 )
+ -                ( 65  top> #0x #30x #5 #4 )
+ UBR@             ( 66  top> #6 #5 #4 )
+ 28  ( LIT)       ( 66  top> #30x #6 #5 #4 )
+ -                ( 66  top> #0x #30x #6 #5 #4 )
+ ( #7 Calling Arg )  ( 71  top> #6 #5 #4 )
+ ( #6 Calling Arg )  ( 71  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 71  top> #5 #4 )
+ ( #4 Calling Arg )  ( 71  top> #4 )
+ -192 FP+!  ( Link)   ( 71  top> empty )
+   Try  ( CALL)    ( 71  top> empty )
+ 192 FP+!  ( Unlink)  ( 71  top> empty )
+
+
+
+
+( 129DB0 /129AC0)  [ -62 ] MEM_ARG@  ( 76  top> empty )
+( 12A0B0 /129DB0)  [ 0018 ] BRANCHNZ  ( 77  top> #0x )
+( 12A3B8 /12A0B0)  -192 FP+!  ( Link)   ( 81  top> empty )
+( 12A3E0 /12A3B8)    do_error  ( CALL)    ( 81  top> empty )
+( 12A408 /12A3E0)  192 FP+!  ( Unlink)  ( 81  top> empty )
+( 12A6E0 /12A408)  1000  ( LIT)       ( 85  top> empty )
+( 12A7A8 /12A6E0)  tries  ( SYMBOL)    ( 85  top> #0x )
+( 12A800 /12A7A8)  +!               ( 85  top> #0x #0x )
+( 12AB78 /12A800)  EXIT  [ 0018 ] LABEL     ( 87  top> empty )
+( 12ABA0 /12AB78)    ;  ( END )   
+
+ ( 88  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+
+
+
+( 10C2A0 /0)  : main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+( 10C318 /10C2A0)  1  ( LIT)       ( 6  top> empty )
+( 10C458 /10C318)  [ 0025 ADD_INDEX ] >R   ( 44  top> #64 )
+( 10C5D8 /10C458)  ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+( 10C600 /10C5D8)  [ 0025 ] LABEL     ( 32  top> empty )
+( 10C6A0 /10C600)  0  ( LIT)       ( 14  top> empty )
+( 10C6C8 /10C6A0)  tries  ( SYMBOL)    ( 14  top> #0x )
+( 10C708 /10C6C8)  !                ( 14  top> #0x #0x )
+( 10CA28 /10C708)  -64 FP+!  ( Link)   ( 17  top> empty )
+( 10CA50 /10CA28)    Doit  ( CALL)    ( 17  top> empty )
+( 10CA78 /10CA50)  64 FP+!  ( Unlink)  ( 17  top> empty )
+( 10CDE0 /10CA78)  tries  ( SYMBOL)    ( 20  top> empty )
+( 10CE08 /10CDE0)  @                ( 20  top> #0x )
+( 10CFC8 /10CE08)  113  ( LIT)       ( 22  top> #66x )
+( 10D008 /10CFC8)  -                ( 23  top> #67x #66x )
+( 10D0A0 /10D008)  [ 0023 ] BRANCHZ   ( 23  top> #0x )
+( 1240F8 /10D0A0)  -64 FP+!  ( Link)   ( 25  top> empty )
+( 124120 /1240F8)    do_error  ( CALL)    ( 25  top> empty )
+( 124148 /124120)  64 FP+!  ( Unlink)  ( 25  top> empty )
+( 124438 /124148)  [ 0023 ] LABEL     ( 30  top> empty )
+( 124460 /124438)  R>               ( 31  top> empty )
+( 124588 /124460)  1  ( LIT)       ( 31  top> #0x )
+( 1245E0 /124588)  +                ( 31  top> #0x #64x )
+( 124780 /1245E0)  DUP_>R   ( #64 )  ( 10  top> #64 )
+( 1247E8 /124780)  2500  ( LIT)       ( 10  top> #64x )
+( 124828 /1247E8)  U>               ( 11  top> #65x #64x )
+( 1248C0 /124828)  [ 0025 ] BRANCHZ   ( 11  top> #0x )
+( 124900 /1248C0)  [ 0025 DROP_INDEX ] R>DROP  ( 37  top> empty )
+( 124928 /124900)  EXIT  [ 0026 ] LABEL     ( 45  top> empty )
+( 124950 /124928)    ;  ( END )   
+
+ ( 39  top> empty )
+
+

@@ -1,0 +1,220 @@
+\ /* towers.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+\ CESYS compiled
+
+EMPTY
+: XY " DOS XY towers.ces" EVALUATE ;
+
+\ #define maxcells 	 18
+\ #define    stackrange	3
+\ #define true  1
+\ #define false 0
+
+DECIMAL
+load GNUTOOL.4
+
+ 100 REG-ADDR $FFC0 AND  UBR!
+
+\  int   stack[stackrange+1];
+\ struct element    cellspace[maxcells+1];
+\ int    freelist,  movesdone;
+VARIABLE movesdone   4   CELL- ALLOT
+VARIABLE freelist   4   CELL- ALLOT
+VARIABLE cellspace   76   CELL- ALLOT
+VARIABLE stack   8   CELL- ALLOT
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Towers.\n"); }
+   ." Error in Towers." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+: Makenull
+  >r  $0  stack  r@  2* + !
+  r> drop ;
+
+: Getelement
+  freelist @ $0  > 1 and
+  [ 44 ] branchz
+  freelist @ 0 u!
+  cellspace freelist @  2* 2* + $2 + @ freelist !
+  [ 45 ] branch
+
+[ 44 ] label
+  17 g@ 64 + 17 g!
+    do_error
+  17 g@ 64 - 17 g!
+
+[ 45 ] label
+  0 u@ ;
+
+: Push
+  0 u! 1 u!
+  $0 2 u!
+  stack 1 u@ 2* + @ $0  > 1 and
+  [ 48 ] branchz
+
+  cellspace stack 1 u@ 2* + @
+  2* 2* + @ 0 u@  <= 1 and
+  [ 49 ] branchz
+
+  $1 2 u! 
+  17 g@ 64 + 17 g!
+    do_error
+  17 g@ 64 - 17 g!
+
+[ 49 ] label
+[ 48 ] label
+
+  2 u@  0= 1 and
+  [ 51 ] branchz
+
+  17 g@ 64 + 17 g!
+    Getelement 
+  17 g@ 64 - 17 g!
+
+  3 u!
+  stack 1 u@ 2* + @
+  cellspace 3 u@ 2* 2* + $2 + !
+  3 u@ stack 1 u@ 2* + !
+  0 u@ cellspace 3 u@ 2* 2* + !
+
+[ 51 ] label
+   ;
+
+: Init
+  0 u! 1 u! 0 u@ 
+  17 g@ 64 + 17 g!
+    Makenull 
+  17 g@ 64 - 17 g!
+  1 u@ 2 u!
+
+[ 53 ] label
+  $1 2 u@  <= 1 and
+  [ 54 ] branchz
+
+  0 u@ 2 u@ 
+  17 g@ 64 + 17 g!
+    Push 
+  17 g@ 64 - 17 g!
+
+[ 55 ] label
+  2 u@ $1 - 2 u!
+  [ 53 ] branch
+
+[ 54 ] label
+   ;
+
+: Pop
+  >r stack r@ 2* + @ $0  > 1 and
+  [ 57 ] branchz
+  cellspace stack
+  r@ 2* + @ 2* 2* + @ 2 u!
+  cellspace stack r@ 2* + @
+  2* 2* + $2 + @ 1 u!
+  freelist @ cellspace stack r@ 2* + @ 2* 2* + $2 + ! 
+  stack r@ 2* + @ freelist !
+  1 u@ stack r@ 2* + ! 2 u@ r> drop  exit
+
+[ 57 ] label
+  17 g@ 64 + 17 g!
+    do_error
+  17 g@ 64 - 17 g!
+   $0 r> drop ;
+
+: Move
+  0 u! 1 u! 1 u@ 0 u@ 
+  17 g@ 64 + 17 g!
+    Pop 
+  17 g@ 64 - 17 g!
+  
+  17 g@ 64 + 17 g!
+    Push 
+  17 g@ 64 - 17 g!
+  movesdone @ $1 + movesdone !
+  ;
+
+: tower
+  0 u! 1 u! 2 u! 2 u@ $1  = 1 and
+  [ 61 ] branchz
+  1 u@ 0 u@ 
+  17 g@ 64 + 17 g!
+    Move 
+  17 g@ 64 - 17 g!
+  [ 62 ] branch
+
+[ 61 ] label
+  $6 0 u@ - 1 u@ - 3 u!
+  2 u@ $ffff +   3 u@   0 u@ 
+  17 g@ 64 + 17 g!
+RECURSE \     tower 
+  17 g@ 64 - 17 g!
+  1 u@ 0 u@ 
+  17 g@ 64 + 17 g!
+    Move 
+  17 g@ 64 - 17 g!
+  2 u@ $ffff + 1 u@ 3 u@ 
+  17 g@ 64 + 17 g!
+RECURSE \     tower 
+  17 g@ 64 - 17 g!
+
+[ 62 ] label
+  ;
+
+: main
+ 100 REG-ADDR $FFC0 AND  UBR! $0 1 u!
+
+[ 64 ] label
+  $23 1 u@
+dup .
+  > 1 and
+  [ 65 ] branchz
+
+  $1 0 u!
+
+[ 67 ] label
+  0 u@ $12  <= 1 and
+  [ 68 ] branchz
+  0 u@ $ffff + cellspace 0 u@ 2* 2* + $2 + !
+
+[ 69 ] label
+  0 u@ $1 + 0 u!
+  [ 67 ] branch
+
+[ 68 ] label
+  $12 freelist ! $e $1 
+  17 g@ 64 + 17 g!
+    Init 
+  17 g@ 64 - 17 g!
+  $2 
+  17 g@ 64 + 17 g!
+    Makenull 
+  17 g@ 64 - 17 g!
+  $3 
+  17 g@ 64 + 17 g!
+    Makenull 
+  17 g@ 64 - 17 g!
+  $0 movesdone ! $e $2 $1 
+  17 g@ 64 + 17 g!
+    tower 
+  17 g@ 64 - 17 g!
+  movesdone @ $3fff  <> 1 and
+  [ 70 ] branchz
+
+  17 g@ 64 + 17 g!
+    do_error
+  17 g@ 64 - 17 g!
+
+[ 70 ] label
+[ 66 ] label
+  1 u@ $1 + 1 u!
+  [ 64 ] branch
+
+[ 65 ] label
+  ;
+

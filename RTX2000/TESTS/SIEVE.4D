@@ -1,0 +1,125 @@
+\ /* Eratosthenes Sieve Prime Number Program in C from Byte January 1983 */
+\ Improved source code GNU C for RTX 2000
+
+EMPTY
+: XY " DOS XY SIEVE.4d" EVALUATE ;
+
+load GNUTOOL.4
+
+VARIABLE flags   8192   CELL- ALLOT
+
+DECIMAL
+ #REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+: do_error
+  ." Error in Sieve."   CR
+   ;
+
+ 64 FRAME_SIZE ! 
+: main
+ #REGS 100 - REG-ADDR $FFC0 AND  UBR!
+ 1  ( LIT)       ( 6  top> empty )
+ [ 0020 ADD_INDEX ] >R   ( 137  top> #65 )
+ ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+ [ 0020 ] LABEL     ( 107  top> empty )
+ 0  ( LIT)       ( 14  top> empty )
+ flags  ( SYMBOL)    ( 16  top> #64 )
+ [                ( 131  top> #69 #64 )
+ flags  ( SYMBOL)    ( 131  top> #69 #64 )
+ 8190  ( LIT)       ( 131  top> #0x #69 #64 )
+ +                ( 131  top> #0x #0x #69 #64 )
+ ] LITERAL        ( 131  top> #0x #69 #64 )
+ ROT              ( 132  top> #71d #69 #64 )
+ 2 U!            ( 132  top> #64 #71d #69 )
+ OVER          ( #69)  ( 132  top> #71d #69 )
+ 3 U!            ( 132  top> #69 #71d #69x )
+ U>               ( 134  top> #71x #69x )
+ [ 0023 ] BRANCHNZ  ( 134  top> #0x )
+ [                ( 135  top> empty )
+ flags  ( SYMBOL)    ( 135  top> empty )
+ 8190  ( LIT)       ( 135  top> #0x )
+ +                ( 135  top> #0x #0x )
+ ] LITERAL        ( 135  top> #0x )
+ 4 U!            ( 17  top> #71 )
+ ( LOOP_BEGIN)    ( 17  top> empty )
+ [ 009 ] LABEL     ( 29  top> empty )
+ 1  ( LIT)       ( 24  top> empty )
+ 3 U@            ( 24  top> #0x )
+ C!               ( 24  top> #69x #0x )
+ 3 U@            ( 28  top> empty )
+ 1  ( LIT)       ( 28  top> #69x )
+ +                ( 28  top> #0x #69x )
+ [ 3 ] DUP_U!         ( 21  top> #69 )
+ 4 U@            ( 21  top> #69x )
+ U>               ( 22  top> #71x #69x )
+ [ 009 ] BRANCHZ   ( 22  top> #0x )
+ ( LOOP_END)      ( 34  top> empty )
+ [ 0023 ] LABEL     ( 133  top> empty )
+ 0  ( LIT)       ( 37  top> empty )
+ [ 0018 ADD_INDEX ] >R   ( 125  top> #66 )
+ ( TYPE 1 LOOP BEGIN)  ( 38  top> empty )
+ [ 0018 ] LABEL     ( 88  top> empty )
+ flags  ( SYMBOL)    ( 46  top> empty )
+ [ 0018 ]  INDEX +  ( 46  top> #74x )
+ C@               ( 47  top> #75d )
+ [ 0012 ] BRANCHZ   ( 50  top> #0x )
+ [ 0018 ]  INDEX  ( 53  top> empty )
+ 2*               ( 53  top> #66x )
+ 3  ( LIT)       ( 55  top> #78d )
+ +                ( 55  top> #0x #0x )
+ [ 0018 ]  INDEX  ( 57  top> #68 )
+ OVER_+    ( #68 )  ( 57  top> #66x #68 )
+ [ 5 ] DUP_U!         ( 119  top> #67 #68 )
+ SWAP             ( 119  top> #67 #68 )
+ 6 U!            ( 119  top> #68 #67 )
+ 8190  ( LIT)       ( 119  top> #67x )
+ <=               ( 121  top> #81x #67x )
+ [ 0021 ] BRANCHZ   ( 121  top> #0x )
+ ( LOOP_BEGIN)    ( 59  top> empty )
+ [ 0017 ] LABEL     ( 74  top> empty )
+ 0  ( LIT)       ( 67  top> empty )
+ flags  ( SYMBOL)    ( 67  top> #0x )
+ 5 U@  +         ( 68  top> #74x #0x )
+ C!               ( 68  top> #83x #0x )
+ 5 U@            ( 72  top> empty )
+ 6 U@  +         ( 72  top> #67x )
+ [ 5 ] DUP_U!         ( 62  top> #67 )
+ 8190  ( LIT)       ( 62  top> #67x )
+ >                ( 63  top> #81x #67x )
+ [ 0017 ] BRANCHZ   ( 63  top> #0x )
+ ( TYPE 2 LOOP END)  ( 79  top> empty )
+ [ 0021 ] LABEL     ( 120  top> empty )
+ 1  ( LIT)       ( 82  top> empty )
+ 2 U@ +   2 U!  ( 86  top> #0x )
+ [ 0012 ] LABEL     ( 86  top> empty )
+ R>               ( 87  top> empty )
+ 1  ( LIT)       ( 87  top> #66x )
+ +                ( 87  top> #0x #66x )
+ DUP_>R   ( #66 )  ( 41  top> #66 )
+ 8190  ( LIT)       ( 41  top> #66x )
+ U>               ( 42  top> #73x #66x )
+ [ 0018 ] BRANCHZ   ( 42  top> #0x )
+ [ 0018 DROP_INDEX ] R>DROP  ( 93  top> empty )
+ [ 0022 ] LABEL     ( 126  top> empty )
+ 2 U@            ( 97  top> empty )
+ 1899  ( LIT)       ( 97  top> #64x )
+ -                ( 98  top> #85x #64x )
+ [ 005 ] BRANCHZ   ( 98  top> #0x )
+ -64 FP+!  ( Link)   ( 100  top> empty )
+   do_error  ( CALL)    ( 100  top> empty )
+ 64 FP+!  ( Unlink)  ( 100  top> empty )
+ [ 005 ] LABEL     ( 105  top> empty )
+ R>               ( 106  top> empty )
+ 1  ( LIT)       ( 106  top> #65x )
+ +                ( 106  top> #0x #65x )
+ DUP_>R   ( #65 )  ( 10  top> #65 )
+ 349  ( LIT)       ( 10  top> #65x )
+ U>               ( 11  top> #70x #65x )
+ [ 0020 ] BRANCHZ   ( 11  top> #0x )
+ [ 0020 DROP_INDEX ] R>DROP  ( 112  top> empty )
+ EXIT  [ 0024 ] LABEL     ( 138  top> empty )
+   ;  ( END )   
+
+
+.( max 349) cr
+

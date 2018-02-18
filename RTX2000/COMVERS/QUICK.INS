@@ -1,0 +1,408 @@
+\ /* quick.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY quick.ins" EVALUATE ;
+
+DECIMAL
+load GNUins.4
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\ #define sortelements 	 5000
+
+\ int seed ;
+VARIABLE seed   4   CELL- ALLOT
+
+\ int    sortlist[sortelements+1],
+\     biggest, littlest,      top;
+VARIABLE top   4   CELL- ALLOT
+VARIABLE littlest   4   CELL- ALLOT
+VARIABLE biggest   4   CELL- ALLOT
+VARIABLE sortlist   10004   CELL- ALLOT
+
+: .DATA
+  1000 2 DO I SORTLIST + @ .  2 +LOOP ;
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ 
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\   { printf ( " Error in Quick.\n"); }
+   ." Error in Quick." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+\ static void Initrand ()
+ 64 FRAME_SIZE ! 
+ : Initrand  ( FUNC )   ( 3  top> empty )
+\     {
+\     seed = 9219;
+ 9219  ( LIT)       ( 6  top> empty )
+ seed  ( SYMBOL)    ( 6  top> #0x )
+ !                ( 6  top> #0x #0x )
+\     };
+   ;  ( END )   
+
+\ static int Rand ()
+ 64 FRAME_SIZE ! 
+ : Rand  ( FUNC )   ( 3  top> empty )
+\     {
+
+\     seed = (seed * 1309 + 13849) ;
+ seed  ( SYMBOL)    ( 6  top> empty )
+ @                ( 6  top> #0x )
+ 1309  ( LIT)       ( 6  top> #0x )
+ *                ( 6  top> #0x #0x )
+ 13849  ( LIT)       ( 8  top> #64d )
+ +                ( 8  top> #0x #0x )
+ seed  ( SYMBOL)    ( 10  top> #0x )
+
+\     return( seed );
+ TUCK_!           ( 10  top> #0x )
+\     };
+   ;  ( END )   
+
+
+\ static void    Initarr()
+ 64 FRAME_SIZE ! 
+ : Initarr  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int i, temp;
+
+\ 	Initrand();
+ -64 FP+!  ( Link)   ( 7  top> empty )
+   Initrand  ( CALL)    ( 7  top> empty )
+ 64 FP+!  ( Unlink)  ( 7  top> empty )
+
+\ 	biggest = 0; littlest = 0;
+ 0  ( LIT)       ( 9  top> empty )
+ biggest  ( SYMBOL)    ( 9  top> #0x )
+ !                ( 9  top> #0x #0x )
+ 0  ( LIT)       ( 10  top> empty )
+ littlest  ( SYMBOL)    ( 10  top> #0x )
+ !                ( 10  top> #0x #0x )
+
+\ 	for ( i = 1; i <= sortelements; i++ )
+ 1  ( LIT)       ( 13  top> #64 )
+ [ 0011 ADD_INDEX ] >R   ( 78  top> #64 )
+ ( TYPE 1 LOOP BEGIN)  ( 14  top> empty )
+
+\ 	    {
+ [ 0011 ] LABEL     ( 66  top> empty )
+
+\ 	    temp = Rand();
+ -64 FP+!  ( Link)   ( 23  top> empty )
+   Rand  ( CALL)    ( 23  top> empty )
+ 64 FP+!  ( Unlink)  ( 23  top> #2x )
+
+\ 	    sortlist[i] = temp - 32668 ;
+ [ 0011 ]  INDEX  ( 28  top> #67 )
+ 2*               ( 28  top> #64x #67 )
+ [ sortlist ] SYMBOL_+  ( 29  top> #69d #67 )
+ SWAP             ( 31  top> #70d #67d )
+ 32668  ( LIT)       ( 31  top> #67x #70d )
+ -                ( 31  top> #0x #0x #70d )
+ SWAP !           ( 31  top> #0x #70d )
+
+\ 	    if ( sortlist[i] > biggest ) biggest = sortlist[i];
+ [ 0011 ]  INDEX  ( 34  top> empty )
+ 2*               ( 34  top> #64x )
+ [ sortlist ] SYMBOL_+  ( 35  top> #73d )
+ @                ( 37  top> #74d )
+ biggest  ( SYMBOL)    ( 38  top> #75 )
+ @                ( 38  top> #0x #75 )
+ >                ( 40  top> #76x #75x )
+ [ 008 ] BRANCHZ   ( 40  top> #0x )
+ [ 0011 ]  INDEX  ( 42  top> empty )
+ 2*               ( 42  top> #64x )
+ [ sortlist ] SYMBOL_+  ( 43  top> #78d )
+ @                ( 44  top> #79d )
+ biggest  ( SYMBOL)    ( 44  top> #0x )
+ !                ( 44  top> #0x #0x )
+ [ 007 ] BRANCH    ( 45  top> empty )
+
+\ 	    else if ( sortlist[i] < littlest ) littlest = sortlist[i];
+ [ 008 ] LABEL     ( 47  top> empty )
+ [ 0011 ]  INDEX  ( 50  top> empty )
+ 2*               ( 50  top> #64x )
+ [ sortlist ] SYMBOL_+  ( 51  top> #81d )
+ @                ( 52  top> #82d )
+ littlest  ( SYMBOL)    ( 53  top> #83 )
+ @                ( 53  top> #0x #83 )
+ <                ( 55  top> #84x #83x )
+ [ 107 ] BRANCHZ   ( 55  top> #0x )
+ [ 0011 ]  INDEX  ( 57  top> empty )
+ 2*               ( 57  top> #64x )
+ [ sortlist ] SYMBOL_+  ( 58  top> #86d )
+ @                ( 59  top> #87d )
+ littlest  ( SYMBOL)    ( 59  top> #0x )
+ !                ( 59  top> #0x #0x )
+ [ 007 ] LABEL     ( 64  top> empty )
+ [ 107 ] LABEL     ( 64  top> empty )
+
+\ 	    };
+ R>               ( 65  top> empty )
+ 1  ( LIT)       ( 65  top> #64x )
+ +                ( 65  top> #0x #64x )
+ DUP_>R           ( 17  top> #64 )
+ 5000  ( LIT)       ( 17  top> #64x )
+ U>               ( 18  top> #66x #64x )
+ [ 0011 ] BRANCHZ   ( 18  top> #0x )
+ [ 0011 DROP_INDEX ] R>DROP  ( 71  top> empty )
+
+\ 	};
+ EXIT  [ 0012 ] LABEL     ( 79  top> empty )
+   ;  ( END )   
+
+
+\ static void    Quicksort( a,l,r) int a[], l, r;
+ 64 FRAME_SIZE ! 
+ : Quicksort  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int i,j,x,w;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+ ( #6 dummy reload )  ( 6  top> #65 #64 )
+
+\ 	i=l; j=r;
+ OVER          ( #65)  ( 10  top> #66 #65 #64 )
+ 2 U!!            ( 10  top> #67 #66 #65 #64 )
+ [ 3 ] DUP_U!         ( 10  top> #66 #65 #64 )
+ 2 U@@            ( 13  top> #68 #65 #64 )
+\ 	x=a[(l+r) / 2];
+ 3 U@@  +         ( 13  top> #67x #68 #65 #64 )
+ 4 U!!            ( 16  top> #72 #68 #65 #64 )
+ 5 U!!            ( 16  top> #68 #65 #64 )
+ 6 U!!            ( 16  top> #65 #64 )
+ 7 U!!            ( 16  top> #64 )
+ 4 U@@            ( 16  top> empty )
+ 0<               ( 16  top> #72x )
+\ 	do {
+ [ 0014 ] BRANCHZ   ( 17  top> #0x )
+
+ 1  ( LIT)       ( 18  top> empty )
+ 4 U@@ +   4 U!!  ( 19  top> #0x )
+ [ 0014 ] LABEL     ( 19  top> empty )
+ 4 U@@            ( 21  top> empty )
+ -2  ( LIT)       ( 21  top> #72x )
+ AND              ( 21  top> #0x #72x )
+ 7 U@@  +         ( 22  top> #74d )
+ @                ( 23  top> #75d )
+ 8 U!!            ( 25  top> #69 )
+ ( LOOP_BEGIN)    ( 25  top> empty )
+
+\ 	    while ( a[i]<x ) i = i+1;
+ [ 0015 ] LABEL     ( 26  top> empty )
+ 2 U@@            ( 131  top> empty )
+ 2*               ( 131  top> #67x )
+ 7 U@@  +         ( 132  top> #76d )
+ @                ( 133  top> #77d )
+ 8 U@@            ( 134  top> #78x )
+ <                ( 136  top> #69x #78x )
+ [ 0028 ] BRANCHZ   ( 136  top> #0x )
+
+ ( LOOP_BEGIN)    ( 29  top> empty )
+ [ 0020 ] LABEL     ( 38  top> empty )
+ 2 U@@            ( 37  top> empty )
+ 1  ( LIT)       ( 37  top> #67x )
+ +                ( 37  top> #0x #67x )
+ DUP -dup      ( #67)  ( 31  top> #67 )
+ 2*               ( 31  top> #0x #67 )
+ 7 U@@  +         ( 32  top> #76d #67 )
+ @_SWAP           ( 33  top> #77d #67 )
+ 2 U!!            ( 34  top> #67 #78d )
+ 8 U@@            ( 34  top> #78x )
+ >=               ( 35  top> #69x #78x )
+ [ 0020 ] BRANCHZ   ( 35  top> #0x )
+ ( LOOP_END)      ( 43  top> empty )
+
+\ 	    while ( x<a[j] ) j = j-1;
+ [ 0028 ] LABEL     ( 135  top> empty )
+ 5 U@@            ( 125  top> empty )
+ 2*               ( 125  top> #68x )
+ 7 U@@  +         ( 126  top> #80d )
+ @                ( 127  top> #81d )
+ 8 U@@            ( 128  top> #82d )
+ >                ( 128  top> #69x #82d )
+ [ 0027 ] BRANCHZ   ( 130  top> #0x )
+ ( LOOP_BEGIN)    ( 46  top> empty )
+ [ 0023 ] LABEL     ( 55  top> empty )
+ 5 U@@            ( 54  top> empty )
+ 1  ( LIT)       ( 54  top> #68x )
+ -                ( 54  top> #0x #68x )
+ DUP -dup      ( #68)  ( 48  top> #68 )
+ 2*               ( 48  top> #0x #68 )
+ 7 U@@  +         ( 49  top> #80d #68 )
+ @                ( 50  top> #81d #68 )
+ 9 U!!  ( flush )   ( 51  top> #82d #68 )
+ 5 U!!            ( 51  top> #68 )
+ 8 U@@            ( 51  top> empty )
+ 9 U@@            ( 51  top> #69x )
+ >=               ( 52  top> #82x #69x )
+ [ 0023 ] BRANCHZ   ( 52  top> #0x )
+ ( LOOP_END)      ( 60  top> empty )
+
+ [ 0027 ] LABEL     ( 129  top> empty )
+
+\ 	    if ( i<=j ) {
+ 2 U@@            ( 63  top> empty )
+ 5 U@@            ( 63  top> #67x )
+ <=               ( 64  top> #68x #67x )
+ [ 0017 ] BRANCHZ   ( 64  top> #0x )
+
+\ 		w = a[i];
+ 2 U@@            ( 67  top> empty )
+ 2*               ( 67  top> #67x )
+ 7 U@@  +         ( 68  top> #84d )
+ @                ( 69  top> #85d )
+
+\ 		a[i] = a[j];
+ 2 U@@            ( 71  top> #70 )
+ 2*               ( 71  top> #67x #70 )
+ 7 U@@  +         ( 72  top> #86d #70 )
+ 5 U@@            ( 73  top> #87 #70 )
+ 2*               ( 73  top> #68x #87 #70 )
+ 7 U@@  +         ( 74  top> #88d #87 #70 )
+ @                ( 75  top> #89d #87d #70 )
+ SWAP             ( 75  top> #0x #87d #70 )
+ !                ( 75  top> #87x #0x #70 )
+
+\ 		a[j] = w;
+ 5 U@@            ( 77  top> #70 )
+ 2*               ( 77  top> #68x #70 )
+ 7 U@@  +         ( 78  top> #90d #70 )
+ !                ( 79  top> #91d #70d )
+
+\ 		i = i+1;    j= j-1;
+ 2 U@@            ( 82  top> empty )
+ 1  ( LIT)       ( 82  top> #67x )
+ +                ( 82  top> #0x #67x )
+ -1  ( LIT)       ( 84  top> #67 )
+ 5 U@@ +   5 U!!  ( 87  top> #0x #67 )
+
+\ 		}
+ 2 U!!            ( 87  top> #67 )
+ [ 0017 ] LABEL     ( 87  top> empty )
+
+\ 	} while ( i<=j );
+ 2 U@@            ( 89  top> empty )
+ 5 U@@            ( 89  top> #67x )
+ >                ( 90  top> #68x #67x )
+ [ 0015 ] BRANCHZ   ( 90  top> #0x )
+ ( LOOP_END)      ( 93  top> empty )
+
+\ 	if ( l <j ) Quicksort(a,l,j);
+ 6 U@@            ( 96  top> empty )
+ 5 U@@            ( 96  top> #65x )
+ <                ( 97  top> #68x #65x )
+ [ 0025 ] BRANCHZ   ( 97  top> #0x )
+ 7 U@@            ( 99  top> empty )
+ 6 U@@            ( 100  top> #4 )
+ 5 U@@            ( 101  top> #5 #4 )
+ ( #6 Calling Arg )  ( 105  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 105  top> #5 #4 )
+ ( #4 Calling Arg )  ( 105  top> #4 )
+ -64 FP+!  ( Link)   ( 105  top> empty )
+  recurse \   Quicksort  ( CALL)    ( 105  top> empty )
+ 64 FP+!  ( Unlink)  ( 105  top> empty )
+
+ [ 0025 ] LABEL     ( 107  top> empty )
+
+\ 	if ( i<r ) Quicksort(a,i,r);
+ 2 U@@            ( 109  top> empty )
+ 3 U@@            ( 109  top> #67x )
+ <                ( 110  top> #66x #67x )
+ [ 0026 ] BRANCHZ   ( 110  top> #0x )
+ 7 U@@            ( 112  top> empty )
+ 2 U@@            ( 113  top> #4 )
+ 3 U@@            ( 114  top> #5 #4 )
+ ( #6 Calling Arg )  ( 118  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 118  top> #5 #4 )
+ ( #4 Calling Arg )  ( 118  top> #4 )
+ -64 FP+!  ( Link)   ( 118  top> empty )
+ recurse \   Quicksort  ( CALL)    ( 118  top> empty )
+ 64 FP+!  ( Unlink)  ( 118  top> empty )
+\ 	};
+ EXIT  [ 0026 ] LABEL     ( 120  top> empty )
+   ;  ( END )   
+
+
+\ int main ()
+ 64 FRAME_SIZE ! 
+ : main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\     {
+\     int i;
+
+\     for (i = 0 ; i < 50  ; i++ )
+ 0  ( LIT)       ( 6  top> empty )
+ 2 U!!            ( 61  top> #64 )
+ [                ( 64  top> empty )
+ sortlist  ( SYMBOL)    ( 64  top> empty )
+ 2  ( LIT)       ( 64  top> #0x )
+ +                ( 64  top> #0x #0x )
+ ] LITERAL        ( 64  top> #0x )
+ 3 U!!            ( 7  top> #66 )
+ ( LOOP_BEGIN)    ( 7  top> empty )
+
+\    {
+ [ 0035 ] LABEL     ( 49  top> empty )
+
+\     Initarr();
+ -64 FP+!  ( Link)   ( 15  top> empty )
+   Initarr  ( CALL)    ( 15  top> empty )
+ 64 FP+!  ( Unlink)  ( 15  top> empty )
+
+\     Quicksort(sortlist,1,sortelements);
+ sortlist  ( SYMBOL)    ( 18  top> empty )
+ 1  ( LIT)       ( 19  top> #4 )
+ 5000  ( LIT)       ( 20  top> #5 #4 )
+ ( #6 Calling Arg )  ( 24  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 24  top> #5 #4 )
+ ( #4 Calling Arg )  ( 24  top> #4 )
+ -64 FP+!  ( Link)   ( 24  top> empty )
+   Quicksort  ( CALL)    ( 24  top> empty )
+ 64 FP+!  ( Unlink)  ( 24  top> empty )
+
+\     if ( (sortlist[1] != littlest) || (sortlist[sortelements] != biggest) )
+ 3 U@@            ( 28  top> empty )
+ @                ( 28  top> #66x )
+ littlest  ( SYMBOL)    ( 29  top> #67 )
+ @                ( 29  top> #0x #67 )
+ -                ( 31  top> #68x #67x )
+ [ 0034 ] BRANCHNZ  ( 31  top> #0x )
+ [                ( 33  top> empty )
+ sortlist  ( SYMBOL)    ( 33  top> empty )
+ 10000  ( LIT)       ( 33  top> #0x )
+ +                ( 33  top> #0x #0x )
+ ] LITERAL        ( 33  top> #0x )
+ @                ( 33  top> #0x )
+ biggest  ( SYMBOL)    ( 34  top> #70 )
+ @                ( 34  top> #0x #70 )
+ -                ( 36  top> #71x #70x )
+ [ 0032 ] BRANCHZ   ( 36  top> #0x )
+ [ 0034 ] LABEL     ( 39  top> empty )
+
+\ 	do_error();
+ -64 FP+!  ( Link)   ( 42  top> empty )
+   do_error  ( CALL)    ( 42  top> empty )
+ 64 FP+!  ( Unlink)  ( 42  top> empty )
+\   }
+
+ [ 0032 ] LABEL     ( 47  top> empty )
+ 2 U@@            ( 48  top> empty )
+ 1  ( LIT)       ( 48  top> #64x )
+ +                ( 48  top> #0x #64x )
+ [ 2 ] DUP_U!         ( 10  top> #64 )
+dup -dup .  49  ( LIT)       ( 10  top> #64x )
+ >                ( 11  top> #65x #64x )
+ [ 0035 ] BRANCHZ   ( 11  top> #0x )
+ ( TYPE 1 LOOP END)  ( 54  top> empty )
+ EXIT  [ 0036 ] LABEL     ( 62  top> empty )
+\     };
+   ;  ( END )   
+
+.( max iteration = 49 )
+

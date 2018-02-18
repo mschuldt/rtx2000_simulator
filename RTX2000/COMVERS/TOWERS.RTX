@@ -1,0 +1,573 @@
+\ /* towers.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY towers.RTX" EVALUATE ;
+
+\ #define maxcells 	 18
+\ #define    stackrange	3
+\ #define true  1
+\ #define false 0
+
+DECIMAL
+load GNUTOOL.4
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\  int   stack[stackrange+1];
+\ struct element    cellspace[maxcells+1];
+\ int    freelist,  movesdone;
+VARIABLE movesdone   4   CELL- ALLOT
+VARIABLE freelist   4   CELL- ALLOT
+VARIABLE cellspace   76   CELL- ALLOT
+VARIABLE stack   8   CELL- ALLOT
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Towers.\n"); }
+   ." Error in Towers." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+: Error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Towers.\n"); }
+   ." Error in Towers." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+\ static void Makenull (s)
+ 64 FRAME_SIZE ! 
+ : Makenull  ( FUNC )   ( 3  top> empty )
+\ 	{
+ ( #4 dummy reload )  ( 4  top> empty )
+
+\ 	stack[s]=0;
+ 2*               ( 9  top> #64d )
+ [ stack ] SYMBOL_+  ( 10  top> #66d )
+ [ 0 ] LIT_SWAP  ( 11  top> #67d )
+ !                ( 11  top> #67x #0x )
+\ 	};
+   ;  ( END )   
+
+( RTX 2000 code generation)
+
+\ static int Getelement ()
+ 64 FRAME_SIZE ! 
+ : Getelement  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int temp;
+
+\ 	if ( freelist>0 )
+ freelist  ( SYMBOL)    ( 8  top> empty )
+ @                ( 8  top> #0x )
+ 0>               ( 8  top> #0x )
+ [ 005 ] BRANCHZ   ( 9  top> #0x )
+\ 	    {
+
+\ 	    temp = freelist;
+ freelist  ( SYMBOL)    ( 12  top> empty )
+ @                ( 12  top> #0x )
+
+\ 	    freelist = cellspace[freelist].next;
+ DUP           ( #64)  ( 16  top> #64 )
+ 2*               ( 16  top> #0x #64 )
+ 2*               ( 16  top> #0x #64 )
+ [ cellspace ] SYMBOL_+  ( 17  top> #69d #64 )
+ 2  ( LIT)       ( 18  top> #70d #64 )
+ +                ( 18  top> #0x #0x #64 )
+ @                ( 18  top> #0x #64 )
+ freelist  ( SYMBOL)    ( 18  top> #0x #64 )
+ !                ( 18  top> #0x #0x #64 )
+2 U!
+\ 	    }
+ [ 006 ] BRANCH    ( 19  top> empty )
+
+\ 	else
+
+ [ 005 ] LABEL     ( 21  top> empty )
+
+\ 	    Error("out of space   ");
+\ *$LC2  ( SYMBOL)    ( 24  top> empty )
+\ ( #4 Calling Arg )  ( 26  top> #4 )
+ -64 FP+!  ( Link)   ( 26  top> empty )
+   Error  ( CALL)    ( 26  top> empty )
+ 64 FP+!  ( Unlink)  ( 26  top> empty )
+ [ 006 ] LABEL     ( 29  top> empty )
+
+\ 	return (temp);
+ 2 U@            ( 31  top> empty )
+\ 	};
+   ;  ( END )   
+
+
+
+( RTX 2000 code generation)
+
+\ static void Push(i,s) int i, s;
+ 64 FRAME_SIZE ! 
+ : Push  ( FUNC )   ( 3  top> empty )
+\ 	{
+\         int errorfound, localel;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+
+\ 	errorfound=false;
+ 0  ( LIT)       ( 9  top> #65 #64 )
+ 2 U!            ( 9  top> #66 #65 #64 )
+
+\ 	if ( stack[s] > 0 )
+ DUP           ( #65)  ( 12  top> #65 #64 )
+ 2*               ( 12  top> #0x #65 #64 )
+ [ stack ] SYMBOL_+  ( 13  top> #69d #65 #64 )
+ 3 U!  ( flush )   ( 16  top> #70d #65 #64 )
+ 4 U!            ( 16  top> #65 #64 )
+ 5 U!            ( 16  top> #64 )
+ 3 U@            ( 16  top> empty )
+ @                ( 16  top> #70x )
+ 0>               ( 16  top> #0x )
+ [ 008 ] BRANCHZ   ( 17  top> #0x )
+
+\ 	    if ( cellspace[stack[s]].discsize<=i )
+ 4 U@            ( 20  top> empty )
+ 2*               ( 20  top> #65x )
+ [ stack ] SYMBOL_+  ( 21  top> #74d )
+ @                ( 24  top> #75d )
+ 2*               ( 24  top> #0x )
+ 2*               ( 24  top> #0x )
+ [ cellspace ] SYMBOL_+  ( 25  top> #78d )
+ @                ( 26  top> #79d )
+ 5 U@            ( 27  top> #80x )
+ <=               ( 28  top> #64x #80x )
+ [ 108 ] BRANCHZ   ( 28  top> #0x )
+
+\ 		{
+\ 		errorfound=true;
+ 1  ( LIT)       ( 33  top> #66 )
+ 2 U!            ( 36  top> #66 )
+
+\ 		Error("disc size error");
+ -64 FP+!  ( Link)   ( 36  top> empty )
+   Error  ( CALL)    ( 36  top> empty )
+ 64 FP+!  ( Unlink)  ( 36  top> empty )
+
+\ 		};
+ [ 008 ] LABEL     ( 40  top> empty )
+ [ 108 ] LABEL     ( 40  top> empty )
+
+\ 	if ( ! errorfound )
+ 2 U@            ( 43  top> empty )
+ [ 0010 ] BRANCHNZ  ( 44  top> #0x )
+
+\ 	    {
+\ 	    localel=Getelement();
+ -64 FP+!  ( Link)   ( 49  top> empty )
+   Getelement  ( CALL)    ( 49  top> empty )
+ 64 FP+!  ( Unlink)  ( 49  top> #2x )
+
+\ 	    cellspace[localel].next=stack[s];
+ DUP           ( #67)  ( 53  top> #67 )
+ 2*               ( 53  top> #0x #67 )
+ 2*               ( 53  top> #0x #67 )
+ [ cellspace ] SYMBOL_+  ( 54  top> #83d #67 )
+ 4 U@            ( 56  top> #84 #67 )
+ 2*               ( 56  top> #65x #84 #67 )
+ [ stack ] SYMBOL_+  ( 57  top> #86d #84 #67 )
+ @_SWAP           ( 58  top> #87d #84d #67 )
+ 2  ( LIT)       ( 58  top> #84x #0x #67 )
+ +                ( 58  top> #0x #0x #0x #67 )
+ !                ( 58  top> #0x #0x #67 )
+
+\ 	    stack[s]=localel;
+ 4 U@            ( 61  top> #67 )
+ 2*               ( 61  top> #65x #67 )
+ [ stack ] SYMBOL_+  ( 62  top> #89d #67 )
+ OVER          ( #67)  ( 63  top> #90d #67 )
+ SWAP !           ( 63  top> #0x #90d #67 )
+
+\ 	    cellspace[localel].discsize=i;
+ 2*               ( 66  top> #67d )
+ 2*               ( 66  top> #0x )
+ [ cellspace ] SYMBOL_+  ( 67  top> #92d )
+ [ 5 ]  U@_SWAP  ( 68  top> #93d )
+ !                ( 68  top> #93x #64x )
+\ 	    }
+ EXIT  [ 0010 ] LABEL     ( 70  top> empty )
+\ 	};
+   ;  ( END )   
+
+ ( 71  top> empty )
+
+( RTX 2000 code generation)
+
+\ static void Init (s,n) int s, n;
+ 64 FRAME_SIZE ! 
+ : Init  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int discctr;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+
+ OVER          ( #64)  ( 10  top> #65 #64 )
+ 4 U!            ( 12  top> #64 #65 #4 ) \  WARNING -- stack argument problem!
+ 3 U!            ( 12  top> #65 #64 )
+
+\ 	Makenull(s);
+ ( #4 Calling Arg )  ( 28  top> #4 )
+ -64 FP+!  ( Link)   ( 12  top> empty )
+   Makenull  ( CALL)    ( 12  top> empty )
+ 64 FP+!  ( Unlink)  ( 12  top> empty )
+
+\ 	for ( discctr = n; discctr >= 1; discctr-- )
+ 3 U@            ( 15  top> empty )
+ [ 5 ] DUP_U!         ( 46  top> #66 )
+ 0>               ( 46  top> #66x )
+ [ 0016 ] BRANCHZ   ( 48  top> #0x )
+ ( LOOP_BEGIN)    ( 17  top> empty )
+
+\ 	    Push(discctr,s);
+ [ 0015 ] LABEL     ( 34  top> empty )
+ 5 U@            ( 24  top> empty )
+ 4 U@            ( 25  top> #4 )
+ ( #5 Calling Arg )  ( 28  top> #5 #4 )
+ ( #4 Calling Arg )  ( 28  top> #4 )
+ -64 FP+!  ( Link)   ( 28  top> empty )
+   Push  ( CALL)    ( 28  top> empty )
+ 64 FP+!  ( Unlink)  ( 28  top> empty )
+ -1  ( LIT)       ( 33  top> empty )
+ 5 U@ +   5 U!  ( 20  top> #0x )
+ 5 U@            ( 20  top> empty )
+ 0>               ( 20  top> #66x )
+ [ 0015 ] BRANCHNZ  ( 21  top> #0x )
+
+\ 	};
+ ( LOOP_END)      ( 39  top> empty )
+ EXIT  [ 0016 ] LABEL     ( 47  top> empty )
+   ;  ( END )   
+
+
+( RTX 2000 code generation)
+
+\ static int Pop (s) int s;
+ 64 FRAME_SIZE ! 
+ : Pop  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	 int temp, temp1;
+ ( #4 dummy reload )  ( 4  top> empty )
+
+\ 	if ( stack[s] > 0 )
+ DUP           ( #64)  ( 9  top> #64 )
+ 2*               ( 9  top> #0x #64 )
+ [ stack ] SYMBOL_+  ( 10  top> #68d #64 )
+ SWAP             ( 13  top> #69d #64 )
+ 2 U!            ( 13  top> #64 #69d )
+ @                ( 13  top> #69x )
+ 0>               ( 13  top> #0x )
+ [ 0018 ] BRANCHZ   ( 14  top> #0x )
+\ 	    {
+
+\ 	    temp1 = cellspace[stack[s]].discsize;
+ 2 U@            ( 18  top> empty )
+ 2*               ( 18  top> #64x )
+ [ stack ] SYMBOL_+  ( 19  top> #73d )
+ @                ( 22  top> #74d )
+
+\ 	    temp = cellspace[stack[s]].next;
+ 2*               ( 22  top> #0x )
+ 2*               ( 22  top> #0x )
+ [ cellspace ] SYMBOL_+  ( 23  top> #77d )
+ @                ( 24  top> #78d )
+ 2 U@            ( 27  top> #66 )
+ 2*               ( 27  top> #64x #66 )
+ [ stack ] SYMBOL_+  ( 28  top> #80d #66 )
+ @                ( 31  top> #81d #66 )
+
+\ 	    cellspace[stack[s]].next=freelist;
+ 2*               ( 31  top> #0x #66 )
+ 2*               ( 31  top> #0x #66 )
+ [ cellspace ] SYMBOL_+  ( 32  top> #84d #66 )
+ 2  ( LIT)       ( 33  top> #85d #66 )
+ +                ( 33  top> #0x #0x #66 )
+ @                ( 33  top> #0x #66 )
+ 2 U@            ( 36  top> #65 #66 )
+ 2*               ( 36  top> #64x #65 #66 )
+ [ stack ] SYMBOL_+  ( 37  top> #87d #65 #66 )
+ @                ( 40  top> #88d #65 #66 )
+ 2*               ( 40  top> #0x #65 #66 )
+ 2*               ( 40  top> #0x #65 #66 )
+ [ cellspace ] SYMBOL_+  ( 41  top> #91d #65 #66 )
+ freelist  ( SYMBOL)    ( 42  top> #92d #65 #66 )
+ @_SWAP           ( 42  top> #0x #92d #65 #66 )
+ 2  ( LIT)       ( 42  top> #92x #0x #65 #66 )
+ +                ( 42  top> #0x #0x #0x #65 #66 )
+ !                ( 42  top> #0x #0x #65 #66 )
+
+\ 	    freelist=stack[s];
+ 2 U@            ( 45  top> #65 #66 )
+ 2*               ( 45  top> #64x #65 #66 )
+ [ stack ] SYMBOL_+  ( 46  top> #94d #65 #66 )
+ @                ( 47  top> #95d #65 #66 )
+ freelist  ( SYMBOL)    ( 47  top> #0x #65 #66 )
+ !                ( 47  top> #0x #0x #65 #66 )
+
+\ 	    stack[s]=temp;
+ 2 U@            ( 50  top> #65 #66 )
+ 2*               ( 50  top> #64x #65 #66 )
+ [ stack ] SYMBOL_+  ( 51  top> #97d #65 #66 )
+ !                ( 52  top> #98d #65d #66 )
+\ 	    return (temp1);
+ EXIT         ( [ 0017 ] BRANCH )  ( 56  top> #66d )
+\ 	    }
+
+\ 	else
+\ 	    Error("nothing to pop ");
+ [ 0018 ] LABEL     ( 60  top> empty )
+\ *$LC4  ( SYMBOL)    ( 63  top> empty )
+\ ( #4 Calling Arg )  ( 65  top> #4 )
+ -64 FP+!  ( Link)   ( 65  top> empty )
+   Error  ( CALL)    ( 65  top> empty )
+ 64 FP+!  ( Unlink)  ( 65  top> empty )
+\ 	};
+ EXIT  [ 0017 ] LABEL     ( 72  top> empty )
+   ;  ( END )   
+
+ ( 72  top> empty )
+
+
+( RTX 2000 code generation)
+
+\ static void Move (s1,s2) int s1, s2;
+ 64 FRAME_SIZE ! 
+ : Move  ( FUNC )   ( 3  top> empty )
+\ 	{
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+
+\ 	Push(Pop(s1),s2);
+ 2 U!            ( 10  top> #65 #64d )
+ ( #4 Calling Arg )  ( 13  top> #4 )
+ -64 FP+!  ( Link)   ( 13  top> empty )
+   Pop  ( CALL)    ( 13  top> empty )
+ 64 FP+!  ( Unlink)  ( 13  top> #2x )
+ 2 U@            ( 18  top> #66d )
+ ( #5 Calling Arg )  ( 21  top> #5 #4 )
+ ( #4 Calling Arg )  ( 21  top> #4 )
+ -64 FP+!  ( Link)   ( 21  top> empty )
+   Push  ( CALL)    ( 21  top> empty )
+ 64 FP+!  ( Unlink)  ( 21  top> empty )
+
+\ 	movesdone=movesdone+1;
+ 1  ( LIT)       ( 25  top> empty )
+ movesdone  ( SYMBOL)    ( 25  top> #0x )
+ +!               ( 25  top> #0x #0x )
+\ 	};
+   ;  ( END )   
+
+ ( 26  top> empty )
+
+
+( RTX 2000 code generation)
+
+\ static void tower(i,j,k) int i,j,k;
+ 64 FRAME_SIZE ! 
+ : tower  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int other;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+ ( #6 dummy reload )  ( 6  top> #65 #64 )
+
+ 2 U!            ( 10  top> #66 #65 #64 )
+ 3 U!            ( 11  top> #65 #64 )
+ 4 U!            ( 11  top> #64 )
+
+\ 	if ( k==1 )
+ 2 U@            ( 11  top> empty )
+ 1  ( LIT)       ( 11  top> #66x )
+ -                ( 12  top> #68x #66x )
+ [ 0022 ] BRANCHNZ  ( 12  top> #0x )
+
+\ 	    Move(i,j);
+ 4 U@            ( 15  top> empty )
+ 3 U@            ( 16  top> #4 )
+ ( #5 Calling Arg )  ( 19  top> #5 #4 )
+ ( #4 Calling Arg )  ( 19  top> #4 )
+ -64 FP+!  ( Link)   ( 19  top> empty )
+   Move  ( CALL)    ( 19  top> empty )
+ 64 FP+!  ( Unlink)  ( 19  top> empty )
+ EXIT         ( [ 0023 ] BRANCH )  ( 21  top> empty )
+
+\ 	else
+ [ 0022 ] LABEL     ( 23  top> empty )
+\ 	    {
+
+\ 	    other=6-i-j;
+ 6  ( LIT)       ( 26  top> empty )
+ 3 U@            ( 26  top> #0x )
+ -                ( 26  top> #65x #0x )
+ 4 U@            ( 27  top> #69d )
+ -                ( 27  top> #64x #0x )
+ [ 8 ] DUP_U!            ( 37  top> #67 )
+ 4 U@            ( 31  top> #67 )
+
+ SWAP          ( #67)  ( 32  top> #4 #67 ) 
+\ WARNING -- stack argument problem! -- manually fixed by PJK
+
+\ 	    tower(i,other,k-1);
+ 2 U@            ( 33  top> #5 #4 )
+ 1  ( LIT)       ( 33  top> #66x #5 #4 )
+ -                ( 33  top> #0x #66x #5 #4 )
+ ( #6 Calling Arg )  ( 54  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 54  top> #5 #4 )
+ ( #4 Calling Arg )  ( 54  top> #4 )
+ -64 FP+!  ( Link)   ( 37  top> empty )
+ recurse \   tower  ( CALL)    ( 37  top> empty )
+ 64 FP+!  ( Unlink)  ( 37  top> empty )
+
+\ 	    Move(i,j);
+ 4 U@            ( 40  top> empty )
+ 3 U@            ( 41  top> #4 )
+ ( #5 Calling Arg )  ( 44  top> #5 #4 )
+ ( #4 Calling Arg )  ( 44  top> #4 )
+ -64 FP+!  ( Link)   ( 44  top> empty )
+   Move  ( CALL)    ( 44  top> empty )
+ 64 FP+!  ( Unlink)  ( 44  top> empty )
+
+\ 	    tower(other,j,k-1);
+ 8 U@            ( 48  top> empty )
+ 3 U@            ( 49  top> #4 )
+ 2 U@            ( 50  top> #5 #4 )
+ 1  ( LIT)       ( 50  top> #66x #5 #4 )
+ -                ( 50  top> #0x #66x #5 #4 )
+ ( #6 Calling Arg )  ( 54  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 54  top> #5 #4 )
+ ( #4 Calling Arg )  ( 54  top> #4 )
+ -64 FP+!  ( Link)   ( 54  top> empty )
+ recurse \   tower  ( CALL)    ( 54  top> empty )
+ 64 FP+!  ( Unlink)  ( 54  top> empty )
+
+\ 	    }
+\ 	};
+ EXIT  [ 0023 ] LABEL     ( 56  top> empty )
+   ;  ( END )   
+
+ ( 57  top> empty )
+
+( RTX 2000 code generation)
+
+\ void main ()    { /* Towers */
+ 64 FRAME_SIZE ! 
+ : main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\     int i, iter;
+
+\     for (iter = 0 ; iter < 35 ; iter++ )
+ 0  ( LIT)       ( 6  top> empty )
+ [ 0033 ADD_INDEX ] >R   ( 102  top> #65 )
+ ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+
+\    {
+ [ 0033 ] LABEL     ( 84  top> empty )
+
+\     for ( i=1; i <= maxcells; i++ )
+ 1  ( LIT)       ( 14  top> empty )
+ [ 0031 ADD_INDEX ] >R   ( 96  top> #64 )
+ ( TYPE 1 LOOP BEGIN)  ( 15  top> empty )
+ [ 0031 ] LABEL     ( 30  top> empty )
+
+\ 	cellspace[i].next=i-1;
+ [ 0031 ]  INDEX  ( 22  top> empty )
+ 2*               ( 22  top> #64x )
+ 2*               ( 22  top> #0x )
+ [ cellspace ] SYMBOL_+  ( 23  top> #69d )
+ [ 0031 ]  INDEX  ( 25  top> #70d )
+ 1  ( LIT)       ( 25  top> #64x #70d )
+ -                ( 25  top> #0x #64x #70d )
+ SWAP             ( 25  top> #0x #70d )
+ 2  ( LIT)       ( 25  top> #70x #0x )
+ +                ( 25  top> #0x #0x #0x )
+ !                ( 25  top> #0x #0x )
+ R>               ( 29  top> empty )
+ 1  ( LIT)       ( 29  top> #64x )
+ +                ( 29  top> #0x #64x )
+ DUP_>R           ( 18  top> #64 )
+ 18  ( LIT)       ( 18  top> #64x )
+ U>               ( 19  top> #67x #64x )
+ [ 0031 ] BRANCHZ   ( 19  top> #0x )
+ [ 0031 DROP_INDEX ] R>DROP  ( 35  top> empty )
+
+ [ 0034 ] LABEL     ( 97  top> empty )
+
+\     freelist=maxcells;
+ 18  ( LIT)       ( 38  top> empty )
+ freelist  ( SYMBOL)    ( 38  top> #0x )
+ !                ( 38  top> #0x #0x )
+
+\     Init(1,14);
+ 1  ( LIT)       ( 41  top> empty )
+ 14  ( LIT)       ( 42  top> #4 )
+ ( #5 Calling Arg )  ( 45  top> #5 #4 )
+ ( #4 Calling Arg )  ( 45  top> #4 )
+ -64 FP+!  ( Link)   ( 45  top> empty )
+   Init  ( CALL)    ( 45  top> empty )
+ 64 FP+!  ( Unlink)  ( 45  top> empty )
+
+\     Makenull(2);
+ 2  ( LIT)       ( 48  top> empty )
+ ( #4 Calling Arg )  ( 50  top> #4 )
+ -64 FP+!  ( Link)   ( 50  top> empty )
+   Makenull  ( CALL)    ( 50  top> empty )
+ 64 FP+!  ( Unlink)  ( 50  top> empty )
+
+\     Makenull(3);
+ 3  ( LIT)       ( 54  top> empty )
+ ( #4 Calling Arg )  ( 56  top> #4 )
+ -64 FP+!  ( Link)   ( 56  top> empty )
+   Makenull  ( CALL)    ( 56  top> empty )
+ 64 FP+!  ( Unlink)  ( 56  top> empty )
+
+\     movesdone=0;
+ 0  ( LIT)       ( 59  top> empty )
+ movesdone  ( SYMBOL)    ( 59  top> #0x )
+ !                ( 59  top> #0x #0x )
+
+\     tower(1,2,14);
+ 1  ( LIT)       ( 62  top> empty )
+ 2  ( LIT)       ( 63  top> #4 )
+ 14  ( LIT)       ( 64  top> #5 #4 )
+ ( #6 Calling Arg )  ( 68  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 68  top> #5 #4 )
+ ( #4 Calling Arg )  ( 68  top> #4 )
+ -64 FP+!  ( Link)   ( 68  top> empty )
+   tower  ( CALL)    ( 68  top> empty )
+ 64 FP+!  ( Unlink)  ( 68  top> empty )
+
+\     if ( movesdone != 16383 )
+ movesdone  ( SYMBOL)    ( 71  top> empty )
+ @                ( 71  top> #0x )
+ 16383  ( LIT)       ( 73  top> #72x )
+ -                ( 74  top> #73x #72x )
+ [ 0027 ] BRANCHZ   ( 74  top> #0x )
+
+\ 	do_error();
+ -64 FP+!  ( Link)   ( 77  top> empty )
+   do_error  ( CALL)    ( 77  top> empty )
+ 64 FP+!  ( Unlink)  ( 77  top> empty )
+
+ [ 0027 ] LABEL     ( 82  top> empty )
+ R>               ( 83  top> empty )
+ 1  ( LIT)       ( 83  top> #65x )
+ +                ( 83  top> #0x #65x )
+ DUP_>R           ( 10  top> #65 )
+ 34  ( LIT)       ( 10  top> #65x )
+ U>               ( 11  top> #66x #65x )
+\    }
+ [ 0033 ] BRANCHZ   ( 11  top> #0x )
+ [ 0033 DROP_INDEX ] R>DROP  ( 89  top> empty )
+ EXIT  [ 0035 ] LABEL     ( 103  top> empty )
+\     }; /* Towers */
+   ;  ( END )   
+
+

@@ -1,0 +1,190 @@
+                        AppForth Software Manual
+                              Version 1.2
+
+                       Wed  10-10-1990  16:34:01
+
+COPYRIGHT 1990
+HARRIS CORPORATION
+ALL RIGHTS RESERVED
+
+This software and documentation is provided by Harris Corporation,
+Semiconductor Sector as a courtesy to its customers free of charge.  The
+programs and other contents of the disk are not released products, and
+therefore are not supported by Harris Corporation and no warranty of any
+kind applies. Any liability resulting from use of this software is
+specifically disclaimed by Harris Corporation.
+
+\ ---------- Introduction
+
+AppForth is a target resident Forth for the Harris RTX 2000 family of
+processors.  It executes in ROM on the Harris RTX DB, and may be ported
+to other hardware platforms by meta-compilation.
+
+AppForth requires a console.  This may be a dumb terminal (if you really
+like to type!), any communications package running on a computer with a
+serial port, or the supplied terminal software (TERM.4 (source code) and
+TERM.EXE (executable image)) for IBM/PC and clones.  There are many
+"envionmental" features such as access to DOS commands and the ability
+to nest files when loading that are available only in TERM.  Source code
+is provided so that TERM may be implemented on other computers as
+needed.
+
+The AppForth package assumes familiarity with Forth and with programming
+in general and with the RTX 2000 series architecture.  Please see the
+references section if you need more help.
+
+Since AppForth is supplied as an application note, no support for this
+product is available from Harris Semiconductor.  If you need a supported
+Forth implementation, please contact Harris for a list of vendors and
+available implementations.
+                                                          
+\ ---------- Getting Started
+
+AppForth is supplied as binary image files on disk.  There is one file
+for each processor class: RTX 2000, RTX2001A, and RTX2010.  To use
+AppForth, you must first program a pair of PROMs with the binary image
+for the processor you are using.
+
+The image file (RTX2000.BIN, RTX2001A.BIN, or RTX2010.BIN) is a 16-bit
+wide image, with the odd and even bytes interleaved.  This means that
+when you program PROMs from one of these files, you must split the image
+into its odd and even components, one for each PROM.
+
+Also note that AppForth is configured for the hardware platform of the
+RTX DB only -- the image files supplied will only run on an RTX DB.
+When AppForth is running on the RTX DB, it can be modified to meta-
+compile for another hardware platform.  This is a non-trivial task and
+should not be undertaken without an intimate understanding of Forth and
+the RTX architecture.
+
+After creating the PROMs with AppForth in them and installing them into
+the RTX DB, connect a serial cable from the RTX DB to the console you
+will be using.
+
+If you are using a dumb terminal or a communications program other than
+the supplied TERM.EXE, configure your system to:
+
+        19200 baud
+            8 data bits
+            2 stop bits
+           no parity
+           no handshake
+
+If you are using TERM.EXE, determine which standard COM port you will be
+attached to, and execute (in DOS) an appropriate version of the
+following command (this is the TERM.EXE configuration):
+
+        C:> TERM  COM3  SAVSYS TERM.EXE  BYE
+
+Activate your terminal program or TERM.EXE now.  (TERM.EXE does not
+require any command line options after its initial configuration.)
+
+Apply power to the RTX DB.
+
+You should see a message similar to the following:
+
+    AppForth  v1.2  Wed  10-10-1990  13:22:24
+
+    COPYRIGHT 1990 HARRIS CORPORATION
+    ALL RIGHTS RESERVED
+
+    This software is provided by Harris Corporation, Semiconductor Sector
+    as a courtesy to its customers free of charge.  The programs and other
+    contents of the disk are not released products, and therefore are not
+    supported by Harris Corporation and no warranty of any kind applies.
+    Any liability resulting from use of this software is specifically
+    disclaimed by Harris Corporation.
+
+You are now communicating directly with AppForth on the RTX DB.
+
+\ ---------- AppForth Concepts
+
+Memory Usage
+
+AppForth is a stand-alone version of Forth running on an RTX series
+processor.  The kernel exists in PROM and maintains variables and other
+dynamic data in RAM.  The default memory map for AppForth is:
+
+        $0000 .. $3FFF  AppForth kernel in PROM
+        $4000 .. $7FFF  Unused space, could be an application PROM
+        $8000 .. $FFFF  System RAM
+
+The RAM usage of AppForth is:
+
+        $8000 .. $FBFF  Application dictionary space
+        $FC00 .. $FE1F  Interrupt vectors
+        $FE20 .. $FFFF  System variables and tables
+
+Meta Compilation
+
+BEWARE!  Meta Compilation is a painful subject, and the meta compiler
+supplied with AppForth is a very particular beast.  It is not a
+comprehensive meta compiler nor is it a general case meta compiler.
+
+AppForth is supplied as a binary and the source code required to
+regenerate the binary image, assuming a running AppForth system to
+compile it on.  To meta-compile AppForth, simply reset the system and
+load the file APPFORTH.4.  The load process will inquire if you wish to
+generate a RAM image (for testing purposes) or a ROM image.  If a ROM
+image was generated, it will be saved on disk in the file AROM.BIN,
+which may be burned into PROMs, installed, and executed.
+
+If a RAM (test) image was generated, it will execute at the memory
+location where it was compiled (at $A000 in the current system).  There
+are many problems which may allow the test image to execute, but the
+equivalent ROM image to fail.
+
+\ ---------- A Simple Application
+
+The following Forth source code is a recursive implementation of the
+Fibonacci function and may be used to verify system operation.  The
+source code may be entered interactively at the keyboard or put in a
+file and downloaded to AppForth.
+
+        \ calculate the Fibonacci number of I.  16 bit integers limit
+        \ the maximum value of I to 24.
+        : FIB ( i -- n)
+           DUP 2 > IF
+              DUP  1- RECURSE
+              SWAP 2- RECURSE  +
+           ELSE
+              DROP 1
+           THEN ;
+
+        \ caluclate the largest 16-bit fib
+        24 FIB U. ( should display 46368)
+
+        \ repeat the largest (and slowest) fib calculation N+1 times
+        : NFIBS ( n)
+           FOR
+              24 FIB DROP
+           NEXT ;
+
+\ ---------- The Terminal Program
+
+The following features of AppForth are available only when using the
+supplied host software TERM.EXE .
+
+o       Execute DOS commands without leaving the AppForth environment.
+        Commands such as EDIT, DIR, DEL, and COPY are available at all
+        times within AppForth as specific instances of the generic
+        AppForth command "DOS <any dos command line>" which will execute
+        the command line specified in a DOS shell and return to
+        AppForth.
+
+o       Load files from DOS across directory and drive boundaries,
+        nesting file loads up to 16 deep.
+
+o       Availability of BDOS services such as creating, opening,
+        closing, reading, and writing files.
+
+o       A simple file listing utility for keeping source code on the
+        screen while interactively debugging.
+
+The protocol structure of TERM allows the extension of these facilities
+to meet the user's needs.  This is why TERM is also supplied in source
+format.
+
+On computers other than IBM/PC and clones, TERM may be ported to any
+native version of Forth or re-implemented in another language.  There is
+nothing about TERM itself that is peculiar to Forth or the RTX.

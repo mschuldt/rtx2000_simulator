@@ -1,0 +1,307 @@
+\ /* matmul.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+\ gcc_compiled.:
+( RTX 2000 code generation)
+EMPTY
+
+: XY " DOS XY matmul.ins" EVALUATE ;
+
+DECIMAL
+
+load GNUins.4
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ int seed ;
+
+VARIABLE seed   4   CELL- ALLOT
+
+\ #define ROWSIZE 40
+\  
+\     /* Intmm, Mm */
+\ int ima[ROWSIZE+1][ROWSIZE+1],
+\     imb[ROWSIZE+1][ROWSIZE+1],
+\     imr[ROWSIZE+1][ROWSIZE+1];
+
+VARIABLE imr   3364   CELL- ALLOT
+
+VARIABLE imb   3364   CELL- ALLOT
+
+VARIABLE ima   3364   CELL- ALLOT
+
+
+\ static void Initrand ()
+ : Initrand  ( FUNC )   ( 3  top> empty )
+\     {
+\     seed = 9219;
+ 9219  ( LIT)       ( 6  top> empty )
+ seed  ( SYMBOL)    ( 6  top> #0x )
+ !                ( 6  top> #0x #0x )
+\     };
+   ;  ( END )     ( 6  top> empty )( RTX 2000 code generation)
+
+
+\ static int Rand ()
+ : Rand  ( FUNC )   ( 3  top> empty )
+\     {
+\     seed = (seed * 1309 + 13849) ;
+ seed  ( SYMBOL)    ( 6  top> empty )
+ @                ( 6  top> #0x )
+ 1309  ( LIT)       ( 6  top> #0x )
+ *                ( 6  top> #0x #0x )
+ 13849  ( LIT)       ( 8  top> #64d )
+ +                ( 8  top> #0x #0x )
+\     return( seed );
+ seed  ( SYMBOL)    ( 10  top> #0x )
+ TUCK_!           ( 10  top> #0x )
+\     };
+   ;  ( END )   
+
+
+\ static void Initmatrix ( m ) int m[ROWSIZE+1][ROWSIZE+1];
+: Initmatrix  ( FUNC )   ( 3  top> empty )
+\         {
+\         int temp, i, j;
+
+ ( #4 dummy reload )  ( 4  top> empty )
+
+\         for ( i = 1; i <= ROWSIZE; i++ )
+ 1  ( LIT)       ( 8  top> #64 )
+ 2 U!!            ( 72  top> #66 #64 )
+ 3 U!!            ( 72  top> #64 )
+ ( LOOP_BEGIN)    ( 9  top> empty )
+ [ 0011 ] LABEL     ( 54  top> empty )
+
+\             for ( j = 1; j <= ROWSIZE; j++ )
+ 1  ( LIT)       ( 15  top> empty )
+ 4 U!!            ( 66  top> #67 )
+ 2 U@@            ( 69  top> empty )
+ 82  ( LIT)       ( 69  top> #66x )
+ *                ( 69  top> #0x #66x )
+ 3 U@@  +         ( 70  top> #71d )
+ 5 U!!            ( 16  top> #72 )
+ ( LOOP_BEGIN)    ( 16  top> empty )
+
+\             {   temp = Rand();
+ [ 0010 ] LABEL     ( 43  top> empty )
+ -64 FP+!  ( Link)   ( 25  top> empty )
+   Rand  ( CALL)    ( 25  top> empty )
+ 64 FP+!  ( Unlink)  ( 25  top> #2x )
+
+\                 m[i][j] = temp - (temp/120)*120 - 60;
+ 4 U@@            ( 31  top> #70 )
+ 2*               ( 31  top> #67x #70 )
+ 5 U@@  +         ( 32  top> #73d #70 )
+ OVER          ( #70)  ( 33  top> #74 #70 )
+ 120  ( LIT)       ( 33  top> #0x #74 #70 )
+ /                ( 33  top> #0x #0x #74 #70 )
+ 120  ( LIT)       ( 34  top> #75d #74 #70 )
+ *                ( 34  top> #0x #0x #74 #70 )
+ ROT              ( 35  top> #76d #74 #70d )
+ SWAP-            ( 35  top> #70x #76d #74 )
+ 60  ( LIT)       ( 37  top> #77d #74d )
+ -                ( 37  top> #0x #0x #74d )
+ SWAP !           ( 37  top> #0x #74d )
+ 4 U@@            ( 42  top> empty )
+ 1  ( LIT)       ( 42  top> #67x )
+ +                ( 42  top> #0x #67x )
+ [ 4 ] DUP_U!         ( 19  top> #67 )
+ 40  ( LIT)       ( 19  top> #67x )
+ >                ( 20  top> #69x #67x )
+ [ 0010 ] BRANCHZ   ( 20  top> #0x )
+ ( TYPE 1 LOOP END)  ( 48  top> empty )
+\             };
+
+ [ 0012 ] LABEL     ( 67  top> empty )
+ 2 U@@            ( 53  top> empty )
+ 1  ( LIT)       ( 53  top> #66x )
+ +                ( 53  top> #0x #66x )
+ [ 2 ] DUP_U!         ( 12  top> #66 )
+ 40  ( LIT)       ( 12  top> #66x )
+ >                ( 13  top> #68x #66x )
+ [ 0011 ] BRANCHZ   ( 13  top> #0x )
+ ( TYPE 1 LOOP END)  ( 59  top> empty )
+\         };
+ EXIT  [ 0013 ] LABEL     ( 73  top> empty )
+   ;  ( END )   
+
+ ( 61  top> empty )
+
+( RTX 2000 code generation)
+
+
+\ static void Innerproduct( result,a,b, row,column)
+ : Innerproduct  ( FUNC )   ( 3  top> empty )
+\         int *result,
+\             a[ROWSIZE+1][ROWSIZE+1],
+\             b[ROWSIZE+1][ROWSIZE+1],
+\             row,column;
+\         /* computes the inner product of A[row,*] and B[*,column] */
+\         {
+\         int i;
+
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+ ( #6 dummy reload )  ( 6  top> #65 #64 )
+ ( #7 dummy reload )  ( 7  top> #66 #65 #64 )
+ 2 U@@  ( MEM_ARG@)  ( 8  top> #67 #66 #65 #64 )
+ 2 U!!            ( 8  top> #68 #67 #66 #65 #64 )
+ 3 U!!            ( 8  top> #67 #66 #65 #64 )
+ 4 U!!            ( 8  top> #66 #65 #64 )
+
+\         *result = 0;
+ 0  ( LIT)       ( 12  top> #65 #64 )
+ 2_PICK        ( #64)  ( 12  top> #0x #65 #64 )
+ !                ( 12  top> #0x #0x #65 #64 )
+ 1  ( LIT)       ( 14  top> #65 #64 )
+ 5 U!!            ( 46  top> #69 #65 #64 )
+ 6 U!!            ( 46  top> #65 #64 )
+ 7 U!!            ( 46  top> #64 )
+
+\         for(i = 1; i <= ROWSIZE; i++ )*result = 
+\  *result+a[row][i]*b[i][column];
+ 5 U@@            ( 46  top> empty )
+ 40  ( LIT)       ( 46  top> #69x )
+ <=               ( 48  top> #70x #69x )
+ [ 0019 ] BRANCHZ   ( 48  top> #0x )
+ 3 U@@            ( 49  top> empty )
+ 82  ( LIT)       ( 49  top> #67x )
+ *                ( 49  top> #0x #67x )
+ 6 U@@  +         ( 50  top> #71d )
+ 2 U@@            ( 51  top> #72 )
+ 2*               ( 51  top> #68x #72 )
+ 8 U!!            ( 15  top> #77 #72 )
+ 9 U!!            ( 15  top> #72 )
+ ( LOOP_BEGIN)    ( 15  top> empty )
+ [ 0018 ] LABEL     ( 34  top> empty )
+ 5 U@@            ( 22  top> empty )
+ 2*               ( 22  top> #69x )
+ 9 U@@  +         ( 23  top> #73d )
+ 5 U@@            ( 24  top> #74 )
+ 82  ( LIT)       ( 24  top> #69x #74 )
+ *                ( 24  top> #0x #69x #74 )
+ 4 U@@  +         ( 25  top> #75d #74 )
+ 8 U@@  +         ( 27  top> #76d #74 )
+ @_SWAP           ( 28  top> #74x #78d )
+ @_SWAP           ( 28  top> #78x #0x )
+ *                ( 28  top> #0x #0x )
+ 7 U@@            ( 29  top> #79d )
+ @ +              ( 29  top> #64x #0x )
+ 7 U@@  !         ( 30  top> #80d )
+ 5 U@@            ( 33  top> empty )
+ 1  ( LIT)       ( 33  top> #69x )
+ +                ( 33  top> #0x #69x )
+ [ 5 ] DUP_U!         ( 18  top> #69 )
+ 40  ( LIT)       ( 18  top> #69x )
+ >                ( 19  top> #70x #69x )
+ [ 0018 ] BRANCHZ   ( 19  top> #0x )
+ ( TYPE 1 LOOP END)  ( 39  top> empty )
+\         };
+ EXIT  [ 0019 ] LABEL     ( 47  top> empty )
+   ;  ( END )   
+
+ ( 41  top> empty )
+
+( RTX 2000 code generation)
+
+
+\ void main ()
+: main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\     {
+\     int i, j, iter;
+
+\    for (iter = 1 ; iter < 25; iter++ )
+ 1  ( LIT)       ( 6  top> empty )
+ [ 0032 ADD_INDEX ] >R   ( 105  top> #66 )
+ ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+
+\    {
+ [ 0032 ] LABEL     ( 84  top> empty )
+
+\     Initrand();
+ -64 FP+!  ( Link)   ( 15  top> empty )
+   Initrand  ( CALL)    ( 15  top> empty )
+ 64 FP+!  ( Unlink)  ( 15  top> empty )
+
+\     Initmatrix (ima);
+ ima  ( SYMBOL)    ( 18  top> empty )
+ ( #4 Calling Arg )  ( 20  top> #4 )
+ -64 FP+!  ( Link)   ( 20  top> empty )
+   Initmatrix  ( CALL)    ( 20  top> empty )
+ 64 FP+!  ( Unlink)  ( 20  top> empty )
+
+\     Initmatrix (imb);
+ imb  ( SYMBOL)    ( 24  top> empty )
+ ( #4 Calling Arg )  ( 26  top> #4 )
+ -64 FP+!  ( Link)   ( 26  top> empty )
+   Initmatrix  ( CALL)    ( 26  top> empty )
+ 64 FP+!  ( Unlink)  ( 26  top> empty )
+
+\     for ( i = 1; i <= ROWSIZE; i++ )
+ 1  ( LIT)       ( 30  top> #64 )
+ [ 0031 ADD_INDEX ] >R   ( 101  top> #64 )
+ ( TYPE 1 LOOP BEGIN)  ( 31  top> empty )
+ [ 0031 ] LABEL     ( 73  top> empty )
+
+\         for ( j = 1; j <= ROWSIZE; j++ )
+\ Innerproduct(&imr[i][j],ima,imb,i,j);
+ 1  ( LIT)       ( 37  top> empty )
+ 2 U!!            ( 96  top> #65 )
+ [ 0031 ]  INDEX  ( 99  top> empty )
+ 82  ( LIT)       ( 99  top> #64x )
+ *                ( 99  top> #0x #64x )
+ 3 U!!            ( 38  top> #70 )
+ ( LOOP_BEGIN)    ( 38  top> empty )
+ [ 0030 ] LABEL     ( 62  top> empty )
+ 2 U@@            ( 44  top> empty )
+ 2*               ( 44  top> #65x )
+ [ imr ] SYMBOL_+  ( 45  top> #71d )
+ 2 U@@            ( 48  top> #72 )
+ [ 2 ] MEM_ARG!  ( 48  top> #65x #72 )
+ 3 U@@  +         ( 49  top> #72d )
+ ima  ( SYMBOL)    ( 50  top> #4 )
+ imb  ( SYMBOL)    ( 51  top> #5 #4 )
+ [ 0031 ]  INDEX  ( 52  top> #6 #5 #4 )
+ ( #7 Calling Arg )  ( 57  top> #7 #6 #5 #4 )
+ ( #6 Calling Arg )  ( 57  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 57  top> #5 #4 )
+ ( #4 Calling Arg )  ( 57  top> #4 )
+ -64 FP+!  ( Link)   ( 57  top> empty )
+   Innerproduct  ( CALL)    ( 57  top> empty )
+ 64 FP+!  ( Unlink)  ( 57  top> empty )
+ 2 U@@            ( 61  top> empty )
+ 1  ( LIT)       ( 61  top> #65x )
+ +                ( 61  top> #0x #65x )
+ [ 2 ] DUP_U!         ( 41  top> #65 )
+ 40  ( LIT)       ( 41  top> #65x )
+ >                ( 42  top> #69x #65x )
+ [ 0030 ] BRANCHZ   ( 42  top> #0x )
+ ( TYPE 1 LOOP END)  ( 67  top> empty )
+\    }
+
+ [ 0033 ] LABEL     ( 97  top> empty )
+ R>               ( 72  top> empty )
+ 1  ( LIT)       ( 72  top> #64x )
+ +                ( 72  top> #0x #64x )
+ DUP_>R           ( 34  top> #64 )
+ 40  ( LIT)       ( 34  top> #64x )
+ U>               ( 35  top> #68x #64x )
+ [ 0031 ] BRANCHZ   ( 35  top> #0x )
+ [ 0031 DROP_INDEX ] R>DROP  ( 78  top> empty )
+ [ 0034 ] LABEL     ( 102  top> empty )
+ R>               ( 83  top> empty )
+ 1  ( LIT)       ( 83  top> #66x )
+ +                ( 83  top> #0x #66x )
+ DUP_>R           ( 10  top> #66 )
+dup . 24  ( LIT)       ( 10  top> #66x )
+ U>               ( 11  top> #67x #66x )
+ [ 0032 ] BRANCHZ   ( 11  top> #0x )
+ [ 0032 DROP_INDEX ] R>DROP  ( 89  top> empty )
+
+\   };
+ EXIT  [ 0035 ] LABEL     ( 106  top> empty )
+   ;  ( END )   
+
+.( max iteration is 24 )
+

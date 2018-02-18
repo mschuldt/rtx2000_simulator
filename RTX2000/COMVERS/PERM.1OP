@@ -1,0 +1,191 @@
+\ /* perm.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY PERM.1OP" EVALUATE ;
+
+DECIMAL
+\ load GNUTOOL.4
+load GNUinst.4
+
+\ int    permarray[permrange+1];
+\ int    pctr;
+VARIABLE permarray   24   CELL- ALLOT
+VARIABLE pctr   4   CELL- ALLOT
+
+\ #define    permrange 10
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\ 	printf(" Error in Perm.\n"); }
+ ." Error in Perm."  cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+ 64 FRAME_SIZE ! 
+
+( 10A1B8 /0)  : Swap_el  ( FUNC )   ( 3  top> empty )
+( 10A230 /10A1B8)  ( #4 dummy reload )  ( 4  top> empty )
+( 10A318 /10A230)  ( #5 dummy reload )  ( 5  top> #64 )
+( 10A4B8 /10A318)  0_PICK   ++    ( #65)  ( 9  top> #65 #64 )
+( 10A510 /10A4B8)  @                ( 9  top> #0x #65 #64 )
+( 10A7B0 /10A510)  >R               ( 10  top> #0x #65 #64d )
+( 10A820 /10A7B0)  1_PICK   ++    ( #64)  ( 10  top> #65 #64d )
+( 10A8A8 /10A820)  @_SWAP           ( 10  top> #0x #65 #64d )
+( 10A930 /10A8A8)  !                ( 10  top> #0x #65 #64d )
+( 10AB90 /10A930)  R>               ( 11  top> #64d )
+( 10AD80 /10AB90)  SWAP !           ( 11  top> #0x #64d )
+( 10ADC0 /10AD80)    ;  ( END )   
+
+ ( 12  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 10B040 /0)  : Initialize  ( FUNC )   ( 3  top> empty )
+( 10B0F0 /10B040)  1  ( LIT)       ( 6  top> empty )
+( 10B230 /10B0F0)  2 U!            ( 35  top> #64 )
+( 10B3B0 /10B230)  ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+( 10B3D8 /10B3B0)  [ 007 ] LABEL     ( 23  top> empty )
+( 10B400 /10B3D8)  2 U@            ( 15  top> empty )
+( 10B4E8 /10B400)  0_PICK       ( #64)  ( 15  top> #64x )
+( 10B528 /10B4E8)  2*               ( 15  top> #0x #64x )
+( 10B648 /10B528)  [ permarray ] SYMBOL_+  ( 16  top> #67d #64x )
+( 10BCB8 /10B648)  1_PICK   ++    ( #64)  ( 18  top> #68d #64x )
+( 10BD40 /10BCB8)  1  ( LIT)       ( 18  top> #0x #68d #64x )
+( 10BDE0 /10BD40)  -                ( 18  top> #0x #0x #68d #64x )
+( 10BE98 /10BDE0)  SWAP !           ( 18  top> #0x #68d #64x )
+( 10C2A8 /10BE98)  1  ( LIT)       ( 22  top> #0x )
+( 10C330 /10C2A8)  +                ( 22  top> #0x #64x )
+( 10C698 /10C330)  [ 2 ] DUP_U!         ( 10  top> #64 )
+( 10C700 /10C698)  7  ( LIT)       ( 10  top> #64x )
+( 10C740 /10C700)  >                ( 11  top> #65x #64x )
+( 10C7D8 /10C740)  [ 007 ] BRANCHZ   ( 11  top> #0x )
+( 10C818 /10C7D8)  ( LOOP_END)      ( 28  top> empty )
+( 10C840 /10C818)  EXIT  [ 008 ] LABEL     ( 36  top> empty )
+( 10C868 /10C840)    ;  ( END )   
+
+ ( 30  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 10DA70 /0)  : Permute  ( FUNC )   ( 3  top> empty )
+( 10DAE8 /10DA70)  ( #4 dummy reload )  ( 4  top> empty )
+( 110F40 /10DAE8)  1  ( LIT)       ( 10  top> #64 )
+( 111038 /110F40)  pctr  ( SYMBOL)    ( 10  top> #0x #64 )
+( 1110A8 /111038)  +!               ( 10  top> #0x #0x #64 )
+( 111260 /1110A8)  [ 2 ] DUP_U!         ( 13  top> #64 )
+( 1112C8 /111260)  1  ( LIT)       ( 13  top> #64x )
+( 111308 /1112C8)  -                ( 14  top> #68x #64x )
+( 1113A0 /111308)  [ 0010 ] BRANCHZ   ( 14  top> #0x )
+( 10EC78 /1113A0)  2 U@            ( 19  top> empty )
+( 10EDA0 /10EC78)  1  ( LIT)       ( 19  top> #0x )
+( 10EDF8 /10EDA0)  -                ( 19  top> #0x #0x )
+( 10EEC0 /10EDF8)  ( #4 Calling Arg )  ( 21  top> #4 )
+( 10EF58 /10EEC0)  -64 FP+!  ( Link)   ( 21  top> empty )
+RECURSE \ ( 10EF80 /10EF58)    Permute  ( CALL)    ( 21  top> empty )
+( 10EFA8 /10EF80)  64 FP+!  ( Unlink)  ( 21  top> empty )
+( 10EFD0 /10EFA8)  2 U@            ( 24  top> empty )
+( 10F0F8 /10EFD0)  1  ( LIT)       ( 24  top> #0x )
+( 10F150 /10F0F8)  -                ( 24  top> #0x #0x )
+( 114280 /10F150)  [ 3 ] DUP_U!         ( 24  top> #65 )
+( 10F830 /114280)  0>               ( 79  top> #65x )
+( 10F8C8 /10F830)  [ 0015 ] BRANCHZ   ( 81  top> #0x )
+( 10F908 /10F8C8)  2 U@            ( 82  top> empty )
+( 10FA30 /10F908)  2*               ( 82  top> #0x )
+( 111588 /10FA30)  4 U!            ( 26  top> #71 )
+( 111620 /111588)  ( LOOP_BEGIN)    ( 26  top> empty )
+( 111648 /111620)  [ 0014 ] LABEL     ( 66  top> empty )
+( 111670 /111648)  3 U@            ( 35  top> empty )
+( 111798 /111670)  2*               ( 35  top> #0x )
+( 111D60 /111798)  4 U@            ( 38  top> #73 )
+( 111F78 /111D60)  [ permarray ] SYMBOL_+  ( 38  top> #0x #73 )
+\ ( 1142D8 /111F78)  5 U!            ( 38  top> #4 #73d ) WARNING -- stack argument problem!
+                     SWAP
+( 1123D0 /1142D8)  [ permarray ] SYMBOL_+  ( 39  top> #73x )
+\ ( 1125D0 /1123D0)  6 U!            ( 42  top> #5 )
+( 112800 /1125D0)  -64 FP+!  ( Link)   ( 42  top> empty )
+( 112828 /112800)    Swap_el  ( CALL)    ( 42  top> empty )
+( 112850 /112828)  64 FP+!  ( Unlink)  ( 42  top> empty )
+( 112878 /112850)  2 U@            ( 46  top> empty )
+( 1129A0 /112878)  1  ( LIT)       ( 46  top> #0x )
+( 1129F8 /1129A0)  -                ( 46  top> #0x #0x )
+( 112AC0 /1129F8)  ( #4 Calling Arg )  ( 48  top> #4 )
+( 112B58 /112AC0)  -64 FP+!  ( Link)   ( 48  top> empty )
+RECURSE \ ( 112B80 /112B58)    Permute  ( CALL)    ( 48  top> empty )
+( 112BA8 /112B80)  64 FP+!  ( Unlink)  ( 48  top> empty )
+( 112BD0 /112BA8)  3 U@            ( 53  top> empty )
+( 112CF8 /112BD0)  2*               ( 53  top> #0x )
+( 112E18 /112CF8)  4 U@            ( 56  top> #78 )
+( 113030 /112E18)  [ permarray ] SYMBOL_+  ( 56  top> #0x #78 )
+\ ( 114360 /113030)  5 U!            ( 56  top> #4 #78d ) WARNING -- stack argument problem!
+                    SWAP
+( 113488 /114360)  [ permarray ] SYMBOL_+  ( 57  top> #78x )
+\ ( 113688 /113488)  6 U!            ( 60  top> #5 )
+( 1138B8 /113688)  -64 FP+!  ( Link)   ( 60  top> empty )
+( 1138E0 /1138B8)    Swap_el  ( CALL)    ( 60  top> empty )
+( 113908 /1138E0)  64 FP+!  ( Unlink)  ( 60  top> empty )
+( 113BF8 /113908)  3 U@            ( 65  top> empty )
+( 113D20 /113BF8)  1  ( LIT)       ( 65  top> #0x )
+( 113D78 /113D20)  -                ( 65  top> #0x #65x )
+( 113EC0 /113D78)  [ 3 ] DUP_U!         ( 29  top> #65 )
+( 113F28 /113EC0)  0>               ( 29  top> #65x )
+( 113FC0 /113F28)  [ 0014 ] BRANCHNZ  ( 30  top> #0x )
+( 114000 /113FC0)  ( LOOP_END)      ( 71  top> empty )
+( 114028 /114000)  [ 0015 ] LABEL     ( 80  top> empty )
+( 114050 /114028)  EXIT  [ 0010 ] LABEL     ( 73  top> empty )
+( 114078 /114050)    ;  ( END )   
+
+ ( 74  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+( 10DB58 /0)  : main  ( FUNC )   ( 3  top> empty )
+( 10DBD0 /10DB58)  1  ( LIT)       ( 6  top> empty )
+( 10DD10 /10DBD0)  [ 0021 ADD_INDEX ] >R   ( 50  top> #64 )
+( 10DE90 /10DD10)  ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+( 10DEB8 /10DE90)  [ 0021 ] LABEL     ( 38  top> empty )
+( 10DF58 /10DEB8)  0  ( LIT)       ( 14  top> empty )
+( 10DF80 /10DF58)  pctr  ( SYMBOL)    ( 14  top> #0x )
+( 10DFC0 /10DF80)  !                ( 14  top> #0x #0x )
+( 10E2E0 /10DFC0)  -64 FP+!  ( Link)   ( 17  top> empty )
+( 10E308 /10E2E0)    Initialize  ( CALL)    ( 17  top> empty )
+( 10E330 /10E308)  64 FP+!  ( Unlink)  ( 17  top> empty )
+( 10E3A8 /10E330)  7  ( LIT)       ( 20  top> empty )
+( 10E410 /10E3A8)  ( #4 Calling Arg )  ( 22  top> #4 )
+( 10E450 /10E410)  -64 FP+!  ( Link)   ( 22  top> empty )
+( 10E478 /10E450)    Permute  ( CALL)    ( 22  top> empty )
+( 10E4A0 /10E478)  64 FP+!  ( Unlink)  ( 22  top> empty )
+( 10E808 /10E4A0)  pctr  ( SYMBOL)    ( 26  top> empty )
+( 10E830 /10E808)  @                ( 26  top> #0x )
+( 10E9F0 /10E830)  8660  ( LIT)       ( 28  top> #66x )
+( 10EA30 /10E9F0)  -                ( 29  top> #67x #66x )
+( 10EAC8 /10EA30)  [ 0019 ] BRANCHZ   ( 29  top> #0x )
+( 10FDD0 /10EAC8)  -64 FP+!  ( Link)   ( 31  top> empty )
+( 10FDF8 /10FDD0)    do_error  ( CALL)    ( 31  top> empty )
+( 10FE20 /10FDF8)  64 FP+!  ( Unlink)  ( 31  top> empty )
+( 110110 /10FE20)  [ 0019 ] LABEL     ( 36  top> empty )
+( 110138 /110110)  R>               ( 37  top> empty )
+( 110260 /110138)  1  ( LIT)       ( 37  top> #0x )
+( 1102B8 /110260)  +                ( 37  top> #0x #64x )
+( 110458 /1102B8)  DUP_>R   ( #64 )  ( 10  top> #64 )
+( 1104C0 /110458)  250  ( LIT)       ( 10  top> #64x )
+( 110500 /1104C0)  U>               ( 11  top> #65x #64x )
+( 110598 /110500)  [ 0021 ] BRANCHZ   ( 11  top> #0x )
+( 1105D8 /110598)  [ 0021 DROP_INDEX ] R>DROP  ( 43  top> empty )
+( 110600 /1105D8)  EXIT  [ 0022 ] LABEL     ( 51  top> empty )
+( 110628 /110600)    ;  ( END )   
+
+ ( 45  top> empty )
+

@@ -1,0 +1,157 @@
+\ /* Eratosthenes Siee Prime Number Program in C from Byte January 1983 */
+
+\ Hand-changed to reflect best possible interblock analysis
+
+EMPTY
+: XY " DOS XY SIEVE.hnd " EVALUATE ;
+
+\ load GNUTOOL.4
+load GNUinst.4
+
+\ char flags [size+1];
+VARIABLE flags   8192   CELL- ALLOT
+\ #define true 1
+\ #define false 0
+\ #define size 8190
+
+DECIMAL
+ #REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ static void do_error() {
+ : do_error  ( FUNC )   ( 3  top> empty )
+\ 	printf(" Error in Sieve.\n"); }
+  ." Error in Sieve."   CR
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+\ void main()
+: main  ( FUNC )   ( 3  top> empty )
+\   {
+\     int prime, count, iter;
+\     register i,k;
+ #REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ \\ count is allocated on stack
+ 0  ( LIT)                 ( 14  top> #count )
+
+\     for(iter = 1; iter < 350 ; iter++)
+ 1  ( LIT)                 ( 6  top> #count )
+ [ 0019 ADD_INDEX ] >R     ( 137  top> #66 #count )
+ ( TYPE 1 LOOP BEGIN)      ( 7  top> #count )
+
+\       {
+ [ 0019 ] LABEL            ( 99  top> #count )
+
+\       count = 0 ;  /* prime counter */
+ DROP  0                   ( 14  top> #count )
+
+\       for (i = 0; i <= size; i++)  /* set all flags true */
+ 0  ( LIT)                 ( 131  top> #count )
+ [ 009 ADD_INDEX ] >R      ( 131  top> #67 #count )
+ ( TYPE 1 LOOP BEGIN)      ( 17  top> #count )
+
+ [ 009 ] LABEL             ( 30  top> #count )
+
+\          flags[i] = true ;
+ 1  ( LIT)                 ( 24  top> #count )
+ flags  ( SYMBOL)          ( 24  top> #0x #count )
+ [ 009 ]  INDEX +          ( 25  top> #71x #0x #count )
+ C!                        ( 25  top> #72x #0x #count )
+ R>                        ( 29  top> #count )
+ 1  ( LIT)                 ( 29  top> #67x #count )
+ +                         ( 29  top> #0x #67x #count )
+ DUP_>R                    ( 20  top> #67 #count )
+ 8190  ( LIT)              ( 20  top> #67x #count )
+ U>                        ( 21  top> #70x #67x #count )
+ [ 009 ] BRANCHZ           ( 21  top> #0x #count )
+ [ 009 DROP_INDEX ] R>DROP ( 35  top> #count )
+ [ 0023 ] LABEL            ( 132  top> #count )
+
+\       for (i = 0; i <= size; i++)
+ 0  ( LIT)                 ( 38  top> #count )
+ [ 0018 ADD_INDEX ] >R     ( 125  top> #67 #count )
+ ( TYPE 1 LOOP BEGIN)      ( 39  top> #count )
+
+\          {
+ [ 0018 ] LABEL            ( 88  top> #count )
+
+\            if (flags[i])     /* found a prime */
+ flags  ( SYMBOL)          ( 47  top> #count )
+ [ 0018 ]  INDEX +         ( 47  top> #71x #count )
+ C@                        ( 48  top> #75d #count )
+ [ 0012 ] BRANCHZ          ( 51  top> #0x #count )
+
+\            {
+\              prime = i + i + 3 ;
+ [ 0018 ]  INDEX           ( 54  top> #count )
+ 2*                        ( 54  top> #67x #count )
+ 3  ( LIT)                 ( 56  top> #78d #count )
+ +                         ( 56  top> #0x #0x #count )
+ [ 0018 ]  INDEX           ( 58  top> #prime #count )
+ OVER_+                    ( 58  top> #67x #prime #count )
+
+\              for (k = i+prime; k<=size; k+= prime)
+ 8190  ( LIT)              ( 119  top> #k #prime #count )
+ 1_PICK  >                 ( 119  top> #8190 #k #prime #count )
+ [ 0021 ] BRANCHZ          ( 121  top> #0x  #k #prime #count )
+ ( LOOP_BEGIN)             ( 60  top> #k #prime  #count )
+ [ 0017 ] LABEL            ( 74  top>  #k #prime #count )
+
+\                      flags[k] = false;
+ 0  ( LIT)                 ( 67  top>  #k #prime #count )
+ flags  ( SYMBOL)          ( 67  top> #0x  #k #prime #count )
+ 2_PICK +    ++            ( 68  top> #71x #0x #k #prime  #count )
+ C!                        ( 68  top> #83x #0x #k #prime  #count )
+
+ OVER_+                    ( 72  top> #k #prime #count )
+ 0_PICK                    ( 63  top> #k #prime #count )
+ 8190  ( LIT)              ( 63  top> #k #k #prime #count )
+ >                         ( 64  top> #81x #k  #k #prime #count )
+ [ 0017 ] BRANCHZ          ( 64  top> #0x  #k #prime #count )
+ ( TYPE 2 LOOP END)        ( 79  top>  #k #prime #count )
+ [ 0021 ] LABEL            ( 120  top>  #k #prime #count )
+
+ DROP DROP
+\              count++;
+ 1  +                      ( 82  top> #count )
+
+\            }
+ [ 0012 ] LABEL            ( 86  top> #count )
+ R>                        ( 87  top> #count )
+ 1  ( LIT)                 ( 87  top> #67x #count )
+ +                         ( 87  top> #0x #67x #count )
+ DUP_>R                    ( 42  top> #67 #count )
+ 8190  ( LIT)              ( 42  top> #67x #count )
+ U>                        ( 43  top> #73x #67x #count )
+ [ 0018 ] BRANCHZ          ( 43  top> #0x #count )
+ [ 0018 DROP_INDEX ] R>DROP ( 93  top> #count )
+
+\          }
+ [ 0022 ] LABEL            ( 126  top> #count )
+ R>                        ( 98  top> #count )
+ 1  ( LIT)                 ( 98  top> #66x #count )
+ +                         ( 98  top> #0x #66x #count )
+ DUP_>R                    ( 10  top> #66 #count )
+dup .  349  ( LIT)               ( 10  top> #66x #count )
+ U>                        ( 11  top> #69x #66x #count )
+ [ 0019 ] BRANCHZ          ( 11  top> #0x #count )
+ [ 0019 DROP_INDEX ] R>DROP ( 104  top> #count )
+
+\       }
+ [ 0024 ] LABEL            ( 138  top> #count )
+
+\     if (count != 1899) do_error();
+ 1899  ( LIT)              ( 108  top> #count )
+ -                         ( 109  top> #85x #count )
+ [ 0020 ] BRANCHZ          ( 109  top> #0x )
+   do_error  ( CALL)       ( 111  top> empty )
+ EXIT  [ 0020 ] LABEL      ( 113  top> empty )
+\   }
+   ;  ( END )
+
+.( max 349)
+cr
+

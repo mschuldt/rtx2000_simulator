@@ -1,0 +1,24 @@
+((S ((S ((S (K IF)) ((S <)  (K 3)))) (K 1)))
+    ((S ((S (K +)) ((S (K CYCLE)) ((S -) (K 1)))))
+    ((S (K CYCLE)) ((S -) (K 2))))).
+
+fib x = 1   ;  x < 3
+      = fib(x-1)  (x-2)
+
+this is fib(x), where:  n  fib(n)
+                        1   1
+                        2   1
+                        3   2
+                        4   3
+                        5   5  ...
+
+***** this is SKIFIB right out of the compiler
+    ((S((S((S(K IF))((S((S(K <))I))(K 3))))(K 1)))
+    ((S((S(K +))((S(K CYCLE))((S((S (K -))I))(K 1)))))
+    ((S(K CYCLE))((S((S(K -))I))(K 2))))).
+
+***** this is SKIFIB with Turner Set optimizations 1 and 2 applied
+    ((S ((S 
+    ((S (K IF)) ((S  <)  (K 3))))(K 1)))
+    ((S((S(K +))((S(K CYCLE))((S -) (K 1)))))
+    ((S(K CYCLE))((S -)  (K 2))))).

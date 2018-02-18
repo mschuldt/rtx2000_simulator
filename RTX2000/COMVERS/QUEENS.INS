@@ -1,0 +1,402 @@
+
+\ /* queens.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY queens.ins" EVALUATE ;
+
+DECIMAL
+load GNUins.4
+
+\ #define true -1
+\ #define false 0
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+
+\ int tries ;
+VARIABLE tries   4   CELL- ALLOT
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ static void do_error() {
+64 frame_size !
+ : do_error  ( FUNC )   ( 3  top> empty )
+\   { printf (" Error in Queens.\n"); }
+ ." Error in Queens." cr
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+( RTX 2000 code generation)
+
+
+\ static void Try(i, q, a, b, c, x) int i, *q, a[], b[], c[], x[];
+64 frame_size !
+ : Try  ( FUNC )   ( 3  top> empty )
+\             {
+\             int     j;
+ ( #4 dummy reload )  ( 4  top> empty )
+ ( #5 dummy reload )  ( 5  top> #64 )
+ ( #6 dummy reload )  ( 6  top> #65 #64 )
+ ( #7 dummy reload )  ( 7  top> #66 #65 #64 )
+
+ [ 2 ] MEM_ARG@  ( 8  top> #67 #66 #65 #64 )
+ 2 U!!            ( 8  top> #68 #67 #66 #65 #64 )
+ 3 U!!            ( 8  top> #67 #66 #65 #64 )
+ 4 U!!            ( 8  top> #66 #65 #64 )
+ [ 3 ] MEM_ARG@  ( 9  top> #65 #64 )
+
+\             tries += 1 ;
+ 1  ( LIT)       ( 15  top> #69 #65 #64 )
+ tries  ( SYMBOL)    ( 15  top> #0x #69 #65 #64 )
+ +!               ( 15  top> #0x #0x #69 #65 #64 )
+
+\             j = 0;
+\  hand-adjustment made from GNU output to eliminate a PICK
+ OVER
+ 0  ( LIT)       ( 17  top> #69 #65 #64 )
+ SWAP       ( #65)  ( 19  top> #0x #70 #69 #65 #64 )
+ !                ( 19  top> #0x #0x #70 #69 #65 #64 )
+
+ 0  ( LIT)       ( 19  top> #70 #69 #65 #64 )
+
+
+\             *q = false;
+ 5 U!!            ( 141  top> #70 #69 #65 #64 )
+ 6 U!!            ( 141  top> #69 #65 #64 )
+ [ 7 ] DUP_U!         ( 141  top> #65 #64 )
+
+\             while ( (! *q) && (j != 8) )
+ SWAP             ( 141  top> #65 #64 )
+ 8 U!!            ( 141  top> #64 #65 )
+ @                ( 141  top> #65x )
+ [ 0010 ] BRANCHNZ  ( 143  top> #0x )
+
+ ( LOOP_BEGIN)    ( 21  top> empty )
+
+ [ 009 ] LABEL     ( 128  top> empty )
+ 5 U@@            ( 28  top> empty )
+ 8  ( LIT)       ( 28  top> #70x )
+ -                ( 29  top> #75x #70x )
+ [ 004 ] BRANCHZ   ( 29  top> #0x )
+
+\                 { j = j + 1;
+ 5 U@@            ( 33  top> empty )
+ 1  ( LIT)       ( 33  top> #70x )
+ +                ( 33  top> #0x #70x )
+
+\                 *q = false;
+ 0  ( LIT)       ( 35  top> #70 )
+ 7 U@@  !         ( 35  top> #0x #70 )
+
+\                 if ( b[j] && a[i+j] && c[i-j+7] )
+ DUP -dup          ( #70)  ( 37  top> #70 )
+ 2*               ( 37  top> #0x #70 )
+ 3 U@@  +         ( 38  top> #77d #70 )
+ SWAP             ( 41  top> #78d #70 )
+ 5 U!!            ( 41  top> #70 #78d )
+ @                ( 41  top> #78x )
+ [ 003 ] BRANCHZ   ( 42  top> #0x )
+ 8 U@@            ( 43  top> empty )
+ 5 U@@  +         ( 43  top> #64x )
+ DUP -dup          ( #81)  ( 44  top> #81 )
+ 2*               ( 44  top> #0x #81 )
+ 4 U@@  +         ( 45  top> #82d #81 )
+ SWAP             ( 48  top> #83d #81 )
+ 9 U!!            ( 48  top> #81 #83d )
+ @                ( 48  top> #83x )
+ [ 103 ] BRANCHZ   ( 49  top> #0x )
+ 8 U@@            ( 50  top> empty )
+ 5 U@@            ( 50  top> #64x )
+ -                ( 50  top> #70x #64x )
+ DUP -dup          ( #86)  ( 51  top> #86 )
+ 2*               ( 51  top> #0x #86 )
+ 2 U@@  +         ( 52  top> #87d #86 )
+ SWAP             ( 56  top> #88d #86 )
+ 10 U!!            ( 56  top> #86 #88d )
+ 14  ( LIT)       ( 56  top> #88x )
+ +                ( 56  top> #0x #88x )
+ @                ( 56  top> #0x )
+ [ 203 ] BRANCHZ   ( 57  top> #0x )
+
+\                     {
+
+\                     x[i] = j;
+ 8 U@@            ( 60  top> empty )
+ 2*               ( 60  top> #64x )
+ 6 U@@  +         ( 61  top> #92d )
+ [ 5 ]  U@_SWAP  ( 62  top> #93d )
+ !                ( 62  top> #93x #70x )
+
+\                     b[j] = false;
+ 5 U@@            ( 64  top> empty )
+ 2*               ( 64  top> #70x )
+ 3 U@@  +         ( 65  top> #94d )
+ [ 0 ] LIT_SWAP  ( 66  top> #95d )
+ !                ( 66  top> #95x #0x )
+
+\                     a[i+j] = false;
+ 9 U@@            ( 69  top> empty )
+ 2*               ( 69  top> #81x )
+ 4 U@@  +         ( 70  top> #97d )
+ [ 0 ] LIT_SWAP  ( 71  top> #98d )
+ !                ( 71  top> #98x #0x )
+
+\                     c[i-j+7] = false;
+ 10 U@@            ( 74  top> empty )
+ 2*               ( 74  top> #86x )
+ 2 U@@  +         ( 75  top> #100d )
+ 14  ( LIT)       ( 77  top> #101d )
+ +                ( 77  top> #0x #101d )
+ 0  ( LIT)       ( 77  top> #0x )
+ SWAP !           ( 77  top> #0x #0x )
+
+\                     if ( i < 8 )
+ 8 U@@            ( 80  top> empty )
+ 7  ( LIT)       ( 80  top> #64x )
+ <=               ( 81  top> #103x #64x )
+ [ 006 ] BRANCHZ   ( 81  top> #0x )
+
+\                         {
+\                           Try(i+1,q,a,b,c,x);
+ 2 U@@            ( 86  top> empty )
+ [ 2 ] MEM_ARG!  ( 86  top> #68x )
+ 6 U@@            ( 87  top> empty )
+ [ 3 ] MEM_ARG!  ( 87  top> #69x )
+ 8 U@@            ( 88  top> empty )
+ 1  ( LIT)       ( 88  top> #64x )
+ +                ( 88  top> #0x #64x )
+ 7 U@@            ( 89  top> #4 )
+ 4 U@@            ( 90  top> #5 #4 )
+ 3 U@@            ( 91  top> #6 #5 #4 )
+ ( #7 Calling Arg )  ( 96  top> #7 #6 #5 #4 )
+ ( #6 Calling Arg )  ( 96  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 96  top> #5 #4 )
+ ( #4 Calling Arg )  ( 96  top> #4 )
+ -64 FP+!  ( Link)   ( 96  top> empty )
+  recurse  \  Try  ( CALL)    ( 96  top> empty )
+ 64 FP+!  ( Unlink)  ( 96  top> empty )
+
+\                         if ( ! *q )
+ 7 U@@            ( 101  top> empty )
+ @                ( 101  top> #65x )
+ [ 303 ] BRANCHNZ  ( 102  top> #0x )
+
+\                             { b[j] = true;
+ 5 U@@            ( 105  top> empty )
+ 2*               ( 105  top> #70x )
+ 3 U@@  +         ( 106  top> #107d )
+ [ -1 ] LIT_SWAP  ( 107  top> #108d )
+ !                ( 107  top> #108x #0x )
+
+\                             a[i+j] = true;
+ 9 U@@            ( 110  top> empty )
+ 2*               ( 110  top> #81x )
+ 4 U@@  +         ( 111  top> #110d )
+ [ -1 ] LIT_SWAP  ( 112  top> #111d )
+ !                ( 112  top> #111x #0x )
+
+\                             c[i-j+7] = true;
+ 10 U@@            ( 115  top> empty )
+ 2*               ( 115  top> #86x )
+ 2 U@@  +         ( 116  top> #113d )
+ 14  ( LIT)       ( 118  top> #114d )
+ +                ( 118  top> #0x #114d )
+ -1  ( LIT)       ( 118  top> #0x )
+ SWAP !           ( 118  top> #0x #0x )
+
+\                             }
+\                         }
+ [ 403 ] BRANCH    ( 120  top> empty )
+
+\                     else { *q = true;  
+ [ 006 ] LABEL     ( 122  top> empty )
+ -1  ( LIT)       ( 125  top> empty )
+ 7 U@@  !         ( 125  top> #0x )
+
+ [ 003 ] LABEL     ( 22  top> empty )
+ [ 103 ] LABEL     ( 22  top> empty )
+ [ 203 ] LABEL     ( 22  top> empty )
+ [ 303 ] LABEL     ( 22  top> empty )
+ [ 403 ] LABEL     ( 22  top> empty )
+\                          }
+\                     }
+\                 }
+\             };
+ 7 U@@            ( 25  top> empty )
+ @                ( 25  top> #65x )
+ [ 009 ] BRANCHZ   ( 26  top> #0x )
+ ( LOOP_END)      ( 133  top> empty )
+ [ 0010 ] LABEL     ( 142  top> empty )
+ EXIT  [ 004 ] LABEL     ( 134  top> empty )
+   ;  ( END )   
+
+\ static void Doit ()
+192 frame_size !
+ : Doit  ( FUNC )   ( 3  top> empty )
+\         {
+\         int i,q;
+\         int a[9], b[17], c[15], x[9];
+
+\         i = 0 - 7;
+ -7  ( LIT)       ( 6  top> empty )
+ 2 U!!            ( 93  top> #64 )
+
+\         while ( i <= 16 )
+ ( LOOP_BEGIN)    ( 8  top> empty )
+ [ 0017 ] LABEL     ( 47  top> empty )
+
+\             { if ( (i >= 1) && (i <= 8) ) a[i] = true;
+ 2 U@@            ( 16  top> empty )
+ 0>               ( 16  top> #64x )
+ [ 0014 ] BRANCHZ   ( 17  top> #0x )
+ 2 U@@            ( 19  top> empty )
+ 8  ( LIT)       ( 19  top> #64x )
+ <=               ( 20  top> #68x #64x )
+ [ 0114 ] BRANCHZ   ( 20  top> #0x )
+ 2 U@@            ( 21  top> empty )
+ 2*               ( 21  top> #64x )
+ UBR@ +           ( 22  top> #69d )
+ [ -1 ] LIT_SWAP  ( 24  top> #70d )
+ 28  ( LIT)       ( 24  top> #70x #0x )
+ -                ( 24  top> #0x #0x #0x )
+ !                ( 24  top> #0x #0x )
+ [ 0014 ] LABEL     ( 25  top> empty )
+ [ 0114 ] LABEL     ( 25  top> empty )
+
+\             if ( i >= 2 ) b[i] = true;
+ 2 U@@            ( 28  top> empty )
+ 1  ( LIT)       ( 28  top> #64x )
+ >                ( 29  top> #72x #64x )
+ [ 0015 ] BRANCHZ   ( 29  top> #0x )
+ 2 U@@            ( 30  top> empty )
+ 2*               ( 30  top> #64x )
+ UBR@ +           ( 31  top> #73d )
+ [ -1 ] LIT_SWAP  ( 33  top> #74d )
+ 64  ( LIT)       ( 33  top> #74x #0x )
+ -                ( 33  top> #0x #0x #0x )
+ !                ( 33  top> #0x #0x )
+
+\             if ( i <= 7 ) c[i+7] = true;
+ [ 0015 ] LABEL     ( 34  top> empty )
+ 2 U@@            ( 37  top> empty )
+ 7  ( LIT)       ( 37  top> #64x )
+ <=               ( 38  top> #76x #64x )
+ [ 0016 ] BRANCHZ   ( 38  top> #0x )
+ 2 U@@            ( 39  top> empty )
+ 2*               ( 39  top> #64x )
+ UBR@ +           ( 40  top> #77d )
+ [ -1 ] LIT_SWAP  ( 42  top> #78d )
+ 82  ( LIT)       ( 42  top> #78x #0x )
+ -                ( 42  top> #0x #0x #0x )
+ !                ( 42  top> #0x #0x )
+ [ 0016 ] LABEL     ( 43  top> empty )
+
+\             i = i + 1;
+ 2 U@@            ( 46  top> empty )
+ 1  ( LIT)       ( 46  top> #64x )
+ +                ( 46  top> #0x #64x )
+ [ 2 ] DUP_U!         ( 11  top> #64 )
+
+ 16  ( LIT)       ( 11  top> #64x )
+ >                ( 12  top> #66x #64x )
+ [ 0017 ] BRANCHZ   ( 12  top> #0x )
+ ( TYPE 1 LOOP END)  ( 52  top> empty )
+\             };
+
+ [ 0019 ] LABEL     ( 94  top> empty )
+
+\         Try(1, &q, b, a, c, x);
+ UBR@             ( 60  top> empty )
+ 96  ( LIT)       ( 60  top> #30x )
+ -                ( 60  top> #0x #30x )
+ [ 2 ] MEM_ARG!  ( 60  top> #0x )
+ UBR@             ( 62  top> empty )
+ 116  ( LIT)       ( 62  top> #30x )
+ -                ( 62  top> #0x #30x )
+ [ 3 ] MEM_ARG!  ( 62  top> #0x )
+ 1  ( LIT)       ( 63  top> empty )
+ UBR@             ( 64  top> #4 )
+ 120  ( LIT)       ( 64  top> #30x #4 )
+ -                ( 64  top> #0x #30x #4 )
+ UBR@             ( 65  top> #5 #4 )
+ 64  ( LIT)       ( 65  top> #30x #5 #4 )
+ -                ( 65  top> #0x #30x #5 #4 )
+ UBR@             ( 66  top> #6 #5 #4 )
+ 28  ( LIT)       ( 66  top> #30x #6 #5 #4 )
+ -                ( 66  top> #0x #30x #6 #5 #4 )
+ ( #7 Calling Arg )  ( 71  top> #6 #5 #4 )
+ ( #6 Calling Arg )  ( 71  top> #6 #5 #4 )
+ ( #5 Calling Arg )  ( 71  top> #5 #4 )
+ ( #4 Calling Arg )  ( 71  top> #4 )
+ -192 FP+!  ( Link)   ( 71  top> empty )
+   Try  ( CALL)    ( 71  top> empty )
+ 192 FP+!  ( Unlink)  ( 71  top> empty )
+
+\         if ( ! q )
+\          { do_error();
+ [ -62 ] MEM_ARG@     ( 76  top> empty )
+ [ 0018 ] BRANCHNZ  ( 77  top> #0x )
+ -192 FP+!  ( Link)   ( 81  top> empty )
+   do_error  ( CALL)    ( 81  top> empty )
+ 192 FP+!  ( Unlink)  ( 81  top> empty )
+\             tries += 1000 ;
+ 1000  ( LIT)       ( 85  top> empty )
+ tries  ( SYMBOL)    ( 85  top> #0x )
+ +!               ( 85  top> #0x #0x )
+\          }
+\         };
+ EXIT  [ 0018 ] LABEL     ( 87  top> empty )
+   ;  ( END )   
+
+
+\ void main ()
+64 frame_size !
+ : main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\     {
+\     int i;
+
+\     for ( i = 1; i <= 2500; i++ )
+ 1  ( LIT)       ( 6  top> empty )
+ [ 0025 ADD_INDEX ] >R   ( 44  top> #64 )
+ ( TYPE 1 LOOP BEGIN)  ( 7  top> empty )
+
+\      {
+ [ 0025 ] LABEL     ( 32  top> empty )
+
+\         tries = 0 ;
+ 0  ( LIT)       ( 14  top> empty )
+ tries  ( SYMBOL)    ( 14  top> #0x )
+ !                ( 14  top> #0x #0x )
+
+\         Doit();
+ -64 FP+!  ( Link)   ( 17  top> empty )
+   Doit  ( CALL)    ( 17  top> empty )
+ 64 FP+!  ( Unlink)  ( 17  top> empty )
+
+\         if (tries != 113 )  do_error();
+ tries  ( SYMBOL)    ( 20  top> empty )
+ @                ( 20  top> #0x )
+ 113  ( LIT)       ( 22  top> #66x )
+ -                ( 23  top> #67x #66x )
+ [ 0023 ] BRANCHZ   ( 23  top> #0x )
+ -64 FP+!  ( Link)   ( 25  top> empty )
+   do_error  ( CALL)    ( 25  top> empty )
+ 64 FP+!  ( Unlink)  ( 25  top> empty )
+ [ 0023 ] LABEL     ( 30  top> empty )
+ R>               ( 31  top> empty )
+ 1  ( LIT)       ( 31  top> #64x )
+ +                ( 31  top> #0x #64x )
+ DUP_>R           ( 10  top> #64 )
+dup -dup . 2500  ( LIT)       ( 10  top> #64x )
+ U>               ( 11  top> #65x #64x )
+ [ 0025 ] BRANCHZ   ( 11  top> #0x )
+\      }
+\     };
+ [ 0025 DROP_INDEX ] R>DROP  ( 37  top> empty )
+ EXIT  [ 0026 ] LABEL     ( 45  top> empty )
+   ;  ( END )   
+
+.( 2500 max iteration )
+

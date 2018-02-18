@@ -1,0 +1,3961 @@
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 1
+
+      Name:           !                      "store"
+      Stack:          n addr --
+      Description:    Store n at addr.
+
+
+      Name:           !+                     "store-plus"
+      Stack:          n addr inc -- addr+inc
+      Description:    Store n at addr, leaving addr plus the increment.
+
+
+      Name:           !-                     "store-minus"
+      Stack:          n addr inc -- addr+inc
+      Description:    Store n at addr, leaving addr minus the increment.
+
+
+      Name:           !INTERRUPT             "store-interrupt"
+      Stack:          addr level --
+      Example:        ' LEVEL3-HANDLER  3 !INTERRUPT
+      Description:    Vector the specified interrupt level to the routine at
+                      addr.
+
+
+      Name:           !L                     "store-long"
+      Stack:          n d-addr --
+      Description:    Store n at d-addr.
+
+
+      Name:           "                      "quote"
+      Stack:          -- addr n
+                      --  (compiling)
+      Description:    Define an in-line string.  When executed, returns the
+                      address and length of the string.
+
+
+      Name:           #                      "sharp"
+      Stack:          d1 -- d2
+      Description:    Generate the next displayable digit from d1 according to
+                      the current base.  See <# and #> .
+
+
+      Name:           #>                     "sharp-greater"
+      Stack:          d -- addr n
+      Description:    Complete the conversion of a double number to text by
+                      dropping the double number and returning the address and
+                      length of the displayable string.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 2
+
+      Name:           #OUT                   "number-out"
+      Stack:          -- addr
+      Description:    A variable containing number of characters output since
+                      the last CR.
+
+
+      Name:           #RCV                   "number-receive"
+      Stack:          -- n
+      Description:    Receive a 16-bit number from the host.  Used in the host
+                      communications protocol handler.
+
+
+      Name:           #S                     "sharp-s"
+      Stack:          d -- 0.
+      Description:    Convert all significant digits of d into a displayable
+                      string, suppressing leading zeros.  See #, <#, and #> .
+
+
+      Name:           #THREADS               "number-threads"
+      Stack:          -- u
+      Description:    The number of threads in each vocabulary.
+
+
+      Name:           #TIB                   "number-t-i-b"
+      Stack:          -- addr
+      Description:    A variable containing the number of bytes in the text
+                      input buffer.  Normally set by QUERY.
+
+
+      Name:           #XMT                   "number-transmit"
+      Stack:          n --
+      Description:    Send a 16-bit number to the host.  Used in the host
+                      communications protocol handler.
+
+
+      Name:           '                      "tick"
+      Stack:          -- addr
+      Use:            ' <name>
+      Description:    Look for the specified word in the dictionary.  Return
+                      it's compilation address if found, otherwise abort.
+
+
+      Name:           'TIB                   "tick-t-i-b"
+      Stack:          -- addr
+      Description:    A pointer to the terminal input buffer.  Used by TIB.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 3
+
+      Name:           (                      "paren"
+      Stack:          --
+                      --   (compiling)
+      Example:        ( any text, but no right parens, here)
+      Description:    Begin a comment, ignoring all text until (and including)
+                      the first right paren.  Comments may not span a line in
+                      text files or from keyboard input nor may comments be
+                      nested.
+
+
+      Name:           (VAL?)                 "paren-val-query"
+      Stack:          addr len -- d 2 | n 1 | 0
+      Description:    Attempt to convert the string to a number According to
+                      the current base.  Return either [a] a double number and
+                      2, or [b] an integer and 1, or [c] zero.  The top of
+                      stack is how many cells the number converted occupies on
+                      the stack.
+
+
+      Name:           (d.)                   "paren-d-dot"
+      Stack:          d -- addr n
+      Description:    Convert d to a displayable string.
+
+
+      Name:           *                      "times"
+      Stack:          n1 n2 -- n3
+      Description:    Multiply n1 and n2 (signed numbers).
+
+
+      Name:           */                     "times-divide"
+      Stack:          n1 n2 n3 -- n4
+      Description:    Multiply n1 by n2 and divide the 32-bit intermediate
+                      product by n3, returning n4.  This routine is preferred
+                      over the discrete sequence  * /  because of the greater
+                      precision of the intermediate result.
+
+
+      Name:           */MOD                  "times-divide-mod"
+      Stack:          n1 n2 n3 -- n4 n5
+      Description:    Multiply n1 by n2 and divide the 32-bit intermediate
+                      product by n3, returning n4 (remainder) and n5
+                      (quotient) of the division.  This routine is preferred
+                      over the discrete sequence  * /MOD  because of the
+                      greater precision of the intermediate result.
+
+
+      Name:           +                      "plus"
+      Stack:          n1 n2 -- n3
+      Description:    Add n1 and n2.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 4
+
+      Name:           +!                     "plus-store"
+      Stack:          n1 addr --
+      Description:    Add n1 to the value at addr.
+
+
+      Name:           +LOOP             c,i  "plus-loop"
+      Stack:          n --
+                      addr --   (compiling)
+      Description:    A compiler directive which terminates a counted loop. At
+                      execution the loop index is incremented by n and the
+                      loop terminates if the new index is crossed the limit.
+                      See: DO LOOP .
+
+
+      Name:           +c                     "plus-carry"
+      Stack:          n1 n2 -- n3
+      Description:    Add n1 and n2 with carry.
+
+
+      Name:           ,                      "comma"
+      Stack:          n --
+      Description:    Store n in the next available dictionary location and
+                      allocate one cell (2 bytes) of the dictionary.
+
+
+      Name:           -                      "minus"
+      Stack:          n1 n2 -- n3
+      Description:    Subtract n2 from n1.
+
+
+      Name:           -1                     "minus-one"
+      Stack:          -- -1
+      Description:    A constant.
+
+
+      Name:           -DIGIT                 "dash-digit"
+      Stack:          c base -- n f
+      Description:    Converts ASCII character c to its numeric equivalent n
+      and
+                      returns a flag indicating if the conversion was valid
+      for the
+                      specified base.
+
+
+      Name:           -ROT                   "dash-rote"
+      Stack:          n1 n2 n3 -- n3 n1 n2
+      Description:    Rotate the top three stack items; the top item becomes
+                      the third.  Opposite of ROT.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 5
+
+      Name:           -SOFTINT               "dash-soft-int"
+      Stack:          --
+      Description:    Clears Software Interrupt request.  The interrupt
+      handler
+                      for the Software Interrupt must execute this instruction
+                      before interrupts are reenabled.
+
+
+      Name:           -TRAILING              "dash-trailing"
+      Stack:          addr len1 -- addr len2
+      Description:    Chop trailing blanks from the string (addr len1).  If
+                      len1 is zero, len2 is zero.  If the entire string is
+                      blank, len2 is zero.
+
+
+      Name:           -ZERO           c,i    "dash-zero"
+      Stack:          --
+      Example:        : XYZ
+                         FOR -ZERO
+                            I .
+                         THEN NEXT ;
+      Equivalent:     : XYZ
+                         ?DUP IF
+                            1- FOR
+                               I .
+                            NEXT
+                         THEN ;
+      Description:    A compiler directive that twists the normal compilation
+                      order of a FOR..NEXT loop.  Use only with great caution.
+                      The net effect of the use of this structure is that (in
+                      the example) "0 XYZ" will not execute the body of the
+                      FOR..NEXT at all, "9 XYZ" will execute 9 times with loop
+                      indices running from 8 down to zero.  Is much more
+                      efficient than the equivalent code.
+
+
+      Name:           -c                     "minus-carry"
+      Stack:          n1 n2 -- n3
+      Description:    Subtract n2 from n1 with borrow.
+
+
+      Name:           .                      "dot"
+      Stack:          n --
+      Description:    Display n according to the current base.
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 6
+
+      Name:           ."              c,i    "dot-quote"
+      Stack:          --
+                      --   (compiling)
+      Example:        ." this is a sample string"
+      Description:    Compile the code sequence to display the specified
+                      string when executed.
+
+
+      Name:           .(              i      "dot-paren"
+      Stack:          --
+                      --   (compiling)
+      Example:        .( this is a sample comment)
+      Description:    Display a comment line during compilation or
+                      interpretation.
+
+
+      Name:           .S                     "dot-s"
+      Stack:          --
+      Description:    Nondestructively display the contents of the parameter
+                      stack or the message "empty".
+
+
+      Name:           /                      "divide"
+      Stack:          n1 n2 -- n3
+      Description:    Divide n1 by n2 returning the quotient n3.
+
+
+      Name:           /MOD                   "divide-mod"
+      Stack:          n1 n2 -- n3 n4
+      Description:    Divide n1 by n2 returning the quotient n4 and the
+                      remainder of the division n3.
+
+
+      Name:           /STRING                "slash-string"
+      Stack:          addr1 len1 n -- addr2 len2
+      Description:    Truncates the first n characters of the string (addr1
+                      len).  addr2 = addr1 + n; len2 = len1 - n.  Used
+                      primarily by WORD.
+
+
+      Name:           0                      "zero"
+      Stack:          -- 0
+      Description:    A constant 0.
+
+
+      Name:           0<                     "zero-less"
+      Stack:          n -- flag
+      Description:    True if n is less than zero.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 7
+
+      Name:           0<>                    "zero-not-equal"
+      Stack:          n -- flag
+      Description:    True if n is not equal to zero.
+
+
+      Name:           0=                     "zero-equals"
+      Stack:          n -- flag
+      Description:    True if n is equal to zero.
+
+
+      Name:           0>                     "zero-greater"
+      Stack:          n -- flag
+      Description:    True if n is greater than zero.
+
+
+      Name:           1+                     "one-plus"
+      Stack:          n1 -- n2
+      Description:    Add 1 to n1.
+
+
+      Name:           1-                     "one-minus"
+      Stack:          n1 -- n2
+      Description:    Subtract 1 from n1.
+
+
+      Name:           2*                     "two-times"
+      Stack:          n1 -- n2
+      Description:    Shift n1 left one bit.  Lsb <- zero.
+
+
+      Name:           2*C                    "two-times-carry"
+      Stack:          n1 -- n2
+      Description:    Shift n1 left one bit.  Lsb <- carry.
+
+
+      Name:           2+                     "two-plus"
+      Stack:          n1 -- n2
+      Description:    Add 2 to n1.
+
+
+      Name:           2-                     "two-minus"
+      Stack:          n1 -- n2
+      Description:    Subtract 2 from n1.
+
+
+      Name:           2/                     "two-divide"
+      Stack:          n1 -- n2
+      Description:    Shift n1 right one bit.  Msb <- sign.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 8
+
+      Name:           :                      "colon"
+      Stack:          --
+      Use:            : <name>   ... ;
+      Description:    Create a new definition called <name> in the compilation
+                      vocabulary and turn on the compiler.  The header of
+                      <name> is SMUDGED and cannot be found until UNSMUDGED
+                      (normally by ; at the end of sucessful compilation).
+
+
+      Name:           ;               c,i    "semi-colon"
+      Stack:          --
+      Description:    Compile an EXIT, turn off compilation, and UNSMUDGE
+      <name>.
+
+
+      Name:           <                      "less-than"
+      Stack:          n1 n2 -- flag
+      Description:    True if n1 is less than n2 (signed numbers).
+
+
+      Name:           <#                     "less-sharp"
+      Stack           --
+      Description:    Initialize pictured numeric output conversion.  The
+      words
+                      #  #>  #S  <#  HOLD  SIGN may be used to specify the
+                      conversion of a double number into an ASCII text string
+                      stored in right-to-left order.
+
+
+      Name:           <=                     "less-than-or-equal"
+      Stack:          n1 n2 -- flag
+      Description:    True if n1 is less than or equal to n2 (signed numbers).
+
+
+      Name:           <>                     "not-equal"
+      Stack:          n1 n2 -- flag
+      Description:    True if n1 is not equal to n2.
+
+
+      Name:           <ALU>
+      Stack:          n --
+      Description:    An internal compiler word for alu opcodes.
+
+
+      Name:           <SHIFT>
+      Stack:          n --
+      Description:    An internal compiler word for shift opcodes.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴� Page 9
+
+      Name:           <exit>
+      Stack:          --
+      Description:    An internal compiler word which compiles an exit opcode,
+                      either combined with the last compiled opcode if
+                      possible or as a "nop exit" if following a call.
+
+
+      Name:           <forth>
+      Stack:          -- addr
+      Description:    The array of dictionary threads for the Forth
+                      vocabulary.  This exists in ram, and is initialized
+                      during reset.
+
+
+      Name:           <header>
+      Stack:          --
+      Description:    Create a dictionary header for the following <name>.
+                      This proceedure is the runtime for the word HEADER.
+
+
+      Name:           <literal>
+      Stack:          n --
+      Description:    Compile the opcode sequence necessary to push n on the
+                      data stack when executed.
+
+
+      Name:           =                      "equals"
+      Stack:          n1 n2 -- flag
+      Description:    True if n1 equals n2.
+
+
+      Name:           >                      "greater-than"
+      Stack:          n1 n2 -- flag
+      Description:    True if n1 is greater than n2 (signed numbers).
+
+
+      Name:           >=                     "greater-than-or-equal"
+      Stack:          n1 n2 -- flag
+      Description:    True if n1 is greater than or equal to n2 (signed
+                      numbers).
+
+
+      Name:           >CODE                  "to-code"
+      Stack:          lfa -- cfa
+      Description:    Convert the link field address of a word to its code
+                      field address.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 10
+
+      Name:           >IN                    "to-in"
+      Stack:          -- addr
+      Description:    The variable which contains the current character offset
+                      in the input stream.
+
+
+      Name:           >LINK                  "to-link"
+      Stack:          cfa -- lfa
+      Description:    Convert the code field address of a word to its link
+                      field address.  The word is assumed to have a header and
+                      a link field, otherwise the result is undefined.
+
+
+      Name:           >NAME                  "to-name"
+      Stack:          cfa -- nfa
+      Description:    Convert the code field address of a word to its name
+                      field address.  The word is assumed to have a header and
+                      a link field, otherwise the result is undefined.
+
+
+      Name:           >R              c      "to-r"
+      Stack           n --
+      Description:    Move n from the data stack to the return stack.
+
+
+      Name:           >R;                    "to-r-exit"
+      Stac            n --
+      Description:    Jump to the specified address by moving n to the return
+                      stack and performing a subroutine return.  Compiled as a
+                      single RTX opcode.
+
+
+      Name:           >VECTOR                "to-vector"
+      Stack:          n -- addr
+      Description:    The address of the level n interrupt handler.
+
+
+      Name:           >ta                    "to-t-a"
+      Stack:          addr1 -- addr2
+      Description:    Adjust the address by subtracting dA from it.  Used
+                      for code relocation.
+
+
+      Name:           ?                      "question"
+      Stack:          addr --
+      Description:    Display the value stored at addr.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 11
+
+      Name:           ?COMP                  "query-compile"
+      Stack:          --
+      Description:    Abort if not compiling.
+
+
+      Name:           ?DUP                   "query-dupe"
+      Stack:          n -- n n
+         or:          0 -- 0
+      Description:    Duplicate n if it is non-zero.
+
+
+      Name:           ?PAUSE                 "query-pause"
+      Stack:          --
+      Description:    Check for keyboard activity while running an output-
+                      bound word.  If the <escape> key was struck, execute the
+                      IDLE routine.  If any other key was struck, wait for
+                      another key and then continue.  Otherwise, simply
+                      continue.
+
+
+      Name:           ?STACK                 "query-stack"
+      Stack:          --
+      Description:    Abort on stack underflow.
+
+
+      Name:           ?line                  "query-line"
+      Stack:          n --
+      Description:    Execute CR if displaying n characters would cause the
+                      display cursor to be past column 72.
+
+
+      Name:           @                      "fetch"
+      Stack:          addr -- n
+      Description:    Read the value at the address.
+
+
+      Name:           @+                     "fetch-plus"
+      Stack:          addr inc -- n addr+inc
+      Description:    Read the value at the address (n), leaving addr plus the
+                      increment.
+
+
+      Name:           @-                     "fetch-minus"
+      Stack:          addr inc -- n addr+inc
+      Description:    Read the value at the address (n), leaving addr minus
+                      the increment.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 12
+
+      Name:           @INTERRUPT             "fetch-interrupt"
+      Stack:          level -- addr
+      Description:    Read the contents of an interrupt vector.  For example,
+
+                      : SETUP
+                         2 @INTERRUPT  OLD-VECTOR !
+                         [']  NEW2  2 !INTERRUPT  ;
+
+                      will save the old contents of the level two interrupt
+                      vector, then install a new handler.
+
+
+      Name:           @L                     "fetch-long"
+      Stack:          d-addr -- n
+      Description:    Read the value stored at d-addr.
+
+
+      Name:           ABORT
+      Stack:          --
+      Description:    Clears the data stack and executes QUIT.  No message is
+                      displayed.
+
+
+      Name:           ABORT"          c,i    "abort-quote"
+      Stack:          flag --
+                      --   (compiling)
+      Example:        ( flag) ABORT" this is an error message"
+      Description:    At execution, abort and display the message if the flag
+                      is non-zero.  Otherwise skip the message and continue
+                      execution.
+
+
+      Name:           ABS
+      Stack:          n -- u
+      Description:    Take the absolute value of n.
+
+
+      Name:           AGAIN           c,i
+      Stack:          --
+      Description:    A compiler directive which terminates an iterated loop.
+                      At execution, the program will always jump back to the
+                      preceeding BEGIN.
+
+
+      Name:           ALIGN
+      Stack:          --
+      Description:    Force the dictionary pointer to a word aligned value
+                      (i.e. a multiple of 2) by adding 0 or 1 to the system
+                      variable H.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 13
+
+      Name:           ALLOT
+      Stack:          n --
+      Description:    Allocates n bytes in the dictionary by adding the value
+                      n to the system variable H.
+
+
+      Name:           AND
+      Stack:          n1 n2 -- n3
+      Description:    Bit-wise AND of n1 with n2.
+
+
+      Name:           APPEND
+      Stack:          addr1 len addr2 --
+      Description:    Append the string (addr1 len) to the counted string at
+                      addr2 and update the count byte at addr2.  No checking
+                      is done to ensure that there is room to append the
+                      string.
+
+      Name:           ASCII           i      "as-key"
+      Stack:          -- char
+                      --                            (compiling)
+      Example:        ASCII A
+      Description:    Either compile the ascii value of the character as a
+                      literal (if in compilation mode) or leave it on the
+                      stack (if in interpret mode).
+
+
+      Name:           BASE
+      Stack:          -- addr
+      Description:    The variable containing the current numeric conversion
+                      radix.
+
+
+      Name:           BCLR                   "b-clear"
+      Stack:          addr pattern --
+      Description:    Clear bits in the byte at addr according to the pattern.
+
+
+      Name:           BEGIN           c,i
+      Stack:          --
+      Use:            BEGIN ... ( flag) UNTIL
+      or:             BEGIN ... ( flag) WHILE ... REPEAT
+      or:             BEGIN ...         AGAIN
+      Description:    A compiler directive which marks the start of an
+                      iterated loop.  BEGIN has no execution behaviour:  It is
+                      only a compiler directive.  A BEGIN-UNTIL structure will
+                      be repeated until the flag is true.  A BEGIN-WHILE-
+                      REPEAT structure will be repeated until the flag is
+                      false.  A BEGIN-AGAIN structure will be repeated
+                      forever. The words after UNTIL or REPEAT will be
+                      executed only when the loop is finished.
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 14
+
+      Name:           BINARY
+      Stack:          --
+      Description:    Set the numeric input-output conversion base to two.
+
+
+      Name:           BL                     "b-l"
+      Stack:          -- 32
+      Description:    A constant.
+
+
+      Name:           BLANK
+      Stack:          addr u --
+      Description:    Fill u bytes of memory at addr with blanks.
+
+
+      Name:           BSET                   "b-set"
+      Stack:          addr patter --
+      Description:    Set bits in the byte at addr according to the pattern.
+
+
+      Name:           C!                     "c-store"
+      Stack:          byte addr --
+      Description:    Store the byte at addr.
+
+
+      Name:           C!+                    "c-store-plus"
+      Stack:          byte addr inc -- addr+inc
+      Description:    Store byte at addr, leaving addr plus the increment.
+
+
+      Name:           C!-                    "c-store-minus"
+      Stack:          n addr inc -- addr+inc
+      Description:    Store byte at addr, leaving addr minus the increment.
+
+
+      Name:           C!L                    "c-store-l"
+      Stack:          byte d-addr --
+      Description:    Store the byte at d-addr.
+
+
+      Name:           C,                     "c-comma"
+      Stack:          byte --
+      Description:    Store the byte in the next available dictionary
+                      location and allocate one byte of the dictionary.
+
+
+      Name:           C@                     "c-fetch"
+      Stack:          addr -- byte
+      Description:    Read the byte at addr.  Not sign extended.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 15
+
+      Name:           C@+                    "c-fetch-plus"
+      Stack:          addr inc -- byte addr+inc
+      Description:    Read the byte at the address (n), leaving addr plus the
+                      increment.
+
+
+      Name:           C@-                    "c-fetch-minus"
+      Stack:          addr inc -- byte addr+inc
+      Description:    Read the byte at the address (n), leaving addr minus the
+                      increment.
+
+
+      Name:           C@L                    "c-fetch-l"
+      Stack:          d-addr -- byte
+      Description:    Read the byte at d-addr.  Not sign extended.
+
+
+      Name:           CELL
+      Stack:          -- 2
+      Description:    A system constant returning the number of bytes in one
+                      compilation cell.
+
+
+      Name:           CELL+                  "cell-plus"
+      Stack:          addr1 -- addr2
+      Description:    Advance addr1 to the next compilation cell.
+
+
+      Name:           CELLS
+      Stack:          n1 -- n2
+      Description:    The number of bytes used by n1 cells.
+
+
+      Name:           CMD                    "c-m-d"
+      Stack:          n --
+      Description:    Send a command to the host.  Used in the host
+                      communications protocol handler.
+
+
+      Name:           CMOVE                  "c-move"
+      Stack:          addr1 addr2 u --
+      Description:    Move u bytes from addr1 to addr2.  The byte at addr1 is
+                      moved first, proceeding toward high memory.  If u is
+                      zero nothing is moved.
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 16
+
+      Name:           CMOVE>                 "c-move-up"
+      Stack:          addr1 addr2 u --
+      Description:    Move the u bytes from addr1 to addr2.  The move begins
+                      by moving the byte at (addr1+u-1) to (addr2+u-1) and
+                      proceeds to successively lower addresses for u bytes.
+                      If u is zero nothing is moved. (Useful for sliding a
+                      string towards higher addresses).
+
+
+      Name:           CMOVEL                 "c-move-l"
+      Stack:          d-addr1 d-addr2 u --
+      Description:    Move u bytes from d-addr1 to d-addr2.  The byte at
+                      d-addr1 is moved first, proceeding toward high memory.
+                      If u is zero nothing is moved.
+
+
+      Name:           COMPARE
+      Stack:          addr1 addr2 n -- flag
+      Description:    Compare memory at addr1 and addr2 for a length of n
+                      bytes.  The flag is true only if all n bytes are
+                      identical.
+
+
+      Name:           COMPILE         c
+      Stack:          --
+      Use:            : <name>   ... COMPILE <namex>  ... ;
+      Description:    When <name> is executed, the address compiled for
+                      <namex> is compiled and not executed.  <name> is
+                      typically immediate and <namex> is typically not
+                      immediate.
+
+
+      Name:           CONSTANT
+      Stack:          n --
+      Use:            n CONSTANT <name>
+      Description:    A defining word for constants.  When executed, <name>
+                      will push its value on the stack.
+
+
+      Name:           CONTEXT
+      Stack:          -- addr
+      Description:    The variable which determines the first vocabulary in
+                      the dictionary search order.
+
+
+      Name:           CONVERT
+      Stack:          d1 addr1 -- d2 addr2
+      Description:    Convert the string beginning at addr1+1 into the
+                      accumulator d1 according to the current base.  Return
+                      the address addr2 of the first non-numeric character and
+                      the accumulated number d2.
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 17
+
+      Name:           COPYRIGHT
+      Stack:          --
+      Description:    Display the Harris Corportation copyright notice.
+
+
+      Name:           COUNT
+      Stack:          addr1 -- addr2 n
+      Description:    Return the length n and the address of the counted
+                      string located at addr1.
+
+
+      Name:           CPR!                   "c-p-r-store"
+      Stack:          n --
+      Description:    Write the Code Page Register.  The new value does not
+                      take effect until after the instruction following the
+                      CPR! executes.
+
+
+      Name:           CPR@                   "c-p-r-fetch"
+      Stack:          -- n
+      Description:    Read the Code Page Register.
+
+
+      Name:           CR                     "c-r"
+      Stack:          --
+      Description:    The carriage return, line feed terminal operation.
+
+
+      Name:           CR!                    "c-r-store"
+      Stack:          n --
+      Description:    Write the configuration register.  Note that some of the
+                      bits in the register are Read-only and may not be
+                      modified by this command.
+
+
+      Name:           CR@                    "c-r-fetch"
+      Stack:          -- n
+      Description:    Read the configuration register.
+
+
+      Name:           CR@OR                  "c-r-fetch-or"
+      Stack:          n1 -- n2
+      Description:    Read the configuration register and bit-wise "or" it
+                      with n1.  CR@OR is a single RTX opcode.
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 18
+
+      Name:           CREATE
+      Stack:          --
+      Use:            CREATE <name>
+      Description:    Make an executable dictionary entry for <name>.
+                      Execution of <name> will return the parameter field
+                      address of <name>.  No dictionary space is allocated for
+                      the parameter field.
+
+
+      Name:           CURRENT
+      Stack:          -- addr
+      Description:    The variable specifying in which vocabulary to put new
+                      definitions.
+
+
+      Name:           CYCLES
+      Stack:          n --
+      Description:    Delay for n+4 machine cycles, assuming no wait states
+                      for the memory in which the routine exists.
+
+
+      Name:           D!                     "d-store"
+      Stack:          d addr --
+      Description:    Store d at the address.
+
+
+      Name:           D+                     "d-plus"
+      Stack:          d1 d2 -- d3
+      Description:    Double precision add of d1 and d2.
+
+
+      Name:           D-                     "d-minus"
+      Stack:          d1 d2 -- d3
+      Description:    Double precision subtract of d2 from d1.
+
+
+      Name:           D.                     "d-dot"
+      Stack:          d --
+      Description:    Display the double number according to the current base.
+
+
+      Name:           D.R                    "d-dot-r"
+      Stack:          d n --
+      Description:    Display the double number according to the current base
+                      right justified in a field n characters wide.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 19
+
+      Name:           D0<                    "d-zero-less-than"
+      Stack:          d -- flag
+      Description:    True if the double number is less than zero.
+
+
+      Name:           D0=                    "d-zero-equals"
+      Stack:          d -- flag
+      Description:    True if the double number is zero.
+
+
+      Name:           D2*                    "d-two-times"
+      Stack:          d1 -- d2
+      Description:    Shift d1 left one bit.  Lsb <- 0.
+
+
+      Name:           D2*c                   "d-two-times-carry"
+      Stack:          d1 -- d2
+      Description:    Arithmetic shift d1 left one bit. Lsb <- 0.
+
+
+      Name:           D2/                    "d-two-divide"
+      Stack:          d1 -- d2
+      Description:    Arithmetic shift d1 right one bit. Msb <- sign.
+
+
+      Name:           D<                     "d-less-than"
+      Stack:          d1 d2 -- flag
+      Description:    True if d1 is less than d2.
+
+
+      Name:           D<>                    "d-not-equal"
+      Stack:          d1 d2 -- flag
+      Description:    True if d1 is not equal to d2.
+
+
+      Name:           D=                     "d-equal"
+      Stack:          d1 d2 -- flag
+      Description:    True if d1 equals d2.
+
+
+      Name:           D>                     "d-greater-than"
+      Stack:          d1 d2 -- flag
+      Description:    True if d1 is greater than d2.
+
+
+      Name:           D>R             c      "d-to-r"
+      Stack:          d --
+      Description:    Move the double number to the return stack.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 20
+
+      Name:           D@                     "d-fetch"
+      Stack:          addr -- d
+      Description:    Read the double number at addr.
+
+
+      Name:           DABS                   "d-abs"
+      Stack:          d -- ud
+      Description:    Take the absolute value of the double number.
+
+
+      Name:           DCONSTANT              "d-constant"
+      Stack:          d --
+      Use:            d DCONSTANT <name>
+      Description:    A defining word for double number constants.  When
+                      executed, <name> will push its value on the stack.
+
+
+      Name:           DDROP                  "d-drop"
+      Stack:          d --
+      Description:    Drop the double number.
+
+
+      Name:           DDUP                   "d-dupe"
+      Stack:          d -- d d
+      Description:    Duplicate the double number.
+
+
+      Name:           DECIMAL
+      Stack:          --
+      Description:    Set the input-output numeric conversion radix to ten.
+
+
+      Name:           DEFINITIONS
+      Stack:          --
+      Description:    Set the compilation vocabulary to the CONTEXT
+                      vocabulary.
+
+
+      Name:           DEPTH
+      Stack:          -- n
+      Description:    Determine the number of items on the data stack.
+
+
+      Name:           DIGIT
+      Stack:          n -- c
+      Description:    Convert a number to its ASCII equivalent.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 21
+
+      Name:           DISABLE
+      Stack:          --
+      Description:    Disable interrupts by setting the Disable Interrupt bit
+                      in the Configuration Register.
+
+
+      Name:           DMAX                   "d-max"
+      Stack:          d1 d2 -- d3
+      Description:    Leave the greater of d1 and d2.
+
+
+      Name:           DMIN                   "d-min"
+      Stack:          d1 d2 -- d3
+      Description:    Leave the lesser of d1 and d2.
+
+
+      Name:           DNEGATE                "d-negate"
+      Stack:          d1 -- d2
+      Description:    Negate the double number.
+
+
+      Name:           DO              c,i
+      Stack:          n1 n2 --
+      Use:            DO ... LOOP
+      or:             DO ... n +LOOP
+      Description:    A compiler directive which marks the start of a counted
+                      loop.  The loop index will begin at n2 and terminate
+      based
+                      on the limit n1.  See LOOP and +LOOP for details on how
+                      the loop is terminated.  The loop is always executed at
+                      least once. For example: n DUP DO ... LOOP executes
+                      65,536 times.  Note: It is much more efficient and
+                      faster to use FOR/NEXT loops on the RTX 2000 Series
+                      processors.
+
+
+      Name:           DOES>           c,i    "does"
+      Stack:          -- addr
+                      --   (compiling)
+      Use:            : <namex>  ... CREATE ... DOES> ... ;
+                      <namex> <name>
+      Example:        : ARRAY
+                         CREATE ALLOT  DOES> + ;
+                      100 ARRAY TEST
+      Description:    Defines the execution-time action of a word created by a
+                      high-level defining word.  DOES> marks the termination
+                      of the defining part of the defining word <namex> and
+                      begins the definition of the execution-time action for
+                      words that will later be defined by <namex>.  When
+                      <name> is later executed, the address of <name>'s
+                      parameter field is placed on the stack and the sequence
+                      of words between DOES> and ; is executed.
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 22
+
+      Name:           DOVER                  "d-over"
+      Stack:          d1 d2 -- d1 d2 d1
+      Description:    Copy the second double number to the top of the stack.
+
+
+      Name:           DPR!                   "d-p-r-store"
+      Stack:          n --
+      Description:    Write the Data Page Register.
+
+
+      Name:           DPR@                   "d-p-r-fetch"
+      Stack:          -- n
+      Description:    Read the Data Page Register.
+
+
+      Name:           DR>             c      "d-r-from"
+      Stack:          -- d
+      Description:    Move a double number from the return stack to the data
+                      stack.
+
+
+      Name:           DROP
+      Stack:          n --
+      Description:    Drop n from the stack.
+
+
+      Name:           DROT                   "d-rote"
+      Stack:          d1 d2 d3 -- d2 d3 d1
+      Description:    Rotate the top three double numbers on the stack,
+                      bringing the third double number number to the top.
+
+
+      Name:           DSQRT                  "d-square-root"
+      Stack:          d -- root
+      Description:    Calculate the square root of an unsigned double number.
+
+
+      Name:           DSWAP                  "d-swap"
+      Stack:          d1 d2 -- d2 d1
+      Description:    Exchange the top two double numbers.
+
+
+      Name:           DU<                    "d-u-less"
+      Stack:          d1 d2 -- flag
+      Description:    True if d1 is less than d2 (unsigned double numbers).
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 23
+
+      Name:           DUMP
+      Stack:          addr len --
+      Description:    Display memory contents starting at addr.
+
+
+      Name:           DUMPL                  "dump-l"
+      Stack:          d-addr u --
+      Description:    Display memory contents starting at d-addr.
+
+
+      Name:           DUP                    "dupe"
+      Stack:          n -- n n
+      Description:    Duplicate the top of stack.
+
+
+      Name:           DUP>R                   "dupe-to-r"
+      Stack:          n -- n
+      Description:    Copy n to the return stack without removing it from the
+                      data stack.
+
+
+      Name:           DUP_C!+                "dupe-c-store-plus"
+      Stack:          char addr n -- char addr+n
+      Description:    Store the character at addr, increment the address by n
+                      (which must be an embedded short literal).
+
+
+      Name:           DUP_G!                 "dupe-g-store"
+      Stack:          n g -- n
+      Description:    Write the specified g-bus port address.  The data (n) is
+                      preserved.  See G! .
+
+
+      Name:           DVARIABLE              "d-variable"
+      Stack:          --
+      Use:            DVARIABLE <name>
+      Description:    A defining word for double number variables.  Four bytes
+                      are allocated in the parameter field of <name>.  When
+                      executed, <name> will push the address of its parameter
+                      field onto the stack.
+
+
+      Name:           EI1                    "e-i-1"
+      Stack:          -- 2
+      Description:    A constant whose value is the mask for the external
+                      interrupt 1.  Used by MASK, UNMASK, and MASKED? .
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 24
+
+      Name:           EI2                    "e-i-2"
+      Stack:          -- 40h
+      Description:    A constant whose value is the mask for the external
+                      interrupt 2.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           EI3                    "e-i-3"
+      Stack:          -- 400h
+      Description:    A constant whose value is the mask for the external
+                      interrupt 3.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           EI4                    "e-i-4"
+      Stack:          -- 800h
+      Description:    A constant whose value is the mask for the external
+                      interrupt 4.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           EI5                    "e-i-5"
+      Stack:          -- 1000h
+      Description:    A constant whose value is the mask for the external
+                      interrupt 5.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           ELSE            c,i
+      Stack:          --
+      Use:            ( flag) IF ... ELSE ... THEN
+      Description:    A compiler directive to create the structure that will
+                      execute if the condition tested by IF was not true.
+
+
+      Name:           EMIT
+      Stack:          char --
+      Description:    Display the character.
+
+
+      Name:           EMIT?                  "emit-query"
+      Stack:          -- flag
+      Description:    True if the device which EMITs is ready for another
+                      character.
+
+
+      Name:           EMPTY
+      Stack:          --
+      Description:    Restore the user dictionary and data pointers to the
+                      values saved by the last GUARD or to their initial
+                      reset values if GUARD has not been executed.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 25
+
+      Name:           ENABLE
+      Stack:          --
+      Description:    Enable interrupts by clearing the Disable Interrupt bit
+                      in the Configuration Register.
+
+
+      Name:           ERASE
+      Stack:          addr len --
+      Description:    Fill memory bytes starting at addr with zero.
+
+
+      Name:           EVALUATE
+      Stack:          addr len --
+      Description:    The string is evaluated by the Forth interpreter, with
+                      the results being exactly as if the string had been
+                      typed by the user.  The program calling EVALUATE is
+                      responsible for not mucking around with the state of the
+                      system in a non- recoverable manner.  EVALUATE preserves
+                      its input stream, and restores its values on exit.  See:
+                      INTERPRET.
+
+
+      Name:           EVEN
+      Stack:          n1 -- n2
+      Description:    Force n1 to be an even number if it is odd.
+
+
+      Name:           EXECUTE
+      Stack:          addr --
+      Description:    Perform a "call" to the specified address (which had
+                      better contain executable code!).
+
+
+      Name:           EXECUTEL               "execute-l"
+      Stack:          d-addr --
+      Description:    Perform a "call" to the specified long address (which
+                      had better contain executable code!).
+
+
+      Name:           EXIT            c
+      Stack:          --
+      Description:    EXIT is used to compile a subroutine return instruction
+                      within a colon definition.  When executing, an error
+                      condition exists if the top of the return stack does not
+                      contain a valid return address.  May not be used within
+                      a do-loop.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 26
+
+      Name:           EXPECT
+      Stack:          addr len --
+      Description:    Accept input from the console at addr.  Input editing is
+                      allowed via the "tilde" escape sequences (for an
+                      example, see the source code to H).  Input is
+                      terminated by either a carriage return (M) or when len
+                      characters have been accepted.  The variable SPAN is set
+                      to the number of characters input.
+
+
+      Name:           FALSE
+      Stack:          -- 0
+      Description:    A constant 0.
+
+
+      Name:           FENCE
+      Stack:          -- addr
+      Description:    A variable containing the address below which FORGETing
+                      is not allowed.
+
+
+      Name:           FILL
+      Stack:          addr len byte --
+      Description:    Fill memory starting at addr with the specified byte.
+
+
+      Name:           FIND
+      Stack:          addr1 -- addr2 flag
+      Description:    Given the address of a counted string, search for a name
+                      matching it in the dictionary.   If a match is not
+      found,
+                      return false and and the string address.  If a match is
+                      found, return a flag (1 if the word is IMMEDIATE and
+                      -1 if the word is not) and the compilation address of
+                      the word.
+
+
+      Name:           FOR             c,i
+      Stack:          u --
+      Use:            ( u) FOR ... NEXT
+      Description:    A compiler directive to build a hardware supported loop
+                      structure for the RTX processor.  This loop structure is
+                      a count-down loop which will execute u+1 times.  If u is
+                      zero, it will execute 65536 times.  The return stack is
+                      used to maintain this index, which may be accessed by I.
+                      See NEXT and I.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 27
+
+      Name:           FORGET
+      Stack:          --
+      Use:            FORGET <name>
+      Description:    Unlink <name> and all definitions made after it from the
+                      dictionary, reclaiming the space occupied by them.
+
+
+      Name:           FORTH
+      Stack:          --
+      Description:    The primary vocabulary.  All ROMed definitions are in
+                      the FORTH vocabulary.  The system search order is: first
+                      search the CONTEXT vocabulary, then search the FORTH
+                      vocabulary.  Its execution behavior is defined by
+                      VOCABULARY.
+
+
+      Name:           G!                     "g-store"
+      Stack:          n g --
+      Description:    Write the specified g-bus port address.  The value of
+                      "g" must be compiled as an in-line short literal
+                      immediately prior to the G! (using a constant is not
+                      acceptable!).  This routine is also available as an
+                      interpreted word, which compiles the proper structure,
+                      executes it immediately, and forgets it.  Note: G-bus
+                      port numbers are restricted to values between 0 and 31
+                      decimal.  Values 0 - 7 refer to RTX processor registers,
+                      and should be used with care.  See the RTX 2000 Series
+                      Programmer's Reference Manual for details.
+
+
+      Name:           G@                     "g-fetch"
+      Stack:          g -- n
+      Description:    Read the specified g-bus port address.  The value of "g"
+                      must be compiled as an in-line short literal immediately
+                      prior to the G@ (using a constant is not acceptable!).
+                      This routine is also available as an interpreted word,
+                      which compiles the proper structure, executes it
+                      immediately, and forgets it. Note: G-bus port
+                      numbers are restricted to values between 0 and 31
+                      decimal.  Values 0 - 7 refer to RTX processor registers,
+                      and should be used with care.  See the RTX 2000 Series
+                      Programmer's Reference Manual for details.
+
+
+      Name:           GUARD
+      Stack:          --
+      Description:    Mark the current dictionary location as the FENCE.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 28
+
+      Name:           H
+      Stack:          -- addr
+      Description:    The variable containing the address of next available
+                      dictionary location.
+
+
+      Name:           HEADER
+      Stack:          --
+      Use;            HEADER <name>
+      Description:    Create a non-executable dictionary header for <name>.
+                      Used by CREATE and other defining words.
+
+
+      Name:           HERE
+      Stack:          -- addr
+      Description:    The address of the next available dictionary location.
+
+
+      Name:           HEX
+      Stack:          --
+      Description:    Set the numeric input-output conversion base to sixteen.
+
+
+      Name:           HOLD
+      Stack:          char --
+      Description:    Insert char into the pictured numeric output string.
+                      Typically used between <# and #>.
+
+
+      Name:           I               c
+      Stack:          -- n
+      Description:    Copy the top of the return stack to the data stack.
+                      I is equivalent to R@, but for compatability with other
+                      systems should be used only to reference loop indices.
+                      I is valid for DO..LOOP, DO..+LOOP, and FOR..NEXT .
+
+
+      Name:           IBC!                   "i-b-c-store"
+      Stack:          n --
+      Description:    Write the Interrupt Base/Control Register.
+
+
+      Name:           IBC@                   "i-b-c-fetch"
+      Stack:          -- n
+      Description:    Read the Interrupt Base/Control Register.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 29
+
+      Name:           ID.                    "i-d-dot"
+      Stack:          nfa --
+      Description:    Display the name associated with the specified name
+      field
+                      address.
+
+
+      Name:           IF              c,i
+      Stack:          flag --
+      Use:            ( flag) IF ... THEN
+      or:             ( flag) IF ... ELSE ... THEN
+      Description:    A compiler directive which builds a conditional
+                      execution structure.  If the flag is true, the code
+                      between IF and THEN or IF and ELSE is executed.  If the
+                      flag is false, execution branches to either THEN or ELSE
+                      (depending on the form used).  All compiler structures
+                      may be nested.
+
+
+      Name:           IMMEDIATE
+      Stack:          --
+      Description:    Mark the most recently created dictionary entry
+                      as a word which will be executed when encountered
+                      during compilation rather than compiled.
+
+
+      Name:           IMR!                   "i-m-r-store"
+      Stack:          n --
+      Description:    Write the Interrupt Mask Register.
+
+
+      Name:           IMR@                   "i-m-r-fetch"
+      Stack:          -- n
+      Description:    Read the Interrupt Mask Register.
+
+
+      Name:           INT-VECTORS
+      Stack:          -- addr
+      Description:    A constant whose value is the address of interrupt
+                      vector table, which must be aligned to an address that
+                      is a multiple of 400H.  32 bytes per interrupt is
+                      allocated in the table.  The table may
+                      contain a call to an interrupt service routine or the
+                      interrupt service routine itself (if it will fit in 32
+                      bytes).
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 30
+
+      Name:           INTERPRET
+      Stack:          --
+      Description:    Begin text interpretation at the character indexed
+                      by the contents of >IN relative to TIB.
+
+
+      Name:           IPR!                   "i-p-r-store"
+      Stack:          n --
+      Description:    Write the Index Page Register.
+
+
+      Name:           IPR@                   "i-p-r-fetch"
+      Stack:          -- n
+      Description:    Read the Index Page Register.
+
+
+      Name:           IS-CODE
+      Stack:          --
+      Description:    Set the status bit in the header of the most recently
+                      defined word to indicate that it is an opcode.  The
+                      compiler will recognize this bit, and compile the opcode
+                      rather than a call to the opcode.
+
+
+      Name:           IVR@                   "i-v-r-fetch"
+      Stack:          -- n
+      Description:    Read the Interrupt Vector Register.
+
+
+      Name:           J               c
+      Stack:          -- w
+      Description:    Return the third item from the return stack.  This is
+                      typically the index of an outer DO..LOOP .  For example,
+                      in "DO ... DO ... I J ... LOOP ... LOOP", I returns the
+                      index of the innermost loop and J returns the index of
+                      the loop one level out.  Not allowed for use with
+                      FOR..NEXT .
+
+
+      Name:           KEY
+      Stack:          -- n
+      Description:    Wait for a keystroke from the console, and return its
+                      ASCII value.
+
+
+      Name:    KEY?                   "key-query"
+      Stack:          -- flag
+      Description:    True if a character is available for KEY.  Executing
+      KEY?
+                      does not consume any pending keystrokes.
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 31
+
+      Name:           L>NAME                 "link-to-name"
+      Stack:          lfa -- nfa
+      Description:    Convert a link field address to a name field address.
+
+
+      Name:           LAST
+      Stack:          -- addr
+      Description:    A variable containing the address of the link field of
+                      the last dictionary entry made, which may not yet be a
+                      complete or valid entry.
+
+
+      Name:           LEAVE           c,i
+      Stack:          --
+                      --   (compiling)
+      Use:            DO ... LEAVE ... LOOP
+      or:             DO ... LEAVE ... +LOOP
+      Description:    A means to exit an counted loop.  Execution is
+                      transferred to just beyond the next LOOP or +LOOP. The
+                      loop is terminated and loop control parameters are
+                      discarded.  LEAVE may not be used in FOR..NEXT
+                      construct, but may be used in other structures within
+                      the DO..LOOP.
+
+
+      Name:           LINKS
+      Stack:          -- addr
+      Description:    A ROMed table containing initial dictionary threads.
+
+
+      Name:           LITERAL         c,i
+      Stack:          -- n
+                      n --   (compiling)
+      Use:            [ n ] LITERAL
+      Example:        [ 100 23 5 */ ] LITERAL
+      Description:    Compile an instruction sequence that will leave n on the
+                      stack when executed.
+
+
+      Name:           LONG
+      Stack:          d-addr --
+      Description:    Move the body of the last word defined to the long
+                      memory location specified by d-addr, makes it an
+                      immediate word, and assigns it a new runtime behavior
+                      which will execute the code in extended memory.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 32
+
+      Name:           LOOP            c,i
+      Stack:          --
+                      addr --   (compiling)
+      Use:            DO ... LOOP
+      Description:    A compiler directive which terminates a counted loop.
+                      At execution the loop index is incremented by one and
+                      the loop terminates if the new index is equal to the
+                      limit.  See: DO +LOOP .
+
+
+      Name:           M*                     "m-times"
+      Stack:          n1 n2 -- d
+      Description:    Return the 32-bit signed product of n1 and n2.
+
+
+      Name:           MASK
+      Stack:          n --
+      Description:    Set the interrupt mask register according to the pattern
+                      on the stack.  All interrupts corresponding to one bits
+                      in the pattern are masked.  See: EI1, EI2, EI3, EI4,
+                      EI5, PSU, PSV, RSU, RSV, SWI, TIMER0, TIMER1, and
+                      TIMER2.
+
+
+      Name:           MASKED?
+      Stack:          n1 -- n2
+      Description:    Return the status of the interrupt mask register
+                      according to the pattern on the stack.  This allows the
+                      program to determine if a specific interrupt is masked
+                      or not.  See:  EI1, EI2, EI3, EI4, EI5, PSU, PSV, RSU,
+                      RSV, SWI, TIMER0, TIMER1, and TIMER2.
+
+
+      Name:           MAX
+      Stack:          n1 n2 -- n3
+      Description:    Leave the greater of n1 and n2.
+
+
+      Name:           MD!                    "m-d-store"
+      Stack:          n --
+      Description:    Write the MD register.
+
+
+      Name:           MD@                    "m-d-fetch"
+      Stack:          -- n
+      Description:    Read the MD register.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 33
+
+      Name:           MHR@                   "m-h-r-fetch"
+      Stack:          -- n
+      Description:    Read the Multiplier High Register, the upper 16-bits of
+                      a 32-bit product.  See the RTX 2000 Series Programmer's
+                      Reference Manual for notes on the stack effects of this
+                      instruction.
+
+
+      Name:           MIN
+      Stack:          n1 n2 -- n3
+      Description:    Leave the lesser of n1 and n2.
+
+
+      Name:           MLR@                   "m-l-r-fetch"
+      Stack:          -- n
+      Description:    Read the Multiplier Low Register, the lower 16-bits of a
+                      32-bit product.  See the RTX 2000 Series Programmer's
+                      Reference Manual for notes on the stack effects of this
+                      instruction.
+
+
+      Name:           MOD
+      Stack:          n1 n2 -- n3
+      Description:    Return the remainder of the division of n1 by n2.  n3
+                      has the same sign as n2 or is zero.
+
+
+      Name:           MULS                   "mul-s"
+      Stack:          n n -- n n
+      Description:    Activates the hw multiplier to perform a signed
+                      multiplication operation.  The results may be read using
+                      the MHR@ and MLR@ instructions.  See the RTX 2000 Series
+                      Programmer's Reference Manual for notes on the stack
+                      effect of this instruction.
+
+
+      Name:           MULU                   "mul-u"
+      Stack:          --
+      Description:    Activates the hw multiplier to perform an unsigned
+                      multiplication operation.  The results may be read using
+                      the MHR@ and MLR@ instructions.  See RTX 2000 Series
+                      Programmer's Reference Manual for notes on the stack
+                      effect of this instruction.
+
+
+      Name:           N2*                    "n-2-times"
+      Stack:          n1 n2 -- n3 n2
+      Description:    Shift n1 left one bit. Lsb <- 0.  n2 is unaffected.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 34
+
+      Name:           N2*c                   "n-2-times-carry"
+      Stack:          n1 n2 -- n3 n2
+      Description:    Shift n1 left one bit, Lsb <- carry.  n2 is un-affected.
+
+
+      Name:           NAND
+      Stack:          n1 n2 -- n3
+      Description:    Bit-wise complimented AND of n1 with n2.
+
+
+      Name:           NEGATE
+      Stack:          n1 -- n2
+      Description:    Negate the number n1, same as subtracting n1 from zero.
+
+
+      Name:           NEXT            c,i
+      Stack:          --
+      Description:    A compiler directive which terminates a FOR loop.  At
+                      execution, if the top of the return stack is zero,
+                      the loop is terminated and sequential execution
+                      continues.  Otherwise, the index is decremented and
+                      execution continues just after the corresponding FOR.
+
+
+      Name:           NIP
+      Stack:          n1 n2 -- n2
+      Description:    Discard the second item on the stack.
+
+
+      Name:           NOOPTIMIZE             "no-optimize"
+      Stack:          --
+      Description:    Turns off automatic compiler optimization, causing RTX
+                      machine instructions to be compiled individually, rather
+                      than having two or more functions combined.  OPTIMIZE
+                      and NOOPTIMIZE directives may be placed throughout an
+                      application to selectively optimize portions of the
+                      code.  OPTIMIZE is the compiler's default mode.
+
+
+      Name:           NOP                    "no-op"
+      Stack:          --
+      Description:    A useful, bug-free operation.  Programs which consist
+                      only of this opcode usually work.  Consumes one clock
+                      cycle.
+
+
+      Name:           NOR
+      Stack:          n1 n2 -- n3
+      Description:    Bit-wise complimented OR of n1 with n2.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 35
+
+      Name:           NOT
+      Stack:          n1 -- n2
+      Description:    Bit-wise inversion of n1.
+
+
+      Name:           OFF
+      Stack:          addr --
+      Description:    Write a 0 to addr.
+
+
+      Name:           ON
+      Stack:          addr --
+      Description:    Write a -1 to addr.
+
+
+      Name:           OPTIMIZE
+      Stack:          --
+      Description:    Turns on automatic compiler optimization features.
+                      OPTIMIZE and NOOPTIMIZE directives may be placed
+                      throughout an application to selectively optimize
+                      portions of the code.  OPTIMIZE is the compiler's
+                      default mode.
+
+
+      Name:           OR
+      Stack:          n1 n2 -- n3
+      Description:    Bit-wise inclusive-OR of n1 with n2.
+
+
+      Name:           OVER
+      Stack:          n1 n2 -- n1 n2 n1
+      Description:    Copy n1 to the top of the stack.
+
+
+      Name:           PAD
+      Stack:          -- addr
+      Description:    The address of a scratch area used to hold data for
+                      intermediate processing.  The address or contents of PAD
+                      may change and the data lost if the address of the next
+                      available dictionary location is changed.
+
+
+      Name:           PC@                    "p-c-fetch"
+      Stack:          -- n
+      Description:    Read the Program Counter register.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 36
+
+      Name:           PICK
+      Stack:          n -- n
+      Description:    Copy the nth stack value (not counting n itself) to
+                      the top of the stack.  "0 PICK" is equivalent to "DUP"
+                      and "1 PICK" is equivalent to "OVER".
+
+
+      Name:           PLACE
+      Stack:          addr1 len addr2 --
+      Description:    Copy the string (addr1 len) to a counted string at
+                      addr2.  No checking is done to ensure that there is room
+                      to place the string.
+
+
+      Name:           PREVIOUS
+      Stack:          -- addr
+      Description:    Return the name field address of the last word defined.
+
+
+      Name:           PSU                    "p-s-u"
+      Stack:          -- 4
+      Description:    A constant whose value is the mask for the parameter
+                      stack underflow interrupt.  Used by MASK, UNMASK, and
+                      MASKED? .
+
+
+      Name:           PSV                    "p-s-v"
+      Stack:          -- 10h
+      Description:    A constant whose value is the mask for the parameter
+                      stack overflow interrupt.  Used by MASK, UNMASK, and
+                      MASKED? .
+
+
+      Name:           QUERY
+      Stack:          --
+      Description:    Accept one line of input from the console to the TIB.
+                      When complete, set >IN to zero and #TIB to the number of
+                      characters accepted.  The buffer may be interpreted or
+                      input may be parsed by WORD.  Actual input is performed
+                      by EXPECT.
+
+
+      Name:           QUIT
+      Stack:          --
+      Description:    Clear the return stack, sets interpret state, accepts
+                      new input from the console, and starts the text
+                      interpreter.  No message is displayed.  This may be
+                      thought of as a "warm-start" of the kernel.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 37
+
+      Name:           R>              c      "r-from"
+      Stack:          -- n
+      Description:    Move n from the return stack to the data stack.
+
+
+      Name:           R>DROP          c      "r-from-drop"
+      Stack:          --
+      Description:    Drop the top of the return stack.
+
+
+      Name:           R>DROP>R        c      "r-from-drop-to-r"
+      Stack:          n --
+      Description:    Replace the top of the return stack with n.
+
+
+      Name:           R@              c      "r-fetch"
+      Stack:          -- n
+      Description:    Copy the top of the return stack.
+
+
+      Name:           RCV                    "r-c-v"
+      Stack:          -- byte
+      Description:    Receive a byte of data from the host program.  Used by
+                      the host communications protocol handler.
+
+
+      Name:           RCV?                   "r-c-v-query"
+      Stack:          -- flag
+      Description:    True if a byte has been received from the host. Used by
+                      the host communications protocol handler.
+
+
+      Name:           RCVS                   "r-c-v-s"
+      Stack:          addr len --
+      Description:    Receive len bytes of data from the host program.  Used
+                      by the host communications protocol handler.
+
+
+      Name:           RECOVER
+      Stack:          --
+      Description:    Recover two bytes from the dictionary.  "-2 ALLOT" .
+
+
+      Name:           RECURSE         c,i
+      Stack:          --
+      Description:    Compile a recursive call for the routine being defined.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 38
+
+      Name:           REPEAT          c,i
+      Stack:          --
+      Use:            BEGIN ... ( flag) WHILE ... REPEAT
+      Description:    A compiler directive to resolve the BEGIN..WHILE..REPEAT
+                      structure.  An unconditional branch to BEGIN is
+                      compiled, and the conditional branch at WHILE is
+                      resolved.
+
+
+      Name:           RESET
+      Stack:          --
+      Description:    Execute a full system reset.  This is the best you can
+                      do without a button.
+
+
+      Name:           RH!                    "r-h-store"
+      Stack:          n --
+      Description:    Write the Holding/Counting Register.
+
+
+      Name:           RH@                    "r-h-fetch"
+      Stack:          -- n
+      Description:    Read the Holding/Counting Register.
+
+
+      Name:           ROLL
+      Stack:          n --
+      Description:    The nth stack value (not counting n) is first removed
+                      and then transferred to the top of the stack, moving the
+                      remaining values into the vacated position. "2 ROLL" is
+                      equivalent to "ROT" and "0 ROLL" is a null operation.
+
+
+      Name:           ROM
+      Stack:          -- addr
+      Description:    A table containing reset initialization values for
+                      system variables.
+
+
+      Name:           ROT                    "rote"
+      Stack:          n1 n2 n3 -- n2 n3 n1
+      Description:    Rotate the top three numbers on the stack, bringing the
+                      third number number to the top.
+
+
+      Name:           RSU                    "r-s-u"
+      Stack:          -- 8
+      Description:    A constant whose value is the mask for the return stack
+                      underflow interrupt.  Used by MASK, UNMASK, and MASKED?.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 39
+
+      Name:           RSV                    "r-s-v"
+      Stack:          -- 20h
+      Description:    A constant whose value is the mask for the return stack
+                      overflow interrupt.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           RX!                    "r-x-store"
+      Stack:          n --
+      Description:    Write the RX Temporary Holding Register.
+
+
+      Name:           RX@                    "r-x-fetch"
+      Stack:          -- n
+      Description:    Read the Temporary Holding Register.
+
+
+      Name:           S>D                    "s-to-d"
+      Stack:          n -- d
+      Description:    Convert a 16 bit signed value to a 32 bit signed value.
+
+
+      Name:           SCAN
+      Stack:          addr1 len1 char -- addr2 len2
+      Description:    Given a string (addr1 len1) and a delimiter (char), scan
+                      forward through the string until the delimiter character
+                      is found or the string is exausted.  Return the address
+                      of the last character examined and the remaining length.
+
+
+      Name:           SEARCH
+      Stack:          addr1 len1 addr2 len2 -- addr3 flag
+      Description:    Given a pattern string (addr1 len1) and a body of text
+                      to search (addr2 len2), look for the pattern in the
+                      body.  If the pattern is found, return its address in
+                      the body and a true flag.  Otherwise, the address is
+                      undefined and the flag is false.
+
+
+      Name:           SEE
+      Stack:          --
+      Use:            SEE <name>
+      Description:    De-compile the specified name.  Also, UN.
+
+
+      Name:           SELCPR                 "sel-c-p-r"
+      Stack:          --
+      Description:    Set Data Page Register Select bit to 0, causing all
+                      data accesses to be addressed through the Code Page
+                      Register.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 40
+
+      Name:           SELDPR                 "sel-d-p-r"
+      Stack:          --
+      Description:    Set Data Page Register Select bit to 1, causing all
+                      data accesses to be addressed through the Data Page
+                      Register.
+
+
+      Name:           SET-INT-MASK
+      Stack:          --
+      Description:    Set the IBC register to point to INT-VECTORS and mask
+                      all interrupts.
+
+
+      Name:           SET-INT-VECTORS
+      Stack:          --
+      Description:    Initialize the interrupt vector table to "NOP RETURN"
+                      for each interrupt.
+
+
+      Name:           SHIFT
+      Stack:          n1 n2 -- n3
+      Description:    Logical shift n1 left n2 bits if n2 is positive, right
+                      n2 bits if n1 is negative.  Zeros are shifted into
+      vacated
+                      bit positions.
+
+
+      Name:           SIGN
+      Stack:          n --
+      Description:    If n is negative, an ASCII "-" (minus sign) is appended
+                      to the pictured numeric output string.  Typically used
+                      between <# and #>.
+
+
+      Name:           SKIP
+      Stack:          addr1 len1 char -- addr2 len2
+      Description:    Given a string (addr1 len1) and a delimiter (char), scan
+                      forward through the string skipping over the delimiter
+                      character until a non-delimiter character is found or
+                      the string is exausted.  Return the address of the last
+                      character examined and the remaining length.
+
+
+      Name:           SLR!                   "s-l-r-store"
+      Stack:          n --
+      Description:    Write the Stack Limit Register.  Bits 0-7 set the value
+                      for the Parameter Stack, bits 8-15 set the value for the
+                      Return Stack.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 41
+
+      Name:           SMUDGE
+      Stack:          --
+      Description:    Set the smudge bit in the header of the last word
+                      defined.  The word will not be found in a dictionary
+                      search.
+
+
+      Name:           SOFTINT                "soft-int"
+      Stack:          --
+      Description:    Generate a Software Interrupt request.  The Software
+                      Interrupt level must be unmasked in the Interrupt Mask
+                      Register before the request will be acknowledged.
+
+
+      Name:           SOS-                   "swap-over-swap-minus"
+      Stack:          n1 n2 -- n2 (n2-n1)
+      Description:    Perform the sequence "swap over swap -".  Compiles as
+                      one RTX instruction.
+
+
+      Name:           SPACE
+      Stack:          --
+      Description:    Display an ASCII space.
+
+
+      Name:           SPACES
+      Stack:          n --
+      Description:    Display n ASCII spaces.
+
+
+      Name:           SPAN
+      Stack:          -- addr
+      Description:    The variable containing the number of characters
+                      actually received and stored by the last execution of
+                      EXPECT.  See:  EXPECT .
+
+
+      Name:           SPR!                   "s-p-r-store"
+      Stack:          n --
+      Description:    Write the Stack Pointer Register.
+
+
+      Name:           SPR@                   "s-p-r-fetch"
+      Stack:          -- n
+      Description:    Read the Stack Pointer Register.  Bits 0-7 reflect the
+                      value of the Parameter Stack Pointer, bits 8-15 reflect
+                      the value of the Return Stack Pointer.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 42
+
+      Name:           SPR@+                  "s-p-r-fetch-plus"
+      Stack:          n1 -- n2
+      Description:    Read the Stack Pointer Register and add n1 to it.
+                      Compiled as a single RTX opcode.
+
+
+      Name:           SQ@                    "s-q-fetch"
+      Stack:          -- n
+      Description:    Read the "pseudo register".  See the RTX 2000 Series
+                      Programmer's Reference Manual for details.
+
+
+      Name:           SQRT                   "square-root"
+      Stack:          n -- root
+      Description:    Calculate the square root of an unsigned value.
+
+
+      Name:           SR!                    "s-r-store"
+      Stack:          n --
+      Description:    Write the Square root register.
+
+
+      Name:           SR@                    "s-r-fetch"
+      Stack:          -- n
+      Description:    Read the Square root register.
+
+
+      Name:           STATE
+      Stack:          -- addr
+      Description:    The variable containing the compilation state flag.  A
+                      non-zero value indicates that the system is compiling.
+
+
+      Name:           STRING
+      Stack:          char --
+      Example:        ASCII \ STRING this is a string\
+      Description:    Compile the string literal delimited by char into the
+                      dictionary as a counted string.
+
+
+      Name:           SUR!                   "s-u-r-store"
+      Stack:          n --
+      Description:    Write the Stack Underflow Limit register.
+
+
+      Name:           SUR@                   "s-u-r-fetch"
+      Stack:          -- n
+      Description:    Read the Stack Underflow Limit register.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 43
+
+      Name:           SVR!                   "s-v-r-store"
+      Stack:          n --
+      Description:    Write the Stack Overflow Limit register.
+
+
+      Name:           SWAP
+      Stack:          n1 n2 -- n2 n1
+      Description:    Exchange the top two numbers on the stack.
+
+
+      Name:           SWAP-                  "swap-minus"
+      Stack:          n1 n2 -- n3
+      Description:    Subtract n1 from n2.
+
+
+      Name:           SWAP-c                 "swap-minus-carry"
+      Stack:          n1 n2 -- n3
+      Description:    Subtract n1 from n2 with borrow.
+
+
+      Name:           SWI                    "s-w-i"
+      Stack:          -- 2000h
+      Description:    A constant whose value is the mask for the software
+                      interrupt.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           TC0!                   "t-c-zero-store"
+      Stack:          n --
+      Description:    Write a value n to the pre-load register of
+                      Timer/Counter 0.
+
+
+      Name:           TC0@                   "t-c-zero-fetch"
+      Stack:          -- n
+      Description:    Read the contents of Timer/Counter 0.
+
+
+      Name:           TC1!                   "t-c-one-store"
+      Stack:          n --
+      Description:    Write a value n to the pre-load register of
+                      Timer/Counter 1.
+
+
+      Name:           TC1@                   "t-c-one-fetch"
+      Stack:          -- n
+      Description:    Read the contents of Timer/Counter 1.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 44
+
+      Name:           TC2!                   "t-c-two-store"
+      Stack:          n --
+      Description:    Write a value n to the pre-load register of
+                      Timer/Counter 2.
+
+
+      Name:           TC2@                   "t-c-two-fetch"
+      Stack:          -- n
+      Description:    Read the contents of Timer/Counter 2.
+
+
+      Name:           THEN            c,i
+      Stack:          --
+      Use:            ( flag) IF ... THEN
+      or:             ( flag) IF ... ELSE ... THEN
+      Description:    A compiler directive which defines the end of a
+                      conditional execution structure.  See IF and ELSE.
+
+
+      Name:           TIB                    "t-i-b"
+      Stack:          -- addr
+      Description:    The text input buffer, used to hold characters from the
+                      input stream coming from the console.
+
+
+      Name:           TIMER0
+      Stack:          -- 80h
+      Description:    A constant whose value is the mask for the timer 0
+                      interrupt.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           TIMER1
+      Stack:          -- 100h
+      Description:    A constant whose value is the mask for the timer 1
+                      interrupt.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           TIMER2
+      Stack:          -- 200h
+      Description:    A constant whose value is the mask for the timer 2
+                      interrupt.  Used by MASK, UNMASK, and MASKED? .
+
+
+      Name:           TIMES           c
+      Stack:          n --
+      Example:        6 TIMES 2*
+      Description:    Compile a "streamed" instruction.  The execution effect
+                      in the example is that 2* will be executed 7 times.
+                      Only single opcodes may be streamed.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 45
+
+      Name:           TRUE
+      Stack:          -- -1
+      Description:    A constant -1.
+
+
+      Name:           TUCK
+      Stack:          n1 n2 -- n2 n1 n2
+      Description:    Insert a copy of n2 under n1 on the data stack.
+                      Equivalent to:  SWAP OVER
+
+
+      Name:           TYPE
+      Stack:          addr n --
+      Description:    Display n characters displayed from memory beginning
+      with the
+                      character at addr.
+
+
+      Name:           U!                     "u-store"
+      Stack:          n u --
+      Example:        12 5 U!
+      Description:    Write n to the u'th word of the User memory. The actual
+                      location written to is be determined by the contents of
+                      the RTX processor's page registers. The value of u must
+                      be compiled immediately before the U@ as a short
+                      literal. See the RTX 2000 Series Programmer's Reference
+                      Manual for details.  In the example, 12 would be written
+                      to the User Space location 10 (word offset 5).
+
+
+      Name:           U.                     "u-dot"
+      Stack:          u --
+      Description:    Display u as an unsigned number in a free-field format.
+
+
+      Name:           U.R                    "u-dot-r"
+      Stack:          u n --
+      Description:    Display u as an unsigned number right justified in a
+                      field n characters wide.
+
+
+      Name:           U2/                    "u-two-divide"
+      Stack:          u1 -- u2
+      Description:    Shift u1 right one bit. Msb <- 0.
+
+
+      Name:           U<                     "u-less-than"
+      Stack:          u1 u2 -- flag
+      Description:    True if u1 is less than u2.
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 46
+
+      Name:           U>                     "u-greater-than"
+      Stack:          u1 u2 -- flag
+      Description:    True if u1 is greater than u2.
+
+
+      Name:           U@                     "u-fetch"
+      Stack:          u -- n
+      Example:        10 U@
+      Description:    Read the u'th word from the User memory.  The actual
+                      location read from is be determined by the contents of
+                      the RTX processor's page registers.  The value of u must
+                      be compiled immediately before the U@ as a short
+                      literal.See the RTX 2000 Series Programmer's Reference
+                      Manual for details.  u must be in the range 0-31.  In
+                      the example, User Space location 20 would be read (word
+                      offset 10).
+
+
+      Name:           UBR!                   "u-b-r-store"
+      Stack:          n --
+      Description:    Write the User Base Register.
+
+
+      Name:           UBR@                   "u-b-r-fetch"
+      Stack:          -- n
+      Description:    Read the User Base Register.
+
+
+      Name:           UCODE                  "u-code"
+      Stack:          n --
+      Use:            n UCODE <name>
+      Description:    A defining word used to make symbolic representations of
+                      specific RTX opcodes.  The value of the opcode is
+                      compiled with the return bit set:  the compiler strips
+                      this bit off when referencing the opcode. Refer to the
+                      RTX 2000 Series Programmer's Reference Manual for
+                      details on generating RTX machine code.
+
+
+      Name:           UD2/                   "u-d-two-divide"
+      Stack:          d1 -- d2
+      Description:    Shift d1 right one bit.  Msb <- 0.
+
+
+      Name:           UM*                    "u-m-times"
+      Stack:          u1 u2 -- ud
+      Description:    Return the unsigned product of u1 and u2.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 47
+
+      Name:           UM/MOD                 "u-m-divide-mod"
+      Stack:          ud u1 -- u2 u3
+      Description:    Return the remainder u2 and the quotient u3 of the
+                      division of the 32-bit value ud by the 16 bit value u1.
+
+
+      Name:           UN                     "uncompile"
+      Stack:          addr --
+      Description:    De-compile memory starting at addr.  16 lines of
+                      decompliation are displayed and the next keystroke is
+                      waited for.  If the next keystroke is: spacebar -- do 16
+                      more lines; return -- quit; <any displayable ascii char>
+                      -- do 1 line.
+
+
+      Name:           UNMASK
+      Stack:          n --
+      Description:    Clear the interrupt mask register according to the
+                      pattern on the stack.  All interrupts corresponding to
+                      one bits in the pattern are unmasked.  See: EI1, EI2,
+                      EI3, EI4, EI5, PSU, PSV, RSU, RSV, SWI, TIMER0, TIMER1,
+                      and TIMER2.
+
+
+      Name:           UNSMUDGE
+      Stack:          --
+      Description:    Clear the smudge bit in the last word defined.
+
+
+      Name:           UNTIL           c,i
+      Stack:          flag --
+      Use:            BEGIN ... ( flag) UNTIL
+      Description:    A compiler directive which closes an iterated loop.  The
+                      body of the loop is executed until the flag is true.
+
+
+      Name:           UPPER
+      Stack:          char -- char
+      Description:    If the character is lower-case alphabetic, convert it to
+                      uppercase.  Otherwise, do nothing to it.
+
+
+      Name:           UPR!                   "u-p-r-store"
+      Stack:          n --
+      Description:    Write the User Page Register.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 48
+
+      Name:           UPR@                   "u-p-r-fetch"
+      Stack:          -- n
+      Description:    Read the User Page Register.
+
+
+      Name:           USE
+      Stack:          n --
+      Description:    Write addr into the code field of the last word defined.
+
+
+      Name:           VAL,                   "val-comma"
+      Stack:          . . n3 n2 n1 #n --
+      Description:    Compile #n words from the stack into the dictionary as a
+                      series of literals.  The words are placed into the
+                      dictionary in reverse order, so that at run time the
+                      words will be on the stack in the same order as at
+                      compile time.
+
+
+      Name:           VAL?                   "val-query"
+      Stack:          addr -- . . . 0 | n 1 | d 2
+      Description:    Convert the count and character string at addr to a
+                      number if possible.  The first character of the string
+                      may modify the base temporarily according to: $=hex,
+                      #=decimal, %=binary. ( $100 = #256 = %100000000 ).  The
+                      first non-base-modifying character may be a minus sign,
+                      which will modify the sign of the resulting number.  If
+                      conversion results in a double number, return the double
+                      number and 2.  If the conversion results in an integer,
+                      return the number and 1.  If no conversion is possible,
+                      return 0.
+
+
+      Name:           VARIABLE
+      Stack:          --
+      Use:            VARIABLE <name>
+      Description:    A defining word for integer variables.  Two bytes are
+                      allocated in the parameter field of <name>.  When
+                      executed, <name> will push the address of its parameter
+                      field onto the stack.
+
+
+      Name:           VLINK
+      Stack:          -- addr
+      Description:    A pointer to the vocabulary link field of the last
+                      vocabulary created.  Note that the vocabularies are
+                      linked as normal dictionary entries as well as in the
+                      VLINK chain.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 49
+
+      Name:           VOCABULARY
+      Stack:          --
+      Use:            VOCABULARY <name>
+      Description:    A defining word for vocabularies.  Space is allocated
+                      for a set of threads for the words that will be defined
+                      in the vocabulary, and a link cell pointing to the
+                      previous vocabulary is established.  WHen <name>
+                      executes, it becomes the CONTEXT vocabulary, which is
+                      the first vocabulary searched for word matches by the
+                      interpreter. To compile words into the vocabulary, it
+                      must be made the CURRENT vocabulary by DEFINITIONS.
+
+
+      Name:           VOCS
+      Stack:          --
+      Description:    Display the names of all vocabularies.
+
+
+      Name:           WHILE           c,i
+      Stack:          flag --
+      Use:            BEGIN ... ( flag) WHILE ... REPEAT
+      Description:    A compiler directive which provides the termination
+                      branch for an iterated loop.  The body of the loop
+                      between BEGIN and WHILE executes, and if the flag
+                      evaluated by WHILE is true, execution will continue to
+                      the REPEAT and back to the BEGIN.  When the flag is
+                      false, execution will skip over the code between WHILE
+                      and REPEAT.
+
+
+      Name:           WITHIN
+      Stack:          n1 n2 n3 -- flag
+      Description:    True if n2 <- n1 < n3.
+
+
+      Name:           WORD
+      Stack:          char -- addr
+      Description:    Parse the input stream for a token delimited by char.
+                      Ignore leading occurrences of char.  Store the parsed
+                      string in memory at HERE as a counted string.  If the
+                      input stream was exausted, store a string with a zero
+                      count byte.  The system variable >IN is adjusted to
+                      point to the first occurrence of char after the parsed
+                      string.  The maximum string length is 255, but since
+                      the TIB is only 132 characters, this is not a problem.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 50
+
+      Name:           WORDS
+      Stack:          --
+      Example:        WORDS
+      or:             WORDS XYZ
+      Description:    Display words defined in the current dictionary.  In the
+                      first example, all words in the CONTEXT vocabulary are
+                      displayed.  In the second example, all words in the
+                      CONTEXT vocabulary containing the substring XYZ are
+                      displayed.
+
+
+      Name:           XMT                    "x-m-t"
+      Stack:          byte --
+      Description:    Transmit a byte to the host.  Used by the host
+                      communications protocol handler.
+
+
+      Name:           XMT?                   "x-m-t-query"
+      Stack:          -- flag
+      Description:    True if a character may be transmitted.
+
+
+      Name:           XMTS                   "x-m-t-s"
+      Stack:          addr len --
+      Description:    Transmit len characters from addr to the host.  Used by
+                      the host communications protocol handler.
+
+
+      Name:           XNOR                   "x-nor"
+      Stack:          n n -- n
+      Description:    Bit-wise complimented exclusive OR of n1 with n2.
+
+
+      Name:           XOR                     "x-or"
+      Stack:          n1 n2 -- n3
+      Description:    Bit-wise exclusive OR of n1 with n2.
+
+
+      Name:           [               i      "left-bracket"
+      Stack:          --
+                      --   (compiling)
+      Description:    Set state to interpret.  The text from the input stream
+                      is subsequently interpreted.  See: ]
+
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 51
+
+      Name:           [']             c,i    "bracket-tick"
+      Stack:          -- addr
+                      --   (compiling)
+      Use:            ['] <name>
+      Description     Compile the address addr of <name> as a literal.  When
+                      the colon definition is later executed, this address is
+                      left on the stack.
+
+
+      Name:           [COMPILE]       c,i    "bracket-compile"
+      Stack:          --
+                      --   (compiling)
+      Use:            [COMPILE] <name>
+      Description:    Forces compilation of the following word <name>. This
+                      allows compilation of an immediate word when it would
+                      otherwise have been executed.
+
+
+      Name:           \                      "back-slash"
+      Stack:          --
+      Description:    Comment to the end of the current line. A space must be
+                      used after \ for correct operation.
+
+
+      Name:           \\              i      "break-optimization"
+      Stack:          --
+      Description:    Break compiler optimization.  This is used to force the
+                      compiler to seperate opcodes that would normally be
+                      combined into one opcode.
+
+
+      Name:           ]                      "right-bracket"
+      Stack:          --
+      Description:    Set state to compilation.  The text from the input
+                      stream is subsequently compiled.
+
+
+      Name:           c2/                    "c-two-divide"
+      Stack:          n1 -- n2
+      Description:    Rotate n1 right one bit.  Msb <- carry, carry <- lsb.
+
+
+      Name:           cD2/                   "c-d-two-divide"
+      Stack:          d1 -- d2
+      Description:    Rotate d1 right one bit. Msb <- carry, carry <- lsb.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 52
+
+      Name:           cU2/                   "c-u-two-divide"
+      Stack:          u1 -- u2
+      Description:    Rotate u1 right one bit. Msb <- carry, carry <- 0.
+
+
+      Name:           cUD2/                  "c-u-d-two-divide"
+      Stack:          d1 -- d2
+      Description:    Rotate di right one bit.  Msb <- carry, carry <- 0.
+
+
+      Name:           dA                     "d-a"
+      Stack:          -- addr
+      Description:    The variable containing the compilation address offset.
+
+
+      Name:           huh?
+      Stack:          flag --
+      Description:    Abort if the flag is zero.
+
+
+      Name:           sys-abort
+      Stack:          --
+      Description:    The primitive system abort routine.  ABORT executes
+                      this routine.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 53
+
+      The following words are EXPECT macros.  They are not useful as words in
+      their own right, and should not be executed by name.
+
+      Name:           ~H                    backspace
+      Stack:          --
+      Description:    Move the cursor left one character and erase it.
+
+
+      Name:           ~M                    return
+      Stack:          --
+      Description:    Terminate input.
+
+
+      Name:           ~[                    escape
+      Stack:          --
+      Description:    Delete the entire line of input, let user start over.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 54
+
+      The following words are also expect macros, but are only useful when
+      using the host environment which manages listing files.
+
+      Name:           ~118                  control-pageup
+      Stack:          --
+      Description:    Move the file line pointer back 1 line and relist.
+
+
+      Name:           ~132                  control-pagedown
+      Stack:          --
+      Description:    Move the file line pointer forward 1 line and relist.
+
+
+      Name:           ~71                   home
+      Stack:          --
+      Description:    Move the file line pointer to top-of-file and relist.
+
+      Name:           ~73                   pageup
+      Stack:          --
+      Description:    Move the file line pointer back 16 lines and relist.
+
+      Name:           ~79                   end
+      Stack:          --
+      Description:    Move the file line pointer to end-of-file and relist.
+
+
+      Name:           ~81                   pagedown
+      Stack:          --
+      Description:    Move the file line pointer forward 16 lines and relist.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 55
+
+      The following words are DOS interface words.  They are useful only when
+      using the host environment.
+
+
+      Name:           #COMMENT
+      Stack:          --
+      Description:    Begin a multi-line comment, terminated with #END.
+                      #COMMENT is only allowed when loading a file and may not
+                      be nested with other #IF or #COMMENT structures.
+
+
+      Name:           #END
+      Stack:          --
+      Description:    Terminate a multi-line comment (#COMMENT) or a
+                      conditional compilation structure (#IF).  Nesting of
+                      these structures is not allowed.
+
+
+      Name:           #IF
+      Stack:          flag --
+      Description:    If the flag is false, skip all text up to and including
+                      the first encountered #END.  If the flag is true, do
+                      nothing.  #IF is allowed only when loading from a file
+                      and may not be nested with other #IF or #COMMENT
+                      structures.
+
+
+      Name:           .FILE                  "dot-file"
+      Stack:          --
+      Description:    Display the name of the current LISTING file.
+
+
+      Name:           A:
+      Stack:          --
+      Description:    Select drive A.
+
+
+      Name:           B
+      Stack:          --
+      Description:    Move the file line pointer back 16 lines and relist.
+
+
+      Name:           B:
+      Stack:          --
+      Description:    Select drive B.
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 56
+
+      Name:           BYE
+      Stack:          --
+      Description:    Exit APPFORTH and return to DOS.
+
+
+      Name:           C:
+      Stack:          --
+      Description:    Select drive C.
+
+
+
+      Name:           CD
+      Stack:          --
+      Example:        CD \MYPATH\MYDIR
+      or:             CD
+      Description:    DOS' change directory.  If no path is specified, the
+                      current directory name is displayed.
+
+
+      Name:           CLICK
+      Stack:          --
+      Description:    Print the current elapsed time since the last TIMER
+                      command was executed.
+
+
+      Name:           CLOSE-FILE
+      Stack:          handle --
+      Description:    Close an open file by it handle.
+
+
+      Name:           COPY
+      Stack:          --
+      Use:            COPY file1.ext file2.exe
+      Description:    The DOS copy command.
+
+
+      Name:           CREATE-FILE
+      Stack:          addr n -- handle
+      Description:    Create a DOS file from the string specified on the stack
+                      and return its handle.  If DOS was unable to create the
+                      file, the handle will be zero.
+
+
+      Name:           D:
+      Stack:          --
+      Description:    Select drive D.
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 57
+
+      Name:           DEL
+      Stack:          --
+      Description:    Execute the DOS command "DEL" .
+
+
+      Name:           DELETE-FILE
+      Stack:          addr n --
+      Description:    Delete the file specified by the string, abort if unable
+                      to delete.
+
+
+      Name:           DIR
+      Stack:          --
+      Description:    Execute the DOS command "DIR" .
+
+
+      Name:           DIR/W
+      Stack:          --
+      Description:    Execute the DOS command "DIR /W" .
+
+
+      Name:           DOS
+      Stack:          --
+      Use:            DOS <any valid dos command line>
+      Description:    Pass the rest of the input line to a dos COMMAND shell
+                      for execution.
+
+
+      Name:           DOS-COMMAND
+      Stack:          addr len --
+      Description:    Pass the specified string to a dos COMMAND shell for
+                      execution.
+
+
+      Name:           EDIT
+      Stack:          --
+      Use:            EDIT <path\filename.ext>
+      Description:    Execute the DOS command "EDIT" which is assumed to
+                      accept a filename paramter.  When the filename is
+                      specified, it is remembered -- subsequent LOAD or EDIT
+                      operations without a filename specified will use the
+                      filename remembered.
+
+
+      Name:           FILEPOS
+      Stack:          handle -- d-addr
+      Description:    Return the current position in the specified file.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 58
+
+      Name:           FILESIZE
+      Stack:          handle -- d-size
+      Description:    Return the size of the specified file.  The file pointer
+                      is positioned at the end of the file by FILESIZE.
+
+
+      Name:           L
+      Stack:          --
+      Description:    Relist the current listing file at the file line
+                      pointer.
+
+
+      Name:           LIST
+      Stack:          n --
+      Description:    Display 16 lines of the current linsting file at line n.
+
+
+      Name:           LISTING
+      Stack:          --
+      Use:            LISTING <path\filename.ext>
+      Description:    Open the specified file for listing operations.  Only
+                      one file may be open at a time.  The listing operations
+                      are:  N L B and LIST .
+
+
+      Name:           LOAD
+      Stack:          --
+      Use:            LOAD <path\filename.ext>
+      Description:    Load the contents of the specified ASCII text file.  The
+                      load begins at the first byte of the file and continues
+                      sequentially to the end.  All control characters except
+                      <carriage-return> and <line-feed> are stripped out
+                      before interpretation.  LOAD is re-entrant (nested LOADs
+                      are allowed).  When the filename is specified, it is
+                      remembered -- subsequent LOAD or EDIT operations without
+                      a filename specified will use the filename remembered.
+
+
+      Name:           N
+      Stack:          --
+      Description:    Move the file line pointer forward 16 lines and relist.
+
+
+      Name:           OPEN-FILE
+      Stack:          addr len -- handle
+      Description:    Open the file specified by the string and return a valid
+                      DOS handle for it.  If DOS was unable to open the file,
+                      a handle value of zero will be returned.
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 59
+
+      Name:           RENAME
+      Stack:          --
+      Description:    The dos RENAME command.
+
+
+      Name:           READ-FILE
+      Stack:          addr len1 handle -- len2
+      Description:    Read len1 characters from the file whose handle is on
+                      the stack and place these characters at addr.  Len2 is
+                      how many characters were actually read, which may be
+                      less than len1.
+
+
+      Name:           READ-LINE
+      Stack:          addr len1 handle -- len2 flag
+      Description:    Read the next carriage-return, line-feed delimited line
+                      from the file whose handle is on the stack and place
+                      the data at addr.  If the read failed (at end of file)
+                      the flag is false.  Otherwise, len2 is the length of the
+                      line read.  The cr-lf characters are not placed in the
+                      buffer. The file is re-positioned to just after the
+                      cr-lf sequence, leaving the system ready to read the
+                      next line.
+
+
+      Name:           SEEK-FILE
+      Stack:          d-addr direction handle -- d-addr
+      Description:    Move the specified file's pointer to the d-addr from its
+                      current position in a manner specified by direction.
+                      dir=0: relative to start of file; dir=1: relative to
+                      current position; dir=2: relative to end of file.
+
+
+      Name:           SHELL
+      Stack:          --
+      Description:    The dos COMMAND processor.
+
+
+      Name:           TICKS
+      Stack:          -- n
+      Description:    Read the host time value, returning a count of system
+                      clock ticks whose rate is 18.2 ticks/second.
+
+
+      Name:           TIMER
+      Stack:          --
+      Description:    Initialize the elapsed time counter.  See CLICK.
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+
+                                  AppForth Glossary
+                          Copyright 1990 Harris Corporation
+                                 All Rights Reserved
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴 Page 60
+
+      Name:           USING
+      Stack:          --
+      Use:            USING <path\filename.ext>
+      Description:    Set the default LOAD and EDIT filename.  If LOAD or EDIT
+                      is executed with no specified filename, this will be the
+                      one used.  See LOAD and EDIT.
+
+
+      Name:           WRITE-FILE
+      Stack:          addr len1 handle -- len2
+      Description:    Write len1 bytes of data to the handle file from addr.
+                      Return the number of characters actually written.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                      !"#$%&'()*+.-./0 9:;<=>?@A Z[\]^_`a z{|}~
+
+
+
+
+

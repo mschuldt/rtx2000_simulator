@@ -1,0 +1,228 @@
+\ /* perm.c */                        
+\ /* from Stanford benchmark suite */                        
+\ /* modified for reasonable 16-bit operation */                        
+                        
+EMPTY                        
+: XY " DOS XY PERM.hnd" EVALUATE ;                        
+                        
+DECIMAL                        
+\ load GNUTOOL.4                        
+load GNUinst.4                        
+                        
+\ int    permarray[permrange+1];                        
+\ int    pctr;                        
+VARIABLE permarray   24   CELL- ALLOT                        
+VARIABLE pctr   4   CELL- ALLOT                        
+                        
+\ #define    permrange 10                        
+                        
+\ gcc_compiled.:                        
+( RTX 2000 code generation)                        
+                        
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!                        
+                        
+\ static void do_error() {                        
+ : do_error       ( FUNC )        ( 3  top> empty )                        
+\ 	printf(" Error in Perm.\n"); }                        
+ ." Error in Perm."  cr                        
+   ;       ( END )          ( 13  top> #2x )( RTX 2000 code generation)                        
+                        
+\ gcc_compiled.:                        
+                        
+\ static void    Swap_el      ( a,b )                        
+ : Swap_el       ( FUNC )        ( 3  top> empty )                        
+\ 	int *a, *b;                        
+\ 	{                        
+\ 	int t;                        
+ ( #4 dummy reload ) ( 4  top> empty )                        
+ ( #5 dummy reload ) ( 5  top> #64 )                        
+                        
+\ 	t = *a;  *a = *b;  *b = t;                        
+ 1_pick ++ ( #64)       ( 9  top> #65 #64 )                        
+ @                   ( 9  top> #0x #65 #64 )                        
+ 1_pick ++ ( #65)       ( 10  top> ##2 #65 #64d )                        
+ @                   ( 10  top> #0x ##2 #65 #64d )                        
+ 3_pick ++ ( #64)       ( 10  top> #0x ##2 #65 #64d )                        
+ !                   ( 10  top> #64x #0x ##2 #65 ##64)                        
+ SWAP         !      ( 11  top> ##2 #65d ##64 )                        
+ DROP                ( 11  top> ##64 )                        
+\ 	};                        
+   ;       ( END top> ##2 )                           
+                        
+                        
+\ static void    Initialize ()                        
+ : Initialize       ( FUNC )        ( 3  top> empty )                        
+\ 	{                        
+\ 	int i;                        
+                        
+\ 	for      ( i = 1; i <= 7; i++ ) {                        
+ 1  ( LIT)            ( 6  top> empty )                        
+ [ 007 ADD_INDEX ] >R ( 35  top> #64 )                        
+      ( TYPE 1 LOOP BEGIN)       ( 7  top> empty )                        
+ [ 007 ] LABEL        ( 23  top> empty )                        
+                        
+\ 	    permarray[i]=i-1;                        
+ [ 007 ]  INDEX       ( 15  top> empty )                        
+ 2*                   ( 15  top> #64x )                        
+ [ permarray ] SYMBOL_+       ( 16  top> #67d )                        
+ [ 007 ]  INDEX       ( 18  top> #68d )                        
+ 1  ( LIT)            ( 18  top> #64x #68d )                        
+ -                    ( 18  top> #0x #64x #68d )                        
+ SWAP !               ( 18  top> #0x #68d )                        
+ R>                   ( 22  top> empty )                        
+ 1  ( LIT)            ( 22  top> #64x )                        
+ +                    ( 22  top> #0x #64x )                        
+ DUP_>R               ( 10  top> #64 )                        
+ 7  ( LIT)            ( 10  top> #64x )                        
+ U>                   ( 11  top> #65x #64x )                        
+ [ 007 ] BRANCHZ      ( 11  top> #0x )                        
+\ 	    };                        
+ [ 007 DROP_INDEX ] R>DROP       ( 28  top> empty )                        
+\ 	};                        
+ EXIT  [ 008 ] LABEL  ( 36  top> empty )                        
+   ;       ( END )                           
+                        
+                        
+\ static void    Permute (n)                        
+ : Permute       ( FUNC )        ( 3  top> empty )                        
+\ 	int n;                        
+\ 	{   /* permute */                        
+\ 	int k;                        
+                        
+      ( #4 dummy reload )       ( 4  top> empty )                        
+                        
+\ 	pctr = pctr + 1;                        
+ 1  ( LIT)            ( 10  top> #64 )                        
+ pctr  ( SYMBOL)         ( 10  top> #0x #64 )                        
+ +!                    ( 10  top> #0x #0x #64 )                        
+                        
+\ 	if      ( n!=1 )  {                        
+ [ 2 ] DUP_U!              ( 13  top> #64 )                        
+ 1  ( LIT)            ( 13  top> #64x )                        
+ -                     ( 14  top> #68x #64x )                        
+ [ 0010 ] BRANCHZ        ( 14  top> #0x )                        
+                        
+\ 	    Permute(n-1);                        
+ 2 U@                 ( 19  top> empty )                        
+ 1  ( LIT)            ( 19  top> #64x )                        
+ -                     ( 19  top> #0x #64x )                        
+      ( #4 Calling Arg )       ( 21  top> #4 )                        
+ -64 FP+!  ( Link)        ( 21  top> empty )                        
+   recurse \  Permute  ( CALL)         ( 21  top> empty )                        
+ 64 FP+!       ( Unlink)       ( 21  top> empty )                        
+                        
+\ 	    for      ( k = n-1; k >= 1; k-- ) {                        
+ 2 U@                 ( 24  top> empty )                        
+ 1  ( LIT)            ( 24  top> #64x )                        
+ -                    ( 24  top> #0x #64x )                        
+ 0_pick ++               ( top> #k )
+ 0>                   ( 79  top> #k #k )                        
+ [ 0015 ] BRANCHZ     ( 81  top> #0x #k )                        
+
+ 2 U@                 ( 82  top> #k )                        
+ 2*                   ( 82  top> #64x #k )                        
+ 4 U!                 ( 26  top> #71 #k )                        
+ ( LOOP_BEGIN)        ( 26  top> #k )                        
+ [ 0014 ] LABEL       ( 66  top> #k )                        
+                                    
+\ 		Swap_el(&permarray[n],&permarray[k]);                        
+ 0_pick ++ ( #k)         ( 35  top> #k )                        
+ 2*                   ( 35  top> #k #k )                        
+ 4 U@                 ( 38  top> #73 #k )                        
+ [ permarray ] SYMBOL_+       ( 38  top> #71x #73 #k )                        
+ SWAP                 ( 39  top> #4 #73d #k )                         
+ [ permarray ] SYMBOL_+       ( 39  top> #73x #4 #k )                        
+      ( #5 Calling Arg )       ( 42  top> #5 #4 #k )                        
+      ( #4 Calling Arg )       ( 42  top> #4 #k )                        
+   Swap_el  ( CALL)         ( 42  top> empty #k )                        
+                        
+\ 		Permute(n-1);                        
+ 3 U!                 ( top> #k )
+ 2 U@                 ( 46  top> )                        
+ 1  ( LIT)            ( 46  top> #64x )                        
+ -                    ( 46  top> #0x #64x )                        
+      ( #4 Calling Arg )       ( 48  top> #4 )                        
+ -64 FP+!  ( Link)        ( 48  top> empty )                        
+   recurse \   Permute  ( CALL)         ( 48  top> empty )                        
+ 64 FP+!       ( Unlink)       ( 48  top> empty )                        
+                        
+\ 		Swap_el(&permarray[n],&permarray[k]);                        
+ 3 U@   0_pick ++          ( 53  top> empty)                        
+ 2*                   ( 53  top> #k #k )                        
+ 4 U@                 ( 56  top> #78 #k )                        
+ [ permarray ] SYMBOL_+       ( 56  top> #71x #78 #k )                        
+ SWAP                 ( 57  top> #4 #78d #k )                         
+ [ permarray ] SYMBOL_+   ( 57  top> #78x #4 #k )                        
+      ( #5 Calling Arg )  ( 60  top> #5 #4 #k )                        
+      ( #4 Calling Arg )  ( 60  top> #4 #k )                        
+   Swap_el  ( CALL)       ( 60  top> #k )                        
+                        
+ -1  ( LIT)   +       ( 65  top> #k )                        
+ 0_pick ++               ( 29  top>  #k )                        
+ 0>                    ( 29  top> #k #k )                        
+ [ 0014 ] BRANCHNZ       ( 30  top> #0x #k )                        
+\ 		};                        
+ ( LOOP_END)           ( 71  top> #k )                        
+
+DROP ( #k)
+ [ 0015 ] LABEL          ( 80  top> empty )                        
+\ 	    };                        
+ EXIT  [ 0010 ] LABEL          ( 73  top> empty )                        
+\ 	}     /* permute */;                        
+   ;       ( END )                           
+                        
+                        
+                        
+\ void main ()    {   /* Perm */                        
+ : main       ( FUNC )        ( 3  top> empty )                        
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!                        
+\     int i;                        
+                        
+\     for      ( i = 1; i <= 250 ; i++ ) {                        
+ 1  ( LIT)            ( 6  top> empty )                        
+ [ 0021 ADD_INDEX ] >R        ( 50  top> #64 )                        
+      ( TYPE 1 LOOP BEGIN)       ( 7  top> empty )                        
+ [ 0021 ] LABEL          ( 38  top> empty )                        
+                        
+\         pctr = 0;                        
+ 0  ( LIT)            ( 14  top> empty )                        
+ pctr  ( SYMBOL)         ( 14  top> #0x )                        
+ !                     ( 14  top> #0x #0x )                        
+                        
+\ 	Initialize();                        
+   Initialize  ( CALL)         ( 17  top> empty )                        
+                        
+\ 	Permute(7);                        
+ 7  ( LIT)            ( 20  top> empty )                        
+      ( #4 Calling Arg )       ( 22  top> #4 )                        
+ -64 FP+!  ( Link)        ( 22  top> empty )                        
+   Permute  ( CALL)         ( 22  top> empty )                        
+ 64 FP+!       ( Unlink)       ( 22  top> empty )                        
+                        
+\         if      ( pctr != 8660 )  do_error();                        
+ pctr  ( SYMBOL)         ( 26  top> empty )                        
+ @                     ( 26  top> #0x )                        
+ 8660  ( LIT)            ( 28  top> #66x )                        
+ -                     ( 29  top> #67x #66x )                        
+ [ 0019 ] BRANCHZ        ( 29  top> #0x )                        
+ -64 FP+!  ( Link)        ( 31  top> empty )                        
+   do_error  ( CALL)         ( 31  top> empty )                        
+ 64 FP+!       ( Unlink)       ( 31  top> empty )                        
+                        
+ [ 0019 ] LABEL          ( 36  top> empty )                        
+ R>                    ( 37  top> empty )                        
+ 1  ( LIT)            ( 37  top> #64x )                        
+ +                     ( 37  top> #0x #64x )                        
+ DUP_>R                ( 10  top> #64 )                        
+dup . 250  ( LIT)            ( 10  top> #64x )                        
+ U>                    ( 11  top> #65x #64x )                        
+\ 	};                        
+ [ 0021 ] BRANCHZ        ( 11  top> #0x )                        
+ [ 0021 DROP_INDEX ] R>DROP       ( 43  top> empty )                        
+                        
+\     }     /* Perm */;                        
+ EXIT  [ 0022 ] LABEL          ( 51  top> empty )                        
+   ;       ( END )                           
+                        
+.( max 250) cr
+

@@ -1,0 +1,65 @@
+\ /* towers.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY fib.RTX" EVALUATE ;
+
+DECIMAL
+load GNUTOOL.4
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ gcc_compiled.:
+
+
+( RTX 2000 code generation)
+
+
+: cfib  ( FUNC )   ( 3  top> empty )
+ ( #4 dummy reload )  ( 4  top> empty )
+ DUP 2 U!         ( 9  top> #64 )
+ 2  ( LIT)       ( 9  top> #64x )
+ <=               ( 10  top> #66x #64x )
+ [ 003 ] BRANCHZ   ( 10  top> #0x )
+ 1  ( LIT)       ( 13  top> empty )
+ DUP 3 U!         ( 17  top> #2 )
+ [ 001 ] BRANCH    ( 15  top> #2 )
+ [ 003 ] LABEL     ( 17  top> empty )
+ ( -16 SP+! )      ( 20  top> empty )
+ 2 U@            ( 21  top> empty )
+ 1  ( LIT)       ( 21  top> #64x )
+ -                ( 21  top> #0x #64x )
+ ( #4 CALL ARG )  ( 24  top> #4 )
+ -64 FP+!  ( Link)   ( 32  top> empty )
+   recurse \ fib  ( CALL)    ( 24  top> empty )
+  64 FP+!  ( Link)   ( 32  top> empty )
+ 5 U!            ( 32  top> #68 )
+ 2 U@            ( 29  top> #68 )
+ 2  ( LIT)       ( 29  top> #64x #68 )
+ -                ( 29  top> #0x #64x #68 )
+ -64 FP+!  ( Link)   ( 32  top> empty )
+ recurse \  fib  ( CALL)    ( 32  top> empty )
+ 64 FP+!  ( Unlink)  ( 32  top> #2x )
+ 5 U@  +         ( 37  top> #70d )
+ ( 16 SP+! )      ( 39  top> #2 )
+ DUP 3 U!         ( 45  top> #2 )
+ [ 001 ] LABEL     ( 45  top> empty )
+   ;  ( END )     ( 45  top> empty )
+
+
+: 3_OVER_SWAP-  $B443 , ; IMMEDIATE
+: 1_OVER_SWAP-  $B441 , ; IMMEDIATE
+: DROP_1_EXIT   $BEE1 , ; IMMEDIATE
+
+\ Pure Forth version of fib
+
+: fib  ( n -- n )
+  3_OVER_SWAP-  0<
+  IF  DROP_1_EXIT   THEN
+  1_OVER_SWAP-  RECURSE
+  SWAP 2 -      RECURSE 
+  + ;
+
+: FIBS  FOR  30 FIB DROP  NEXT ;
+

@@ -1,0 +1,354 @@
+\ /* bubble.c */
+\ /* from Stanford benchmark suite */
+\ /* modified for reasonable 16-bit operation */
+
+EMPTY
+: XY " DOS XY BUBBLE.1op" EVALUATE ;
+
+DECIMAL
+\ load GNUTOOL.4
+load GNUinst.4
+
+\ int seed ;
+
+VARIABLE seed   4   CELL- ALLOT
+
+\ int    sortlist[sortelements+1],
+\     biggest, littlest, top;
+VARIABLE top   4   CELL- ALLOT
+
+VARIABLE littlest   4   CELL- ALLOT
+
+VARIABLE biggest   4   CELL- ALLOT
+
+VARIABLE sortlist   10004   CELL- ALLOT
+
+: .DATA
+  1000 2 DO I SORTLIST + @ .  2 +LOOP ;
+
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+
+\ gcc_compiled.:
+( RTX 2000 code generation)
+\ #define sortelements 	 5000
+\ #define srtelements 	 500
+\ #define false 0
+\ #define true  1
+
+\ static void do_error()
+\   { printf ( "Error3 in Bubble.\n"); }
+ : do_error  ( FUNC )   ( 3  top> empty )
+ ." Error3 in Bubble."  CR 
+   ;  ( END )     ( 13  top> #2x )( RTX 2000 code generation)
+
+
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+\ static void Initrand ()
+( 10A1B8 /0)  : Initrand  ( FUNC )   ( 3  top> empty )
+\     {
+( 10A258 /10A1B8)  9219  ( LIT)       ( 6  top> empty )
+
+\     seed = 9219;
+( 10A280 /10A258)  seed  ( SYMBOL)    ( 6  top> #0x )
+( 10A2C0 /10A280)  !                ( 6  top> #0x #0x )
+\     };
+( 10A318 /10A2C0)    ;  ( END )   
+
+ ( 6  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+\ static int Rand ()
+( 10A520 /0)  : Rand  ( FUNC )   ( 3  top> empty )
+\     {
+
+\     seed = (seed * 1309 + 13849) ;
+( 10A610 /10A520)  seed  ( SYMBOL)    ( 6  top> empty )
+( 10A638 /10A610)  @                ( 6  top> #0x )
+( 10A678 /10A638)  1309  ( LIT)       ( 6  top> #0x )
+( 10A6B8 /10A678)  *                ( 6  top> #0x #0x )
+( 10A8D0 /10A6B8)  13849  ( LIT)       ( 8  top> #64d )
+( 10A928 /10A8D0)  +                ( 8  top> #0x #0x )
+( 10AB18 /10A928)  seed  ( SYMBOL)    ( 10  top> #0x )
+
+\     return( seed );
+( 10AB40 /10AB18)  TUCK_! ( #0)    ( 10  top> #0x #0x )
+\     };
+( 10ABC0 /10AB40)    ;  ( END )   
+
+ ( 11  top> #2 )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+\ static void bInitarr()
+( 10BF30 /0)  : bInitarr  ( FUNC )   ( 3  top> empty )
+\ 	{
+\ 	int i, temp;
+
+\ 	Initrand();
+( 10F288 /10BF30)  -64 FP+!  ( Link)   ( 7  top> empty )
+( 10F2B0 /10F288)    Initrand  ( CALL)    ( 7  top> empty )
+( 10F2D8 /10F2B0)  64 FP+!  ( Unlink)  ( 7  top> empty )
+
+\ 	biggest = 0; littlest = 0;
+( 10F378 /10F2D8)  0  ( LIT)       ( 9  top> empty )
+( 10F3A0 /10F378)  biggest  ( SYMBOL)    ( 9  top> #0x )
+( 10F3E0 /10F3A0)  !                ( 9  top> #0x #0x )
+( 10F4B0 /10F3E0)  0  ( LIT)       ( 10  top> empty )
+( 10F4D8 /10F4B0)  littlest  ( SYMBOL)    ( 10  top> #0x )
+( 10F518 /10F4D8)  !                ( 10  top> #0x #0x )
+
+\ 	for ( i = 1; i <= srtelements; i++ )
+( 10D440 /10F518)  1  ( LIT)       ( 13  top> #64 )
+( 10D570 /10D440)  [ 0011 ADD_INDEX ] >R   ( 81  top> #64 )
+
+\ 	    {
+( 10D6F0 /10D570)  ( TYPE 1 LOOP BEGIN)  ( 14  top> empty )
+( 10D718 /10D6F0)  [ 0011 ] LABEL     ( 69  top> empty )
+
+\ 	    temp = Rand();
+( 10DA08 /10D718)  -64 FP+!  ( Link)   ( 23  top> empty )
+( 10DA30 /10DA08)    Rand  ( CALL)    ( 23  top> empty )
+( 10DA58 /10DA30)  64 FP+!  ( Unlink)  ( 23  top> #2x )
+
+\ 	    sortlist[i] = temp - 32767 ;
+( 10DB18 /10DA58)  [ 0011 ]  INDEX  ( 28  top> #67 )
+( 10DC60 /10DB18)  0_PICK         ( #64)  ( 28  top> #64x #67 )
+( 10DCB8 /10DC60)  2*               ( 28  top> #0x #64x #67 )
+( 10DE20 /10DCB8)  [ sortlist ] SYMBOL_SWAP  ( 29  top> #69d #64x #67 )
+( 10F5F8 /10DE20)  OVER_+    ( #68 )  ( 29  top> #0x #68x #64x #67 )
+( 10FB10 /10F5F8)  3_PICK ++ ( LAST #67)  ( 31  top> #70d #68x #64x #67d )
+( 10FBB0 /10FB10)  32767  ( LIT)       ( 31  top> #0x #70d #68x #64x #67d )
+( 10FC68 /10FBB0)  -                ( 31  top> #0x #0x #70d #68x #64x #67d )
+( 10FD38 /10FC68)  SWAP !           ( 31  top> #0x #70d #68x #64x #67d )
+
+\ 	    if ( sortlist[i] > biggest ) biggest = sortlist[i];
+( 110180 /10FD38)  SWAP             ( 34  top> #68x #64x #67d )
+( 110208 /110180)  2*               ( 34  top> #0x #68x #67d )
+( 110688 /110208)  +                ( 35  top> #73d #68x #67d )
+( 1114B0 /110688)  @                ( 37  top> #74d #67d )
+( 1118C8 /1114B0)  biggest  ( SYMBOL)    ( 38  top> #75 #67d )
+( 111998 /1118C8)  @                ( 38  top> #0x #75 #67d )
+( 111D38 /111998)  ROT              ( 39  top> #76d #75d #67d )
+( 112198 /111D38)  DROP             ( 39  top> #67d #76d #75d )
+( 112240 /112198)  >                ( 40  top> #76x #75x )
+( 112298 /112240)  [ 008 ] BRANCHZ   ( 40  top> #0x )
+
+( 1122D8 /112298)  [ 0011 ]  INDEX  ( 44  top> empty )
+( 112400 /1122D8)  2*               ( 44  top> #0x )
+( 112520 /112400)  [ sortlist ] SYMBOL_+  ( 45  top> #78d )
+( 112BA0 /112520)  @                ( 46  top> #79d )
+( 112C40 /112BA0)  biggest  ( SYMBOL)    ( 46  top> #0x )
+( 112CE0 /112C40)  !                ( 46  top> #0x #0x )
+( 112F28 /112CE0)  [ 007 ] BRANCH    ( 47  top> empty )
+
+\ 	    else if ( sortlist[i] < littlest ) littlest = sortlist[i];
+( 112F50 /112F28)  [ 008 ] LABEL     ( 49  top> empty )
+( 112F78 /112F50)  [ 0011 ]  INDEX  ( 53  top> empty )
+( 1130A0 /112F78)  2*               ( 53  top> #0x )
+( 1131C0 /1130A0)  [ sortlist ] SYMBOL_+  ( 54  top> #81d )
+( 1137A8 /1131C0)  @                ( 55  top> #82d )
+( 113AC8 /1137A8)  littlest  ( SYMBOL)    ( 56  top> #83 )
+( 113B68 /113AC8)  @                ( 56  top> #0x #83 )
+( 114198 /113B68)  <                ( 58  top> #84x #83x )
+( 1141F0 /114198)  [ 107 ] BRANCHZ   ( 58  top> #0x )
+
+( 114230 /1141F0)  [ 0011 ]  INDEX  ( 60  top> empty )
+( 114358 /114230)  2*               ( 60  top> #0x )
+( 114478 /114358)  [ sortlist ] SYMBOL_+  ( 61  top> #86d )
+( 114AF0 /114478)  @                ( 62  top> #87d )
+( 114B90 /114AF0)  littlest  ( SYMBOL)    ( 62  top> #0x )
+( 114C30 /114B90)  !                ( 62  top> #0x #0x )
+
+( 114E78 /114C30)  [ 007 ] LABEL     ( 67  top> empty )
+( 114E78 /114C30)  [ 107 ] LABEL     ( 67  top> empty )
+( 114EA0 /114E78)  R>               ( 68  top> empty )
+( 114FC8 /114EA0)  1  ( LIT)       ( 68  top> #0x )
+( 115020 /114FC8)  +                ( 68  top> #0x #64x )
+( 1151C0 /115020)  DUP_>R   ( #64 )  ( 17  top> #64 )
+( 115228 /1151C0)  500  ( LIT)       ( 17  top> #64x )
+( 115268 /115228)  U>               ( 18  top> #66x #64x )
+( 115300 /115268)  [ 0011 ] BRANCHZ   ( 18  top> #0x )
+\ 	    };
+( 115340 /115300)  [ 0011 DROP_INDEX ] R>DROP  ( 74  top> empty )
+( 115368 /115340)  EXIT  [ 0012 ] LABEL     ( 82  top> empty )
+\ 	};
+( 115390 /115368)    ;  ( END )   
+
+ ( 76  top> empty )
+
+( RTX 2000 code generation)
+
+ 64 FRAME_SIZE ! 
+
+\ void main()
+( 115770 /0)  : main  ( FUNC )   ( 3  top> empty )
+#REGS 100 - REG-ADDR $FFC0 AND  UBR!
+\     {
+\     int i, j, iter;
+
+\    for (iter = 1 ; iter < 30 ; iter++ )
+( 115650 /115770)  1  ( LIT)       ( 6  top> empty )
+( 117850 /115650)  2 U!            ( 136  top> #66 )
+( 117AC0 /117850)  [                ( 140  top> empty )
+( 117AE8 /117AC0)  sortlist  ( SYMBOL)    ( 140  top> empty )
+( 117B10 /117AE8)  2  ( LIT)       ( 140  top> #0x )
+( 117B50 /117B10)  +                ( 140  top> #0x #0x )
+( 117BA8 /117B50)  ] LITERAL        ( 140  top> #0x )
+( 117C28 /117BA8)  3 U!            ( 7  top> #74 )
+( 117C68 /117C28)  ( LOOP_BEGIN)    ( 7  top> empty )
+
+\    {
+( 117C90 /117C68)  [ 0026 ] LABEL     ( 111  top> empty )
+
+\     bInitarr();
+( 117F80 /117C90)  -64 FP+!  ( Link)   ( 15  top> empty )
+( 117FA8 /117F80)    bInitarr  ( CALL)    ( 15  top> empty )
+( 117FD0 /117FA8)  64 FP+!  ( Unlink)  ( 15  top> empty )
+
+\     top=srtelements;
+( 118070 /117FD0)  500  ( LIT)       ( 17  top> empty )
+( 118470 /118070)  top  ( SYMBOL)    ( 128  top> #0x )
+( 118498 /118470)  !                ( 128  top> #0x #0x )
+( 10E1F0 /118498)  ( LOOP_BEGIN)    ( 20  top> empty )
+
+\     while ( top>1 ) {
+( 10E1F0 /10E1B0)  ( LOOP_BEGIN)    ( 20  top> empty )
+
+( 10E218 /10E1F0)  [ 0023 ] LABEL     ( 81  top> empty )
+
+\ 	i=1;
+( 10E290 /10E218)  1  ( LIT)       ( 28  top> empty )
+
+\ 	while ( i<top ) {
+( 10E3B8 /10E290)  top  ( SYMBOL)    ( 122  top> #64 )
+( 10E3F8 /10E3B8)  @                ( 122  top> #0x #64 )
+( 10E5F0 /10E3F8)  1_PICK       ( #64)  ( 123  top> #70d #64 )
+( 10E618 /10E5F0)  4 U!            ( 123  top> #64 #70d #64x )
+( 10E658 /10E618)  <                ( 125  top> #70x #64x )
+( 10E6B0 /10E658)  [ 0027 ] BRANCHZ   ( 125  top> #0x )
+
+( 10E6F0 /10E6B0)  ( LOOP_BEGIN)    ( 30  top> empty )
+( 10E718 /10E6F0)  [ 0022 ] LABEL     ( 70  top> empty )
+
+\ 	    if ( sortlist[i] > sortlist[i+1] ) {
+( 10E740 /10E718)  4 U@            ( 38  top> empty )
+( 10E828 /10E740)  0_PICK         ( #64)  ( 38  top> #64x )
+( 10E868 /10E828)  2*               ( 38  top> #0x #64x )
+( 10E988 /10E868)  [ sortlist ] SYMBOL_+  ( 39  top> #72d #64x )
+( 10EF70 /10E988)  SWAP             ( 41  top> #73 #64x )
+( 10EFF8 /10EF70)  2*               ( 41  top> #0x #73 )
+( 1187E0 /10EFF8)  3 U@  +         ( 42  top> #75d #73 )
+( 118FA0 /1187E0)  @_SWAP           ( 43  top> #76 #73d )
+( 119070 /118FA0)  @_SWAP           ( 43  top> #73x #77 )
+( 119FF0 /119070)  >                ( 46  top> #78x #77x )
+( 11A048 /119FF0)  [ 0021 ] BRANCHZ   ( 46  top> #0x )
+
+\ 		j = sortlist[i];
+( 11A088 /11A048)  4 U@            ( 50  top> empty )
+( 11A170 /11A088)  0_PICK         ( #64)  ( 50  top> #64x )
+( 11A1B0 /11A170)  2*               ( 50  top> #0x #64x )
+( 11A2D0 /11A1B0)  [ sortlist ] SYMBOL_SWAP  ( 51  top> #80d #64x )
+( 11A4E8 /11A2D0)  OVER_+    ( #71 )  ( 51  top> #0x #71x #64x )
+( 11A8B8 /11A4E8)  @                ( 52  top> #81d #71x #64x )
+
+\ 		sortlist[i] = sortlist[i+1];
+( 11AC78 /11A8B8)  2_PICK   ++    ( #64)  ( 55  top> #65 #71x #64x )
+( 11AD18 /11AC78)  2*               ( 55  top> #0x #65 #71x #64x )
+( 11B238 /11AD18)  2_PICK   ++    ( #71)  ( 56  top> #83d #65 #71x #64x )
+( 11B2F0 /11B238)  +                ( 56  top> #0x #83d #65 #71x #64x )
+( 11B8C8 /11B2F0)  3_PICK   ++    ( #64)  ( 58  top> #84 #65 #71x #64x )
+( 11B998 /11B8C8)  2*               ( 58  top> #0x #84 #65 #71x #64x )
+( 11BD50 /11B998)  [ 3 ]  U@_SWAP  ( 59  top> #86d #84 #65 #71x #64x )
+( 11C138 /11BD50)  OVER_+    ( #74 )  ( 59  top> #86d #74x #84 #65 #71x #64x )
+( 11CA18 /11C138)  @                ( 60  top> #87d #74x #84d #65 #71x #64x )
+( 11CB48 /11CA18)  ROT              ( 60  top> #0x #74x #84d #65 #71x #64x )
+( 11CC78 /11CB48)  !                ( 60  top> #84x #0x #74x #65 #71x #64x )
+
+\ 		sortlist[i+1] = j;
+( 11D2D8 /11CC78)  3_PICK  ++     ( #64)  ( 63  top> #74x #65 #71x #64x )
+( 11D3D8 /11D2D8)  2*               ( 63  top> #0x #74x #65 #71x #64x )
+( 11DCC0 /11D3D8)  +                ( 64  top> #89d #74x #65 #71x #64x )
+( 11E3F8 /11DCC0)  !                ( 65  top> #90d #65d #71x #64x )
+
+( 11EEB8 /11E3F8)  DROP             ( 66  top> #71x #64x )
+( 11EF80 /11EEB8)  DROP             ( 66  top> #64x )
+\ 		};
+( 11EFC0 /11EF80)  [ 0021 ] LABEL     ( 66  top> empty )
+
+\ 	    i=i+1;
+( 11EFE8 /11EFC0)  4 U@            ( 69  top> empty )
+( 11F110 /11EFE8)  1  ( LIT)       ( 69  top> #0x )
+( 11F168 /11F110)  +                ( 69  top> #0x #64x )
+( 11F2F0 /11F168)  top  ( SYMBOL)    ( 32  top> #64 )
+( 11F330 /11F2F0)  @                ( 32  top> #0x #64 )
+( 11F528 /11F330)  1_PICK       ( #64)  ( 33  top> #70d #64 )
+( 11F550 /11F528)  4 U!            ( 33  top> #64 #70d #64x )
+( 11F5A0 /11F550)  >=               ( 34  top> #70x #64x )
+( 11F5F8 /11F5A0)  [ 0022 ] BRANCHZ   ( 34  top> #0x )
+\ 	    };
+( 11F638 /11F5F8)  ( LOOP_END)      ( 75  top> empty )
+
+( 11F660 /11F638)  [ 0027 ] LABEL     ( 124  top> empty )
+
+\ 	top=top-1;
+( 11F928 /11F660)  -1  ( LIT)       ( 80  top> empty )
+( 11F9F0 /11F928)  top  ( SYMBOL)    ( 80  top> #0x )
+( 11FA48 /11F9F0)  +!               ( 80  top> #0x #0x )
+
+\ 	};
+( 11FB70 /11FA48)  top  ( SYMBOL)    ( 22  top> empty )
+( 11FB98 /11FB70)  @                ( 22  top> #0x )
+( 11FD58 /11FB98)  1  ( LIT)       ( 24  top> #68x )
+( 11FD98 /11FD58)  <=               ( 25  top> #69x #68x )
+( 11FDF0 /11FD98)  [ 0023 ] BRANCHZ   ( 25  top> #0x )
+( 11FE30 /11FDF0)  ( LOOP_END)      ( 86  top> empty )
+( 11FE58 /11FE30)  [ 0028 ] LABEL     ( 131  top> empty )
+
+\     if ( (sortlist[1] != littlest) || (sortlist[srtelements] != biggest) )
+( 11FE80 /11FE58)  3 U@            ( 90  top> empty )
+( 11FF68 /11FE80)  @                ( 90  top> #0x )
+( 120120 /11FF68)  littlest  ( SYMBOL)    ( 91  top> #95 )
+( 120178 /120120)  @                ( 91  top> #0x #95 )
+( 1204A8 /120178)  -                ( 93  top> #96x #95x )
+( 120540 /1204A8)  [ 0025 ] BRANCHNZ  ( 93  top> #0x )
+( 1206A0 /120540)  [                ( 95  top> empty )
+( 1206C8 /1206A0)  sortlist  ( SYMBOL)    ( 95  top> empty )
+( 1206F0 /1206C8)  1000  ( LIT)       ( 95  top> #0x )
+( 120730 /1206F0)  +                ( 95  top> #0x #0x )
+( 120788 /120730)  ] LITERAL        ( 95  top> #0x )
+( 1207C8 /120788)  @                ( 95  top> #0x )
+( 120908 /1207C8)  biggest  ( SYMBOL)    ( 96  top> #98 )
+( 120948 /120908)  @                ( 96  top> #0x #98 )
+( 120BA8 /120948)  -                ( 98  top> #99x #98x )
+( 120C40 /120BA8)  [ 0016 ] BRANCHZ   ( 98  top> #0x )
+( 120C80 /120C40)  [ 0025 ] LABEL     ( 101  top> empty )
+
+( 120F70 /120C80)  -64 FP+!  ( Link)   ( 104  top> empty )
+\ 	do_error();
+( 120F98 /120F70)    do_error  ( CALL)    ( 104  top> empty )
+( 120FC0 /120F98)  64 FP+!  ( Unlink)  ( 104  top> empty )
+( 1212B0 /120FC0)  [ 0016 ] LABEL     ( 109  top> empty )
+\    }
+
+( 1212D8 /1212B0)  2 U@            ( 110  top> empty )
+( 121400 /1212D8)  1  ( LIT)       ( 110  top> #0x )
+( 121458 /121400)  +                ( 110  top> #0x #66x )
+( 1215F8 /121458)  [ 2 ] DUP_U!         ( 10  top> #66 )
+( 121660 /1215F8)  29  ( LIT)       ( 10  top> #66x )
+( 1216A0 /121660)  >                ( 11  top> #67x #66x )
+( 121738 /1216A0)  [ 0026 ] BRANCHZ   ( 11  top> #0x )
+( 121778 /121738)  ( TYPE 1 LOOP END)  ( 116  top> empty )
+\  };
+( 1217A0 /121778)  EXIT  [ 0029 ] LABEL     ( 137  top> empty )
+( 1217C8 /1217A0)    ;  ( END )   
+
+
