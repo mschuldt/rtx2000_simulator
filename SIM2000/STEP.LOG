@@ -1,0 +1,1447 @@
+
+cat step.math
+From krl@mlb.semi.harris.com Thu Oct 18 16:20:36 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA20460; Thu, 18 Oct 90 16:20:32 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA09440; Thu, 18 Oct 90 16:20:31 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA11305; Thu, 18 Oct 90 16:20:28 EDT
+Date: Thu, 18 Oct 90 16:20:28 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010182020.AA11305@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Step Math Models
+Cc: krl@mlb.semi.harris.com
+Status: RO
+
+Phil,
+
+At long last, here is the first installment in the complete description
+of the step math op codes, along with some test words.  These were
+written to be as machine independant as possible.  Some thoughts on
+step division as we know it: the more I look at these op codes, the
+more I am convinced that the use of the CR1 bit or'ed with C16 in
+determining YES was an unsuccessful attempt to implement a signed
+divide.  If you refer to my description of Step Division in the
+Programmer's Reference, you will notice an alternate division method
+which uses only C16.  I recommend the alternate method whenever
+possible, though I am 99% convinced that the old method is harmless.
+Though I have yet to thoroughly study the matter, I suspect that signed
+step division could be fixed by using the XNOR of C15 and C16 to
+determine YES, with the S bit (bit 0) of the instruction set to
+subtract the sign bit of MD from CR0.  These were tested on a RTXEB
+with a RTX2010.
+
+Ken
+
+\ Simulation of Step Math OP Codes
+\ K.R.Lyons 10/18/90
+\ No carries are used to avoid machine dependancies.
+
+HEX
+
+VARIABLE TOP
+VARIABLE NEXT
+VARIABLE MD
+VARIABLE ZA     \ Low 15 alu bits out & C14
+VARIABLE ZB     \ High 2 alu bits out & C16
+VARIABLE CRA    \ Low 2 CR bits
+
+: U/1' ( -- )
+  TOP @ 7FFF AND 1 +    \ Subtract 15 low bits of MD from
+  MD @ NOT 7FFF AND +   \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ Get C14 to add to high bit
+  TOP @ 0< 1 AND +      \   of TOP and the inverse of the
+  MD @ NOT 0< 1 AND +   \   high bit of MD.
+  CRA @ 1 AND 2* +      \ Add in CR0 and an inverted high
+  2 + DUP ZB !          \   zero bit (i.e. a 1)
+  4 AND                 \ Get C16.  0 => borrow    => restore
+  IF                    \           1 => no borrow => keep result
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @ 2*             \ Update TOP from alu output and NEXT
+  ELSE
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @ 2*            \ Update TOP from TOP and NEXT
+  THEN
+  NEXT @ 0< 1 AND +     \ Shift NEXT into TOP
+  TOP !
+  NEXT @ 2*             \ Shift NEXT left
+  ZB @ 2/ 2/ +          \ Shift C16 into NEXT
+  NEXT ! ;
+
+: U/' ( -- )
+  TOP @ 7FFF AND 1 +    \ Subtract 15 low bits of MD from
+  MD @ NOT 7FFF AND +   \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ Get C14 to add to high bit
+  TOP @ 0< 1 AND +      \   of TOP and the inverse of the
+  MD @ NOT 0< 1 AND +   \   high bit of MD.
+  CRA @ 1 AND 2* +      \ Add in CR0 and an inverted high
+  2 + DUP ZB !          \   zero bit (i.e. a 1)
+  4 AND CRA @ 2 AND OR  \ Get C16 or CR1
+  IF                    \ 1 => no borrow => keep result
+    1                   \ 1 to shift into NEXT
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @ 2*             \ Update TOP from alu output and NEXT
+  ELSE                  \ 0 => borrow    => restore
+    0                   \ 0 to shift into NEXT
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @ 2*            \ Update TOP from TOP and NEXT
+  THEN
+  NEXT @ 0< 1 AND +     \ Shift NEXT into TOP
+  TOP !
+  NEXT @ 2* +           \ Shift NEXT left and YES into N0
+  NEXT ! ;
+
+: U/" ( -- )
+  TOP @ 7FFF AND 1 +    \ Subtract 15 low bits of MD from
+  MD @ NOT 7FFF AND +   \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ Get C14 to add to high bit
+  TOP @ 0< 1 AND +      \   of TOP and the inverse of the
+  MD @ NOT 0< 1 AND +   \   high bit of MD.
+  CRA @ 1 AND 2* +      \ Add in CR0 and an inverted high
+  2 + DUP ZB !          \   zero bit (i.e. a 1)
+  4 AND CRA @ 2 AND OR  \ Get C16 or CR1
+  IF                    \ 1 => no borrow => keep result
+    1                   \ 1 to shift into NEXT
+    ZB @ 2/ 3 AND CRA ! \ Update CR from alu output
+    ZA @                \ Update TOP from alu output
+    ZB @ 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* +
+    TOP !
+  ELSE
+    0                   \ to shift into NEXT
+  THEN
+  NEXT @ 2* +           \ Shift NEXT left and YES into N0
+  NEXT ! ;
+
+: U/1" ( -- )
+  TOP @ 7FFF AND 1 +    \ Subtract 15 low bits of MD from
+  MD @ NOT 7FFF AND +   \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ Get C14 to add to high bit
+  TOP @ 0< 1 AND +      \   of TOP and the inverse of the
+  MD @ NOT 0< 1 AND +   \   high bit of MD.
+  CRA @ 1 AND 2* +      \ Add in CR0 and an inverted high
+  2 + DUP ZB !          \   zero bit (i.e. a 1)
+  4 AND                 \ Get C16
+  IF                    \ 1 => no borrow => keep result
+    1                   \ 1 to shift into NEXT
+    ZB @ 2/ 3 AND CRA ! \ Update CR from alu output
+    ZA @                \ Update TOP from alu output
+    ZB @ 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* +
+    TOP !
+  ELSE
+    0                   \ to shift into NEXT
+  THEN
+  NEXT @ 2* +           \ Shift NEXT left and YES into N0
+  NEXT ! ;
+
+: Z ( -- )
+  ." Divisor (MD): " MD @ . CR
+  ." Dividend:     " NEXT @ TOP @ D. CR
+  ." TOP:          " TOP @ . CR
+  ." NEXT:         " NEXT @ U. CR
+  ." CR1: " CRA @ 2/ . ." CR0: " CRA @ 1 AND . CR
+  ." U/''" U/" CR
+  ." TOP:          " TOP @ U. CR
+  ." NEXT:         " NEXT @ U. CR
+  ." CR1: " CRA @ 2/ . ." CR0: " CRA @ 1 AND . CR
+  ." ZB: " ZB @ . ." ZA: " ZA @ U. CR
+  ." C16: " ZB @ 2/ 2/ . CR ;
+
+: U/MOD ( u u -- u u )
+  MD !
+  0 D2* TOP ! NEXT !
+  0 CRA !
+  U/1' U/1' U/1' U/1' U/1' U/1' U/1' U/1'
+  U/1' U/1' U/1' U/1' U/1' U/1' U/1' U/1"
+  TOP @ NEXT @ ;
+
+: X ( u u -- )
+  OVER U. ." divided by "
+  DUP  U. ." equals "
+  U/MOD
+  U. ." remainder " U. CR ;
+
+0 TOP !
+0 NEXT !
+0 CRA !
+0 MD !
+
+
+
+greyhound>
+
+
+cat xken
+From krl@mlb.semi.harris.com Thu Oct 25 08:24:49 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA27545; Thu, 25 Oct 90 08:24:40 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA17076; Thu, 25 Oct 90 08:24:33 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA12719; Thu, 25 Oct 90 08:24:31 EDT
+Date: Thu, 25 Oct 90 08:24:31 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010251224.AA12719@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Signed Multiplication Steps Model
+Status: RO
+
+Phil,
+
+Some more models!  These accurately model the behavior of the
+ubiquitous signed multiplication steps accurately as far as I can tell,
+and check out in all the cases I've tried.  This is progress to finally
+understand how these instructions work, even if I am not entirely sure
+why they work.  When I finish these models, I hope to have time to
+model the much simpler way that I think it should be.  I am ever more
+confident that I could revamp the entire step math section to simplify
+such things that are unnecessarily complicated, and to fix all the
+things that are broken.
+
+Ken
+
+--------Cut Here--------
+\ RTX 2000,2001A,2010 Signed Multiply Step Models
+\ krl 10/23/90
+HEX
+
+A89D UCODE *'
+A49D UCODE *"
+A012 UCODE 2*'
+
+A89D CONSTANT *'VAL
+
+VARIABLE T    \ Stack TOP Register
+VARIABLE N      \ NEXT register
+VARIABLE OLDN   \ Temporary NEXT
+VARIABLE MD     \ MD register
+VARIABLE CR0    \ CR bit 0
+VARIABLE CR1    \ CR bit 1
+VARIABLE LASTIR \ Previous contents of IR
+VARIABLE ACCUM  \ Propigate T15 until 1st addition
+VARIABLE ACCUM1 \ Delayed ACCUM
+VARIABLE SIGN   \ Initial N15 and'ed with initial MD15
+VARIABLE MIXED  \ Not initial T15 and'ed with initial MD 15
+VARIABLE FILL   \ In mixed: once T15 goes high, it stays high
+VARIABLE SST    \ Value to shift into T15
+VARIABLE CY     \ Carry, but not really
+
+: *'SIM ( -- )
+  N @  OLDN !                         \ Keep N for later
+  LASTIR @ *'VAL = IF                 \ Not 1st step:
+    MIXED @  T @ 0<  AND  FILL !        \ T15 and MIXED -> FILL
+    ACCUM @  ACCUM1 !                   \ ACCUM -> ACCUM1
+  ELSE                                \ 1st Step:
+    0  FILL !                           \ 0 -> FILL
+    T @ 0< NOT  MD @ 0<  AND  MIXED !   \ Not T15 and MD15 -> MIXED
+    0  ACCUM1 !                         \ 0 -> ACCUM1
+    N @ 0<   MD @ 0<  AND  SIGN !       \ N15 and MD15 -> SIGN
+    T @ 0<  ACCUM !                     \ T15 -> ACCUM
+  THEN
+  *'VAL  LASTIR !                     \ Update LASTIR
+  N @  1 AND  IF                      \ N0=1:
+    N @  U2/  N !                       \ N/2 -> N
+    T @  1 AND  MD @  1 AND  +          \ T0+MD0 -> N15
+    DUP  1 AND  IF
+      8000  N @  +  N !  THEN
+    U2/                                 \ (T+MD)/2 -> T
+    T @  U2/
+    MD  @  U2/
+    +  +
+    DUP  7FFF AND  T !
+    0<  1 AND                           \ CO15+MD15+CR0 -> CY
+    MD @  0< 1 AND
+    CR0 @  +  +
+    DUP  1 AND  CY !
+    U2/                                 \ CO16 xor MD15 xor CR0 -> CR0
+    MD @ 0< 1 AND                       \ CO16 xor MD15 xor CR0 -> CR1
+    CR0 @  XOR  XOR
+    DUP  CR0 !  CR1 !
+  ELSE                                \ N0=0:
+    N @  U2/  N !                       \ N/2 -> N
+    T @                                 \ T0 -> N15
+    DUP  1 AND  IF
+      8000  N @  +  N !  THEN
+    U2/  T !                            \ T/2 -> T
+    CR0 @  CY !                         \ CR0 -> CY
+    CR1 @  CR0 !                        \ CR1 -> CR0
+  THEN
+  CY @  IF                    \ CY=1:
+    0  ACCUM !                  \ 0 -> ACCUM
+    ACCUM1 @  NOT               \ not ACCUM1 or (SIGN and N0) or FILL -> T15
+  ELSE                        \ CY=0:
+    ACCUM @                     \ ACCUM or (SIGN and N0) or FILL -> T15
+  THEN
+  SIGN @  OLDN @  1 AND  AND
+  FILL @  OR  OR  IF
+    8000  T @  +  T !
+  THEN ;
+
+: *"SIM ( -- )
+  LASTIR @ *'VAL = IF                 \ Not 1st step:
+    MIXED @  T @ 0<  AND  FILL !        \ T15 and MIXED -> FILL
+    ACCUM @  ACCUM1 !                   \ ACCUM -> ACCUM1
+  ELSE                                \ 1st Step:
+    0  FILL !                           \ 0 -> FILL
+    T @ 0< NOT  MD @ 0<  AND  MIXED !   \ Not T15 and MD15 -> MIXED
+    0  ACCUM1 !                         \ 0 -> ACCUM1
+    N @ 0<   MD @ 0<  AND  SIGN !       \ N15 and MD15 -> SIGN
+    T @ 0<  ACCUM !                     \ T15 -> ACCUM
+  THEN
+  *'VAL  LASTIR !                     \ Update LASTIR
+  N @  1 AND  IF                      \ N0=1:
+    N @  U2/  N !                       \ N/2 -> N
+    T @  1 AND  MD @  NOT 1 AND  +      \ T0-MD0 -> N15
+    1 +
+    DUP  1 AND  IF
+      8000  N @  +  N !  THEN
+    U2/                                 \ (T+MD)/2 -> T
+    T @  U2/
+    MD  @  U2/ NOT
+    +  +
+    DUP  7FFF AND  T !
+    0<  1 AND                           \ CO15-MD15+CR0 -> CY
+    MD @  0< NOT 1 AND
+    CR0 @  +  +
+    DUP  1 AND  CY !
+    U2/                                 \ CO16 xor not MD15 xor CR0 -> CR0
+    MD @ 0< NOT 1 AND                   \ CO16 xor not MD15 xor CR0 -> CR1
+    CR0 @  XOR  XOR
+    DUP  CR0 !  CR1 !
+  ELSE                                \ N0=0:
+    N @  U2/  N !                       \ N/2 -> N
+    T @                                 \ T0 -> N15
+    DUP  1 AND  IF
+      8000  N @  +  N !  THEN
+    U2/  T !                            \ T/2 -> T
+    CR0 @  CY !                         \ CR0 -> CY
+    CR1 @  CR0 !                        \ CR1 -> CR0
+  THEN
+  CY @  IF                    \ CY=1:
+    0  ACCUM !                  \ 0 -> ACCUM
+    ACCUM1 @  NOT               \ not SIGN and (not ACCUM1 or FILL) -> T15
+  ELSE                        \ CY=0:
+    ACCUM @                     \ not SIGN and (ACCUM or FILL) -> T15
+  THEN
+  FILL @ OR
+  SIGN @  NOT AND  IF
+    8000  T @  +  T !
+  THEN ;
+
+: I* ( -- )              \ Initialize variables
+  0  LASTIR !
+  0  ACCUM  !
+  0  ACCUM1 !
+  0  SIGN   !
+  0  MIXED  !
+  0  FILL   !
+  0  CR0    !
+  0  CR1    !
+  0  CY     !
+;
+
+: M* ( n n -- d )
+  MD! 0 0 + 2*'
+  *' *' *' *' *' *' *' *' *' *' *' *' *' *' *' *" ;
+
+: Z ( n n -- d )        \ Test Multiplication
+  2DUP  . ." times " . ." equals "
+  2DUP  MD !  N  !
+  M*  D. CR
+  0  T !
+  I*
+  *'SIM *'SIM *'SIM *'SIM *'SIM *'SIM *'SIM *'SIM
+  *'SIM *'SIM *'SIM *'SIM *'SIM *'SIM *'SIM *"SIM
+  N @  T @  D. CR ;
+
+: X ( n n -- d )        \ X-Ray Multiplication Test
+  2DUP  . ." times " . ." equals "
+  2DUP  MD !  N  !
+  M*  D. CR
+  0  T !
+  I*
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *'SIM
+LASTIR @ U. ACCUM ? ACCUM1 ? SIGN ? MIXED ? FILL ? CR1 ? CR0 ? T ? N ? CR *"SIM
+  CR1 @ . CR0 @ . N @  T @  D. CR ;
+
+From krl@mlb.semi.harris.com Thu Oct 25 08:35:44 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA27555; Thu, 25 Oct 90 08:35:40 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA17141; Thu, 25 Oct 90 08:35:39 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA12724; Thu, 25 Oct 90 08:35:37 EDT
+Date: Thu, 25 Oct 90 08:35:37 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010251235.AA12724@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Unsigned Multiplication Step Math Models
+Status: RO
+
+Phil,
+
+As the subject line says...
+BTW, I have discovered that one of the steps that I have documented
+does not work correctly, namely BU*".  Therefore I am not sending you
+its model unless you specifically ask for it.  I doubt that anyone has
+actually used it, and will make sure it gets taken out of the
+documentation.  Speaking of which, Cincy is working on a rewrite of the
+stepmath section much along the lines that you mentioned.  She is
+putting what programmers need to know, and a few gray areas will be
+included in appendices.  I don't believe, however, that she intends to
+include all behavioral details, such as what happens to CR0 and CR1.
+These really are enigmatic bits, as they don't so much tell you what
+happened as control what happens.  The irratating part is that in many
+cases, they don't seem to be at all necessary.  I think they exist
+because someone did not understand arithmetic.  Sigh.
+
+Ken
+
+--------Cut Here--------
+\ RTX 2000,2001A,2010 Unsigned Multiply Step Models
+\ krl 10/24/90
+HEX
+
+A89C UCODE U*'  \ Op codes
+A49C UCODE U*"
+A894 UCODE BU*'
+A012 UCODE 2*'
+
+VARIABLE T      \ Stack TOP Register
+VARIABLE N      \ NEXT register
+VARIABLE M      \ MD register
+VARIABLE CR0    \ CR bit 0
+VARIABLE CR1    \ CR bit 1
+
+: U*'SIM ( -- )
+  N @  1 AND  IF                      \ N0=1:
+    N @  U2/                            \ N/2 -> N
+    T @  1 AND                          \ T0+MD0 -> N15
+    M @  1 AND  +
+    SWAP OVER  1 AND  IF  8000 +  THEN  N !
+    U2/                                 \ (T+MD)/2 -> T
+    T @  U2/  +
+    M @  U2/  +
+    DUP  0<  1 AND                      \ CO15+CR0+0 -> T15
+    CR0 @ +
+    SWAP 7FFF AND
+    OVER  1 AND  IF  8000 +  THEN  T !
+    U2/  DUP  CR0 !  CR1 !              \ CO16 -> CR0 -> CR1
+  ELSE                                \ N0=0:
+    N @  U2/                            \ N/2 -> N
+    T @  1 AND  IF  8000 +  THEN  N !   \ T0 -> N15
+    T @  U2/                            \ T/2 -> T
+    CR0 @  IF  8000 +  THEN  T !        \ CR0 -> T15
+    CR1 @  CR0 !                        \ CR1 -> CR0
+  THEN ;
+
+: U*"SIM ( -- )
+  N @  1 AND  IF                      \ N0=1:
+    N @  U2/                            \ N/2 -> N
+    T @  1 AND  1 +                     \ T0-MD0 -> N15
+    M @ NOT 1 AND  +
+    SWAP OVER  1 AND  IF  8000 +  THEN  N !
+    U2/                                 \ T/2-MD/2 -> T
+    T @  U2/  +
+    M @  NOT  U2/  +
+    DUP  0<  1 AND                      \ CO15+CR0-0 -> T15
+    CR0 @ +  1 +
+    SWAP 7FFF AND
+    OVER  1 AND  IF  8000 +  THEN  T !
+    U2/  DUP  CR0 !  CR1 !              \ CO16 -> CR0 -> CR1
+  ELSE                                \ N0=0:
+    N @  U2/                            \ N/2 -> N
+    T @  1 AND  IF  8000 +  THEN  N !   \ T0 -> N15
+    T @  U2/                            \ T/2 -> T
+    CR0 @  IF  8000 +  THEN  T !        \ CR0 -> T15
+    CR1 @  CR0 !                        \ CR1 -> CR0
+  THEN ;
+
+: BU*'SIM ( -- )
+  T @  1 AND  IF                      \ T0=1:
+    T @  U2/                            \ T(low)/2 -> T(low)
+    M @  U2/  +                         \ (T(hi)+MD)/2 -> T(hi)
+    DUP  0<  1 AND                      \ CO15+CR0+0 -> T15
+    CR0 @  +
+    SWAP  7FFF AND
+    OVER  1 AND  IF  8000 +  THEN  T !
+    U2/  DUP  CR0 !  CR1 !              \ CO16 -> CR0 -> CR1
+  ELSE                                \ T0=0:
+    T @  U2/
+    CR0 @  IF  8000 +  THEN  T !
+    CR1 @  CR0 !
+  THEN ;
+
+: I* ( -- )              \ Initialize variables
+  0  CR0    !
+  0  CR1    !
+;
+
+: UM* ( u u -- d )
+  MD! 0 0 + 2*'
+  U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' ;
+
+: MM* ( u n -- d )
+  MD! 0 0 + 2*'
+  U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*' U*" ;
+
+: BUM* ( u u -- u )
+  SQ! 0 + 2*' 2/
+  BU*' BU*' BU*' BU*' BU*' BU*' BU*' BU*' ;
+
+: DU. <# # # # # # # # # #> TYPE ;
+
+: Z ( n n -- d )        \ Test Multiplication
+  2DUP  U. ." times " U. ." equals "
+  2DUP  M  !  N  !
+  UM*  DU.  ."   Result: "
+  0  T !
+  I*
+  U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM
+  U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM
+  N @  T @  DU. CR ;
+
+: MZ ( n n -- d )        \ Test Mixed Multiplication
+  2DUP  U. ." (unsigned) times " . ." (signed) equals "
+  2DUP  M !  N !
+  MM*  D.  ." (signed)  Result: "
+  0  T !
+  I*
+  U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM
+  U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*'SIM U*"SIM
+  N @  T @  D. CR ;
+
+: BZ ( b b -- n )        \ Test Byte Size Multiplication
+  2DUP  U. ." times " U. ." equals "
+  2DUP  100 * M !  T !
+  BUM*  U.  ."   Result: "
+  I*
+  BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM
+  T @  U. CR ;
+
+: X ( n n -- d )        \ X-Ray Multiplication Test
+  2DUP  U. ." times " U. ." equals "
+  2DUP  M  !  N  !
+  UM*  DU. CR
+  0  T !
+  I*
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR U*'SIM
+  CR1 ?  CR0 ?  T @ U.  N @ U.  CR ;
+
+: BX ( n n -- d )        \ X-Ray Byte Size Multiplication Test
+  2DUP  U. ." times " U. ." equals "
+  2DUP  100 *  M !  T !
+  BUM*  U. CR
+  I*
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR ;
+
+From krl@mlb.semi.harris.com Thu Oct 25 10:05:14 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA27906; Thu, 25 Oct 90 10:05:07 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA18018; Thu, 25 Oct 90 10:04:57 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA12808; Thu, 25 Oct 90 10:04:55 EDT
+Date: Thu, 25 Oct 90 10:04:55 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010251404.AA12808@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: 8-bit Mixed Sign Step Math
+Status: RO
+
+Phil,
+
+I discovered today that the mixed sign 8-bit multiply was not broken
+after all.  So, I am sending you the model for 8-bit multiplication,
+which includs a few things I already sent you, even though they have
+not changed.
+
+Ken
+
+--------Cut Here--------
+\ RTX 2000,2001A,2010 8-bit Step Multiply Model
+\ krl 10/25/90
+HEX
+
+A894 UCODE BU*' \ 8 bit mixed multiply steps
+A494 UCODE BU*"
+A012 UCODE 2*'
+
+VARIABLE T      \ Stack TOP Register
+VARIABLE N      \ NEXT register
+VARIABLE M      \ MD register
+VARIABLE CR0    \ CR bit 0
+VARIABLE CR1    \ CR bit 1
+
+: BU*'SIM ( -- )        
+  T @  1 AND  IF                      \ T0=1:
+    T @  U2/                            \ T(low)/2 -> T(low)
+    M @  U2/  +                         \ (T(hi)+MD)/2 -> T(hi)
+    DUP  0<  1 AND                      \ CO15+CR0+0 -> T15
+    CR0 @  +
+    SWAP  7FFF AND
+    OVER  1 AND  IF  8000 +  THEN  T !
+    U2/  DUP  CR0 !  CR1 !              \ CO16 -> CR0 -> CR1
+  ELSE                                \ T0=0:
+    T @  U2/
+    CR0 @  IF  8000 +  THEN  T !
+    CR1 @  CR0 !
+  THEN ;
+
+: BU*"SIM ( -- )        
+  T @  1 AND  IF                      \ T0=1:
+    T @  1 AND  1 +                     \ Carry into bit zero
+    M @  1 AND  +                       \   instead of bit 8
+    U2/  1 AND
+    T @  U2/  +
+    M @  NOT  U2/  +
+    DUP  0<  1 AND                      \ CO15+CR0-0 -> T15
+    CR0 @ +  1 +
+    SWAP  7FFF AND
+    OVER  1 AND  IF  8000 +  THEN  T !
+    U2/  DUP  CR0 !  CR1 !              \ CO16 -> CR0 -> CR1
+  ELSE                                \ T0=0:
+    T @  U2/
+    CR0 @  IF  8000 +  THEN  T !
+    CR1 @  CR0 !
+  THEN ;
+
+: I* ( -- )              \ Initialize variables
+  0  CR0    !
+  0  CR1    !
+;
+
+: BUM* ( u u -- u )     
+  SQ! 0 + 2*' 2/
+  BU*' BU*' BU*' BU*' BU*' BU*' BU*' BU*' ;
+
+: BMM* ( n u -- n )     
+  SQ! 0 + 2*' 2/
+  BU*' BU*' BU*' BU*' BU*' BU*' BU*' BU*" ;
+
+: BZ ( b b -- n )        \ Test Byte Size Multiplication
+  2DUP  U. ." times " U. ." equals "
+  SWAP FF AND SWAP FF AND       \ Limit input to 8 bits
+  2DUP  100 * M !  T !
+  BUM*  U.  ."   Result: "
+  I*
+  BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM
+  T @  U. CR ;
+
+: BMZ ( b b -- n )        \ Test Mixed Byte Size Multiplication
+  2DUP  U. ." (unsigned) times " . ." (signed) equals "
+  SWAP FF AND SWAP FF AND       \ Limit input to 8 bits
+  2DUP  100 *  M !  T !
+  BMM*  .  ." (signed)  Result: "
+  I*
+  BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*'SIM BU*"SIM
+  T @  .  CR ;
+
+: BX ( n n -- d )        \ X-Ray Byte Size Multiplication Test
+  2DUP  U. ." times " U. ." equals "
+  SWAP FF AND SWAP FF AND       \ Limit input to 8 bits
+  2DUP  100 *  M !  T !
+  BUM*  U. CR
+  I*
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM 
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR ;
+
+: BMX ( n n -- d )       \ X-Ray Byte Size Multiplication Test
+  2DUP  U. ." (unsigned) times " . ." (signed) equals "
+  SWAP FF AND SWAP FF AND       \ Limit input to 8 bits
+  2DUP  100 *  M !  T !
+  BMM*  .  ." (signed)" CR
+  I*
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*'SIM
+  CR1 ?  CR0 ?  T @ U.  CR BU*"SIM
+  CR1 ?  CR0 ?  T @ U.  CR
+  ." Result: " T ? ;
+
+: Z           \ Torture Test
+FF80 00 BMZ       \ -80 *  0
+FF80 01 BMZ       \ -80 *  1
+FF80 FF BMZ       \ -80 * FF
+FFFF 00 BMZ       \  -1 *  0
+FFFF 01 BMZ       \  -1 *  1
+FFFF FF BMZ       \  -1 * FF
+0000 00 BMZ       \   0 *  0
+0000 01 BMZ       \   0 *  1
+0000 FF BMZ       \   0 * FF
+0001 00 BMZ       \   1 *  0
+0001 01 BMZ       \   1 *  1
+0001 FF BMZ       \   1 * FF
+007F 00 BMZ       \  7F *  0
+007F 01 BMZ       \  7F *  1
+007F FF BMZ       \  7F * FF
+;
+
+greyhound>   
+greyhound> cat xken
+From krl@mlb.semi.harris.com Thu Oct 25 14:29:05 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA28675; Thu, 25 Oct 90 14:28:57 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA21140; Thu, 25 Oct 90 14:28:50 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA12845; Thu, 25 Oct 90 14:28:49 EDT
+Date: Thu, 25 Oct 90 14:28:49 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010251828.AA12845@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: 8-bit Step Math Division
+Status: R
+
+Phil,
+
+Here's another installment in the continuing saga.  Idiscovered another
+possibly useful op code, BUMOD',  which allows us to do an 8-bit MOD
+quickly when coupled with BU/'.  The value of the BUMOD' op code is
+A410.
+
+Ken
+
+--------Cut Here--------
+\ Simulation of 8-BIT Division Step Math OP Codes
+\ K.R.Lyons 10/25/90
+\ No carries are used to avoid machine dependancies.
+
+HEX
+
+VARIABLE TOP
+VARIABLE MD
+VARIABLE ZA     \ Low 15 alu bits out & C14
+VARIABLE ZB     \ High 2 alu bits out & C16
+VARIABLE CRA    \ Low 2 CR bits
+
+: BU/' ( -- )
+  TOP @ 7FFF AND 1 +    \ Subtract 15 low bits of MD from
+  MD @ NOT 7FFF AND +   \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ Get C14 to add to high bit
+  TOP @ 0< 1 AND +      \   of TOP and the inverse of the
+  MD @ NOT 0< 1 AND +   \   high bit of MD.
+  CRA @ 1 AND 2* +      \ Add in CR0 and an inverted high
+  2 + DUP ZB !          \   zero bit (i.e. a 1)
+  4 AND                 \ Get C16.  0 => borrow    => restore
+  IF                    \           1 => no borrow => keep result
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @  2*            \ Update TOP from alu output and YES
+  ELSE
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @  2*           \ Update TOP from TOP and YES
+  THEN
+  ZB @  2/  2/  +       \ Shift C16 into TOP
+  TOP !  ;
+
+: BUMOD'  ( -- )      \ Lats step for 8 bit MOD
+  TOP @ 7FFF AND 1 +    \ Subtract 15 low bits of MD from
+  MD @ NOT 7FFF AND +   \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ Get C14 to add to high bit
+  TOP @ 0< 1 AND +      \   of TOP and the inverse of the
+  MD @ NOT 0< 1 AND +   \   high bit of MD.
+  CRA @ 1 AND 2* +      \ Add in CR0 and an inverted high
+  2 + DUP ZB !          \   zero bit (i.e. a 1)
+  4 AND                 \ Get C16.  0 => borrow    => restore
+  IF                    \           1 => no borrow => keep result
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @                \ Update TOP from alu output and YES
+  ELSE
+    TOP @               \ Update TOP from TOP
+  THEN
+  TOP !  ;
+
+: BU/  ( u u -- u )
+  100 *  MD !
+  DUP  0<  1 AND  CRA !
+  2*  TOP !
+  BU/' BU/' BU/' BU/' BU/' BU/' BU/' BU/'
+  TOP @  FF AND ;
+
+: BUMOD  ( u u -- u )
+  100 *  MD !
+  DUP  0<  1 AND  CRA !
+  2*  TOP !
+  BU/' BU/' BU/' BU/' BU/' BU/' BU/' BUMOD'
+  TOP @  U2/ U2/ U2/ U2/ U2/ U2/ U2/ U2/
+;
+
+\ Check it out in hardware also:
+
+A412 UCODE BU/'
+A410 UCODE BUMOD'
+
+: BU/  ( u u -- u )
+  SQ!
+  2*
+  BU/' BU/' BU/' BU/' BU/' BU/' BU/' BU/'
+  FF AND  ;
+
+: BUMOD  ( u u -- u )
+  SQ!
+  2*
+  BU/' BU/' BU/' BU/' BU/' BU/' BU/' BUMOD'
+  U2/ U2/ U2/ U2/ U2/ U2/ U2/ U2/  ;
+
+: X ( u u -- )
+  OVER U. ." divided by "
+  DUP  U. ." equals "
+  BU/
+  U.  CR ;
+
+: MX ( u u -- )
+  OVER U. ." mod "
+  DUP  U. ." equals "
+  BUMOD
+  U.  CR ;
+
+: Z ( -- )      \ Torture test
+00 00 X
+01 00 X
+02 00 X
+FE 00 X
+FF 00 X
+00 01 X
+01 01 X
+02 01 X
+FE 01 X
+FF 01 X
+00 02 X
+01 02 X
+02 02 X
+FE 02 X
+FF 02 X
+00 FE X
+01 FE X
+02 FE X
+FE FE X
+FF FE X
+00 FF X
+01 FF X
+02 FF X
+FE FF X
+FF FF X
+;
+
+: MZ ( -- )      \ Torture test
+00 00 MX
+01 00 MX
+02 00 MX
+FE 00 MX
+FF 00 MX
+00 01 MX
+01 01 MX
+02 01 MX
+FE 01 MX
+FF 01 MX
+00 02 MX
+01 02 MX
+02 02 MX
+FE 02 MX
+FF 02 MX
+00 FE MX
+01 FE MX
+02 FE MX
+FE FE MX
+FF FE MX
+00 FF MX
+01 FF MX
+02 FF MX
+FE FF MX
+FF FF MX
+;
+
+
+greyhound>  cat xl      cat xken
+From krl@mlb.semi.harris.com Fri Oct 26 15:00:33 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA01648; Fri, 26 Oct 90 15:00:27 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA07569; Fri, 26 Oct 90 15:00:26 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA13006; Fri, 26 Oct 90 15:00:24 EDT
+Date: Fri, 26 Oct 90 15:00:24 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010261900.AA13006@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Step Math Ideas
+Cc: krl@mlb.semi.harris.com
+Status: RO
+
+Phil,
+
+This and the following pieces should finish up the model.
+
+By the way, all this thinking about step math has given me some ideas,
+which I will start modeling as time permits.  If you think they are
+important and can convince Ron the same, I would be prefer doing this
+to the marketing and product engineering tasks that have kept me busy
+lately.
+
+Many of these ideas would only be applicable when we are free to
+abandon code compatibility, or if we utilize some of the unused or
+unusable opcodes.  Many of these ideas would be applicable to 32 bit
+processors, also.  For example:
+
+Division could be simplified by using a non-restoring algorithm.  This
+would eliminate a mux in the critical path and would simplify
+implementation of multiple precision division.  Several division steps
+could be combined to achieve arbitrary degrees of precision.
+
+For both multiplication and division, op codes could be formed that
+used the SR register instead of the MD, which could reduce stack
+thrashing in double precision arithmetic.
+
+By adding a barrel shifter, and using a look-ahead booth algorithm,
+worst case multiply time could be cut in half, and typical would be 1/4
+of present time.  This would not be deterministic, however,  and impact
+on total system performance is not as spectacular.  Nonetheless,
+performance would be moved closer to that of a hardware multiplier for
+much less die area.
+
+CRC steps could be made to shift both right and left to obviate the
+need for bit reversals in some CRC's.
+
+Bit reversal could be improved by adding a step that shifts NEXT right
+while shifting TOP left and shifting N0 into T0.  A final step that
+popped the stack would also help.
+
+Regards,
+
+Ken
+
+From krl@mlb.semi.harris.com Fri Oct 26 15:05:45 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA01662; Fri, 26 Oct 90 15:05:40 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA07780; Fri, 26 Oct 90 15:04:45 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA13013; Fri, 26 Oct 90 15:04:43 EDT
+Date: Fri, 26 Oct 90 15:04:43 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010261904.AA13013@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Re:  Step 16-bit Square Root Model
+Status: RO
+
+\ Simulation of 16-bit Square Root Step Math OP Codes
+\ K.R.Lyons 10/25/90
+\ No carries are used to avoid machine dependancies.
+
+HEX
+
+VARIABLE TOP
+VARIABLE NEXT
+VARIABLE MD
+VARIABLE SR
+VARIABLE ZA     \ Low 15 alu bits out & C14
+VARIABLE ZB     \ High 2 alu bits out & C16
+VARIABLE CRA    \ Low 2 CR bits
+
+: S1' ( -- )
+  TOP @ 7FFF AND        \ Subtract 15 low bits of SQ from
+  MD @  2*  SR @  OR
+  NOT 7FFF AND + 1 +    \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ C14+(T15 OR 2*CR0)+NOT(MD14 OR 2*MD15 OR SR15)
+  TOP @ 0< 1 AND        \   -> ZB
+  CRA @ 1 AND 2* OR +
+  MD @  0<  2 AND
+  MD @  2*  0<  1 AND  OR
+  SR @  0<  1 AND OR
+  NOT  3 AND  +
+  DUP 7 AND ZB !
+  4 AND                 \ Get C16.  0 => borrow    => restore
+  IF                    \           1 => no borrow => keep result
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @ 2*             \ Update TOP from alu output and NEXT
+    MD @  SR @  OR  MD !
+  ELSE
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @ 2*            \ Update TOP from TOP and NEXT
+  THEN
+  NEXT @ 0< 1 AND +     \ Shift NEXT into TOP
+  TOP !
+  NEXT @ 2*             \ Shift NEXT left
+  ZB @ 2/ 2/ +          \ Shift C16 into NEXT
+  NEXT !
+  SR @  U2/  SR !
+  ;
+
+: S' ( -- )
+  TOP @ 7FFF AND        \ Subtract 15 low bits of SQ from
+  MD @  2*  SR @  OR
+  NOT 7FFF AND + 1 +    \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ C14+(T15 OR 2*CR0)+NOT(MD14 OR 2*MD15 OR SR15)
+  TOP @ 0< 1 AND        \   -> ZB
+  CRA @ 1 AND 2* OR +
+  MD @  0<  2 AND
+  MD @  2*  0<  1 AND  OR
+  SR @  0<  1 AND OR
+  NOT  3 AND  +
+  DUP 7 AND ZB !
+  4 AND CRA @ 2 AND OR  \ Get C16 or CR1
+  IF                    \ 1 => no borrow => keep result
+    1                   \ 1 to shift into NEXT
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @ 2*             \ Update TOP from alu output and NEXT
+    MD @  SR @  OR  MD !
+  ELSE                  \ 0 => borrow    => restore
+    0                   \ 0 to shift into NEXT
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @ 2*            \ Update TOP from TOP and NEXT
+  THEN
+  NEXT @ 0< 1 AND +     \ Shift NEXT into TOP
+  TOP !
+  NEXT @ 2* +           \ Shift NEXT left and YES into N0
+  NEXT !
+  SR @  U2/  SR !
+  ;
+
+: S" ( -- )
+  TOP @ 7FFF AND        \ Subtract 15 low bits of SQ from
+  MD @  2*  SR @  OR
+  NOT 7FFF AND + 1 +    \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ C14+(T15 OR 2*CR0)+NOT(MD14 OR 2*MD15 OR SR15)
+  TOP @ 0< 1 AND        \   -> ZB
+  CRA @ 1 AND 2* OR +
+  MD @  0<  2 AND
+  MD @  2*  0<  1 AND  OR
+  SR @  0<  1 AND OR
+  NOT  3 AND  +
+  DUP 7 AND ZB !
+  4 AND CRA @ 2 AND OR  \ Get C16 or CR1
+  IF                    \ 1 => no borrow => keep result
+    1                   \ 1 to shift into NEXT
+    ZB @ 2/ 3 AND CRA ! \ Update CR from alu output
+    ZA @                \ Update TOP from alu output
+    ZB @ 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* 2* +
+    TOP !
+    MD @  SR @  OR  MD !
+  ELSE
+    0                   \ to shift into NEXT
+  THEN
+  NEXT @ 2* +           \ Shift NEXT left and YES into N0
+  NEXT !
+  SR @  U2/  SR !
+  ;
+
+: ROOT  ( du -- u u )
+  8000 SR !
+  0000 MD !
+  DUP  0<  1 AND CRA !
+  D2*  TOP !  NEXT !
+  S1' S' S' S' S' S' S' S' S' S' S' S' S' S' S' S"
+  TOP @  NEXT @ ;
+
+: 4U. 0 <# # # # # #> TYPE SPACE ;
+
+: XROOT  ( du -- u u )
+  8000 SR !
+  0000 MD !
+  DUP  0<  1 AND CRA !
+  D2*  TOP !  NEXT !
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S1'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S'
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR S"
+  CRA ?  TOP @ 4U.  NEXT @ 4U.  MD @ 4U.  SR @ 4U. CR ;
+
+: DU. <# # # # # # # # # #> TYPE SPACE ;
+
+: X ( u u -- )
+  ." The square root of " 2DUP DU.
+  ." equals " ROOT
+  U. ." remainder " CRA @ 1 AND D. CR ;
+
+: Z ( -- )      \ Torture Test
+  00000000. X
+  00000001. X
+  0000FFFE. X
+  0000FFFF. X
+  00010000. X
+  00020000. X
+  FFFE0000. X
+  FFFF0000. X
+  FFFF0001. X
+  FFFF0002. X
+  FFFFFFFE. X
+  FFFFFFFF. X
+;
+
+
+
+From krl@mlb.semi.harris.com Fri Oct 26 15:05:48 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA01666; Fri, 26 Oct 90 15:05:43 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA07833; Fri, 26 Oct 90 15:05:41 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA13017; Fri, 26 Oct 90 15:05:39 EDT
+Date: Fri, 26 Oct 90 15:05:39 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010261905.AA13017@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Re:  Step Bit Reversal Model
+Status: RO
+
+\ RTX2000, 2001A, 2010 Step Bit Reversal Model
+\ File: WUR
+\ krl 10/26/90
+
+HEX
+
+VARIABLE T      \ Stack TOP
+VARIABLE M      \ MD Register
+VARIABLE S      \ SR Register
+
+: R' ( -- )
+  T @  1 AND IF
+    M @  S @  OR  M !
+  THEN
+  S @  U2/  S !
+  T @  U2/  T ! ;
+
+: REV ( u -- u )
+  8000 S !
+  0000 M !
+  T !
+  R' R' R' R' R' R' R' R' R' R' R' R' R' R' R' R'
+  M @ ;
+
+: U.16 0 <# # # # # # # # # # # # # # # # # #> TYPE SPACE ;
+
+: X ( u -- )
+  BINARY DUP U.16 ." Reversed is " REV U.16 CR ;
+
+BINARY
+
+: Z ( -- )      \ Torture test
+  0000000000000001 X
+  0000000000000010 X
+  0000000000000100 X
+  0000000000001000 X
+  0000000000010000 X
+  0000000000100000 X
+  0000000001000000 X
+  0000000010000000 X
+  0000000100000000 X
+  0000001000000000 X
+  0000010000000000 X
+  0000100000000000 X
+  0001000000000000 X
+  0010000000000000 X
+  0100000000000000 X
+  1000000000000000 X
+  0000000000000001 X
+  0000000000000011 X
+  0000000000000111 X
+  0000000000001111 X
+  0000000000011111 X
+  0000000000111111 X
+  0000000001111111 X
+  0000000011111111 X
+  0000000111111111 X
+  0000001111111111 X
+  0000011111111111 X
+  0000111111111111 X
+  0001111111111111 X
+  0011111111111111 X
+  0111111111111111 X
+  1111111111111111 X
+  1111111111111110 X
+  1111111111111100 X
+  1111111111111000 X
+  1111111111110000 X
+  1111111111100000 X
+  1111111111000000 X
+  1111111110000000 X
+  1111111100000000 X
+  1111111000000000 X
+  1111110000000000 X
+  1111100000000000 X
+  1111000000000000 X
+  1110000000000000 X
+  1100000000000000 X
+  1000000000000000 X
+  1000000000000000 X
+;
+
+
+
+From krl@mlb.semi.harris.com Fri Oct 26 15:06:39 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA01674; Fri, 26 Oct 90 15:06:35 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA07928; Fri, 26 Oct 90 15:06:33 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA13021; Fri, 26 Oct 90 15:06:32 EDT
+Date: Fri, 26 Oct 90 15:06:32 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010261906.AA13021@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Re:  Step 16-bit CRC Model
+Status: RO
+
+\ RTX2000, 2001A, 2010 Step CRC Model
+\ File: WUC
+\ krl 10/26/90
+
+HEX
+
+VARIABLE T      \ TOP
+VARIABLE N      \ NEXT
+VARIABLE M      \ MD
+
+: C' ( -- )
+  T @  1 AND                    \ If T0 xor N0:
+  N @  1 AND  XOR  IF
+    T @  M @  XOR  T !            \ T xor M -> T
+    8000                          \ 1 -> T15 Later
+  ELSE
+    0000                          \ 0 -> T15 Later
+  THEN
+  N @  U2/                      \ N/2 -> N
+  T @  1 AND  IF  8000 +  THEN  \ T0 -> N15
+  N !
+  T @  U2/  +  T ! ;            \ T/2 -> T
+
+0811 CONSTANT POLY
+
+: CRC ( crc byte -- crc' )      \ Concatenatible CRC
+  N !
+  T !
+  POLY M !
+  C' C' C' C' C' C' C' C'
+  T @ ;
+
+: U.4 0 <# # # # # #> TYPE SPACE ;
+
+: XCRC ( crc byte -- )          \ X-RAY Concatenatible CRC
+  N !
+  T !
+  POLY M !
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 C' CR
+  T @ U.4  N @ U.4 CR
+  ;
+
+: X ( byte -- )                 \ X.25 Character CRC
+  ." The CCITT CRC of " DUP U. ." is "
+  0 SWAP CRC U. CR ;
+
+: Z ( -- )                      \ Test known value
+  54 X ." Which should equal " 14A1 U. CR ;
+
+
+From krl@mlb.semi.harris.com Fri Oct 26 15:07:41 1990
+Received: by greyhound.ECE.CMU.EDU (5.54-ECE2/5.17)
+        id AA01679; Fri, 26 Oct 90 15:07:36 EDT
+Received: from jujeh.mlb.semi.harris.com by mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA07960; Fri, 26 Oct 90 15:07:35 EDT
+Received: by jujeh.mlb.semi.harris.com (4.0/SMI-4.0)
+        id AA13025; Fri, 26 Oct 90 15:07:34 EDT
+Date: Fri, 26 Oct 90 15:07:34 EDT
+From: krl@mlb.semi.harris.com (Ken Lyons)
+Message-Id: <9010261907.AA13025@jujeh.mlb.semi.harris.com>
+To: koopman@greyhound.ece.cmu.edu
+Subject: Re:  Step 8-bit Square Root Model
+Status: RO
+
+
+\ Simulation of 8-bit Square Root Step Math OP Codes
+\ K.R.Lyons 10/26/90
+\ No carries are used to avoid machine dependancies.
+
+HEX
+
+VARIABLE TOP
+VARIABLE MD
+VARIABLE SR
+VARIABLE ZA     \ Low 15 alu bits out & C14
+VARIABLE ZB     \ High 2 alu bits out & C16
+VARIABLE CRA    \ Low 2 CR bits
+
+: BS1' ( -- )
+  TOP @ 7FFF AND        \ Subtract 15 low bits of SQ from
+  MD @  2*  SR @  OR
+  NOT 7FFF AND + 1 +    \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ C14+(T15 OR 2*CR0)+NOT(MD14 OR 2*MD15 OR SR15)
+  TOP @ 0< 1 AND        \   -> ZB
+  CRA @ 1 AND 2* OR +
+  MD @  0<  2 AND
+  MD @  2*  0<  1 AND  OR
+  SR @  0<  1 AND OR
+  NOT  3 AND  +
+  DUP 7 AND ZB !
+  4 AND                 \ Get C16.  0 => borrow    => restore
+  IF                    \           1 => no borrow => keep result
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @ 2*  1 OR       \ Update TOP from alu output and C16
+    MD @  SR @  OR  MD !
+  ELSE
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @ 2*            \ Update TOP from TOP
+  THEN
+  TOP !
+  SR @  U2/  SR !
+  ;
+
+: BS' ( -- )
+  TOP @ 7FFF AND        \ Subtract 15 low bits of SQ from
+  MD @  2*  SR @  OR
+  NOT 7FFF AND + 1 +    \   15 low bits of TOP and put
+  DUP 7FFF AND ZA !     \   result in ZA.
+  0< 1 AND              \ C14+(T15 OR 2*CR0)+NOT(MD14 OR 2*MD15 OR SR15)
+  TOP @ 0< 1 AND        \   -> ZB
+  CRA @ 1 AND 2* OR +
+  MD @  0<  2 AND
+  MD @  2*  0<  1 AND  OR
+  SR @  0<  1 AND OR
+  NOT  3 AND  +
+  DUP 7 AND ZB !
+  4 AND CRA @ 2 AND OR  \ Get C16 or CR1
+  IF                    \ 1 => no borrow => keep result
+    ZB @ 3 AND CRA !    \ Update CR from alu output
+    ZA @ 2*  1 OR       \ Update TOP from alu output and yes
+    MD @  SR @  OR  MD !
+  ELSE                  \ 0 => borrow    => restore
+    CRA @ 1 AND 2*      \ Update CR from CR and TOP
+    TOP @ 0< 1 AND +
+    CRA !
+    TOP @ 2*            \ Update TOP from TOP
+  THEN
+  TOP !
+  SR @  U2/  SR ! ;
+
+: ROOT  ( u -- u )
+  8000 SR !
+  0000 MD !
+  DUP  0<  1 AND CRA !
+  2*  TOP !
+  BS1' BS' BS' BS' BS' BS' BS' BS'
+  TOP @  FF AND ;
+
+: 4U. 0 <# # # # # #> TYPE SPACE ;
+
+: XROOT  ( u -- u )
+  8000 SR !
+  0000 MD !
+  DUP  0<  1 AND CRA !
+  2*  TOP !
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS1'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR BS'
+  CRA ?  TOP @ 4U.  MD @ 4U.  SR @ 4U. CR S" ;
+
+: X ( u -- )
+  ." The square root of " DUP U.
+  ." equals " ROOT  U. CR ;
+
+: Z ( -- )      \ Torture Test
+  0000 X
+  0001 X
+  0002 X
+  0003 X
+  0004 X
+  FFFD X
+  FFFE X
+  FFFF X
+;
+
+
+greyhound>    
+greyhound> 
+greyhound> 
