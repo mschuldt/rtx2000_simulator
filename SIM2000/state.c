@@ -399,7 +399,7 @@ int gfetch(register int offset)
   if (  offset >= 0x18
         && offset <= 0x1F )  return(gdata[offset]);
   error("illegal G@ offset value");
-  return(NULL);
+  return 0;
 }
 
 /* --------------------------------------------------- */
