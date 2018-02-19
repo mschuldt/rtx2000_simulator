@@ -38,6 +38,6 @@ void main()
   trace(0xBE47, PC++);  /* lit 7 */
   trace(0xa840, PC++);  /* + */
   trace(0xaC40, PC++);  /* - */
-  printf("\n%d clocks\n",clocks);
+  printf("\n%ld clocks\n",clocks);
 
 }
