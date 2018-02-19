@@ -2,10 +2,10 @@
 \ Improved source code assembler based on GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY towers.4E" EVALUATE ;
+: XY " DOS XY towers.4e" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 #REGS 100 - REG-ADDR $FFC0 AND  UBR!
 

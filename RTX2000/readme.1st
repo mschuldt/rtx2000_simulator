@@ -22,7 +22,7 @@ to other hardware platforms by meta-compilation.
 
 AppForth requires a console.  This may be a dumb terminal (if you really
 like to type!), any communications package running on a computer with a
-serial port, or the supplied terminal software (TERM.4 (source code) and
+serial port, or the supplied terminal software (TERM.4th (source code) and
 TERM.EXE (executable image)) for IBM/PC and clones.  There are many
 "envionmental" features such as access to DOS commands and the ability
 to nest files when loading that are available only in TERM.  Source code
@@ -124,7 +124,7 @@ comprehensive meta compiler nor is it a general case meta compiler.
 AppForth is supplied as a binary and the source code required to
 regenerate the binary image, assuming a running AppForth system to
 compile it on.  To meta-compile AppForth, simply reset the system and
-load the file APPFORTH.4.  The load process will inquire if you wish to
+load the file APPFORTH.4th.  The load process will inquire if you wish to
 generate a RAM image (for testing purposes) or a ROM image.  If a ROM
 image was generated, it will be saved on disk in the file AROM.BIN,
 which may be burned into PROMs, installed, and executed.
