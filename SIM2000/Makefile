@@ -12,3 +12,9 @@ testhex:
 
 texec:
 	gcc ${FILES} texec.c
+
+
+.PHONY: clean
+
+clean::
+	rm -f sim2000
