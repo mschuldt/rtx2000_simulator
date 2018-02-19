@@ -18,11 +18,11 @@ extern int which_chip;
 #define FALSE 0
 #define TRUE  1
 
-#ifdef TURBOC
+// #ifdef TURBOC
 #define LONG long
-#else
-#define LONG int  /* 32-bit systems */
-#endif
+// #else
+// #define LONG int  /* 32-bit systems */
+// #endif
 
 #ifdef TURBOC
 #define _MASKED_  /* nop */
