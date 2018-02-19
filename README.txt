@@ -15,7 +15,7 @@ This program has been ported to GNU/Linux. Files originally from:
   http://users.ece.cmu.edu/~koopman/forth/RTX2000_APPFORTH.ZIP
 
 
-======= The text from SIM2000/README.1ST follows =============
+======= The text from SIM2000/readme.1st follows =============
 
                                                       10/24/97
 
