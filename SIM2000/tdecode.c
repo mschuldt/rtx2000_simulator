@@ -5,6 +5,7 @@
 /* test code file for instruction cracking */
 
 #include "output.h"
+#include "main.h"
 
 int which_chip ;
 
