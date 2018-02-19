@@ -37,34 +37,34 @@ int CARRY(int a, int b, int c)
 
 int alu(int opa, int opb)
 {switch(IR & 0x0F00)
- {
-  case 0x0200: return(  (opb & opa)  _MASKED_ );
-  case 0x0300: return((~(opb | opa)) _MASKED_ );
-  case 0x0400: set_CY( BORROW(opa,opb,1) );
-               return((opa -  opb) _MASKED_      );
-  case 0x0500: set_CY( BORROW(opa,opb,CY) );
-               return((opa + ~opb + CY) _MASKED_ );
-  case 0x0600: return(  (opb | opa) _MASKED_ );
-  case 0x0700: return((~(opb & opa)) _MASKED_ );
-  case 0x0800: set_CY( CARRY(opa,opb,0) );
-               return((opa + opb) _MASKED_      );
-  case 0x0900: set_CY( CARRY(opa,opb,CY) );
-               return((opa + opb + CY) _MASKED_ );
-  case 0x0A00: return(  (opb ^ opa) _MASKED_ );
-  case 0x0B00: return((~(opb ^ opa)) _MASKED_ );
-  case 0x0C00: set_CY( BORROW(opb,opa,1) );
-               return((opb -  opa) _MASKED_      );
-  case 0x0D00: set_CY( BORROW(opb,opa,CY) );
-               return((opb + ~opa + CY) _MASKED_ );
- }
- error("illegal alu function in alu");
+    {
+    case 0x0200: return(  (opb & opa)  _MASKED_ );
+    case 0x0300: return((~(opb | opa)) _MASKED_ );
+    case 0x0400: set_CY( BORROW(opa,opb,1) );
+      return((opa -  opb) _MASKED_      );
+    case 0x0500: set_CY( BORROW(opa,opb,CY) );
+      return((opa + ~opb + CY) _MASKED_ );
+    case 0x0600: return(  (opb | opa) _MASKED_ );
+    case 0x0700: return((~(opb & opa)) _MASKED_ );
+    case 0x0800: set_CY( CARRY(opa,opb,0) );
+      return((opa + opb) _MASKED_      );
+    case 0x0900: set_CY( CARRY(opa,opb,CY) );
+      return((opa + opb + CY) _MASKED_ );
+    case 0x0A00: return(  (opb ^ opa) _MASKED_ );
+    case 0x0B00: return((~(opb ^ opa)) _MASKED_ );
+    case 0x0C00: set_CY( BORROW(opb,opa,1) );
+      return((opb -  opa) _MASKED_      );
+    case 0x0D00: set_CY( BORROW(opb,opa,CY) );
+      return((opb + ~opa + CY) _MASKED_ );
+    }
+  error("illegal alu function in alu");
 }
 
 void shift()
 { int temp, tempa;
   /* compute shift function */
   switch( IR & 0x000F )
-   {
+    {
     case 0x0000:  /* nop */
       break;
 
@@ -174,7 +174,7 @@ void shift()
       break;
 
     default:  error("illegal shift case in shift");
-   }
+    }
 }
 
 /* .MDUL/________________________________________________________________.MDNM/ */
@@ -182,9 +182,9 @@ void shift()
 
 void bad_insn()
 {  printf("Unsupported instruction: addr=%01X%04X  insn=%04X ",
-      CPR, PC, IR);
-   print_instruction(stdout, decode(IR), IR, CPR, PC);
-   printf("\n");
+          CPR, PC, IR);
+  print_instruction(stdout, decode(IR), IR, CPR, PC);
+  printf("\n");
 }
 
 void D_swap()         /* D swap */
@@ -219,63 +219,63 @@ void step_math()
   int alu_y_source, YES, arithmetic;
 
   if ( IR & 0x0100 )  /* test r bit of instruction */
-        {  alu_y_source = SQ; }
+    {  alu_y_source = SQ; }
   else  {  alu_y_source = MD; }
 
   arithmetic = FALSE;
   switch( IR & 0x0E00 )  /* select ALU function */
-  { case 0x0000: alu_out = (unsigned) TOP;  break;
+    { case 0x0000: alu_out = (unsigned) TOP;  break;
     case 0x0200: alu_out = (unsigned) TOP & (unsigned) alu_y_source ;  break;
     case 0x0400: alu_out = (unsigned) TOP - (unsigned) alu_y_source ;
-                 arithmetic = TRUE; break;
+      arithmetic = TRUE; break;
     case 0x0600: alu_out = (unsigned) TOP | (unsigned) alu_y_source ;  break;
     case 0x0800: alu_out = (unsigned) TOP + (unsigned) alu_y_source ;
-                 arithmetic = TRUE; break;
+      arithmetic = TRUE; break;
     case 0x0A00: alu_out = (unsigned) TOP ^ (unsigned) alu_y_source ;  break;
     case 0x0C00: alu_out = (unsigned) TOP - (unsigned) alu_y_source ;
-                 arithmetic = TRUE; break;
+      arithmetic = TRUE; break;
     case 0x0E00: alu_out =                  (unsigned) alu_y_source ;  break;
     default: error("bad alu case in step_math");
-  }
+    }
 
   switch( IR & 0x00C0 )  /* compute value of YES */
-  { case 0x0000: if (arithmetic)  { YES =  ( (alu_out & 0x10000) ? 1 : 0 ); }
-                           else   { YES =  ( (IR      & 0x0001)  ? 1 : 0 ); }
-                 break;
+    { case 0x0000: if (arithmetic)  { YES =  ( (alu_out & 0x10000) ? 1 : 0 ); }
+      else   { YES =  ( (IR      & 0x0001)  ? 1 : 0 ); }
+        break;
     case 0x0040: if (arithmetic)  { YES =  ( (alu_out & 0x10000) ? 1 : 0 ); }
-                           else   { YES =  ( (IR      & 0x0001)  ? 1 : 0 ); }
-                 YES = YES | CR1 ;
-                 break;
+        else   { YES =  ( (IR      & 0x0001)  ? 1 : 0 ); }
+      YES = YES | CR1 ;
+      break;
     case 0x0080: if (IR & 0x0008) { YES = NEXT & 1; }
-                             else { YES = TOP  & 1; }
-                 break;
+      else { YES = TOP  & 1; }
+      break;
     case 0x00C0: YES = (TOP & 1) ^ (NEXT & 1);
-                 break;
+      break;
     default: error("bad YES case in step_math");
-  }
-  
-  if (YES)
-  { switch( IR & 0x0E00 )  /* select ALU function */
-    { case 0x0000:   W = (unsigned) TOP;  break;
-      case 0x0200:   W = (unsigned) TOP & (unsigned) alu_y_source ;  break;
-      case 0x0400:   W = (unsigned) TOP - (unsigned) alu_y_source ;  break;
-      case 0x0600:   W = (unsigned) TOP | (unsigned) alu_y_source ;  break;
-      case 0x0800:   W = (unsigned) TOP + (unsigned) alu_y_source ;  break;
-      case 0x0A00:   W = (unsigned) TOP ^ (unsigned) alu_y_source ;  break;
-      case 0x0C00:   W = (unsigned) TOP - (unsigned) alu_y_source ;  break;
-      case 0x0E00:   W =                  (unsigned) alu_y_source ;  break;
-      default: error("bad case in step_math");
     }
-  }
+
+  if (YES)
+    { switch( IR & 0x0E00 )  /* select ALU function */
+        { case 0x0000:   W = (unsigned) TOP;  break;
+        case 0x0200:   W = (unsigned) TOP & (unsigned) alu_y_source ;  break;
+        case 0x0400:   W = (unsigned) TOP - (unsigned) alu_y_source ;  break;
+        case 0x0600:   W = (unsigned) TOP | (unsigned) alu_y_source ;  break;
+        case 0x0800:   W = (unsigned) TOP + (unsigned) alu_y_source ;  break;
+        case 0x0A00:   W = (unsigned) TOP ^ (unsigned) alu_y_source ;  break;
+        case 0x0C00:   W = (unsigned) TOP - (unsigned) alu_y_source ;  break;
+        case 0x0E00:   W =                  (unsigned) alu_y_source ;  break;
+        default: error("bad case in step_math");
+        }
+    }
   else
-  {  /* not YES */
-    W =  ;
-  }
+    {  /* not YES */
+      W =  ;
+    }
 
   if ( IR & 0x0100 )  /* test r bit of instruction */
-  { if (YES) MD = MD | SR;
-    SR = (SR >> 1)  & 0x7FFF;
-  }
+    { if (YES) MD = MD | SR;
+      SR = (SR >> 1)  & 0x7FFF;
+    }
 
   TEST_EXIT; CLOCKS(1); }
 
@@ -361,7 +361,7 @@ void do_clear_acc()
 /* .MDBO/---------------------------------------------------.MDNM/ */
 
 void do_clear_softint()
-{ SOFTINT = FALSE; 
+{ SOFTINT = FALSE;
   TEST_EXIT; CLOCKS(1); }
 
 /* .MDBO/---------------------------------------------------.MDNM/ */
@@ -547,9 +547,9 @@ void do_fetch_with_alu_2()
 void do_gfetch()
 { CLOCKS(1);
   if      (SHORT_LIT == 0x16 && which_chip == RTX2000 ) /* MLR special read */
-       { NEXT = TOP;    TOP = gfetch(SHORT_LIT);  }
+    { NEXT = TOP;    TOP = gfetch(SHORT_LIT);  }
   else if (SHORT_LIT == 0x17 && which_chip == RTX2000 ) /* MHR special read */
-       { NEXT = TOP;    TOP = gfetch(SHORT_LIT);  }
+    { NEXT = TOP;    TOP = gfetch(SHORT_LIT);  }
   else { push( gfetch(SHORT_LIT) ); }
   invert();
   TEST_EXIT; }
@@ -662,14 +662,14 @@ void do_mult_sub()
 void do_next()
 {
   if (INDEX)
-  { /* loop */
-    PC = target_addr(IR, PC);
-    INDEX = (INDEX - 1) _MASKED_ ;
-  }
+    { /* loop */
+      PC = target_addr(IR, PC);
+      INDEX = (INDEX - 1) _MASKED_ ;
+    }
   else
-  { /* fall through */
-    rs_pop();
-  }
+    { /* fall through */
+      rs_pop();
+    }
   CLOCKS(1); }
 
 /* .MDBO/---------------------------------------------------.MDNM/ */
@@ -736,9 +736,9 @@ void do_over()
 void do_qdup_0branch()
 {
   if (!TOP)
-   { PC = target_addr(IR, PC);
-     pop();
-   }
+    { PC = target_addr(IR, PC);
+      pop();
+    }
   CLOCKS(1); }
 
 /* .MDBO/---------------------------------------------------.MDNM/ */
@@ -1005,13 +1005,13 @@ void do_under_store_lit_2()
 
 void do_uslash_one_tick()
 {
- /* really sleazy definition to make things work for now ???? */
- /* undoes the preceeding d2* */
- NEXT = (NEXT >> 1) & 0x7FFF ;
- if (TOP & 1)  NEXT = NEXT | 0x8000;
- TOP =  (TOP >> 1)  & 0x7FFF ;
- if (CY)  TOP = TOP | 0x8000 ;
- }
+  /* really sleazy definition to make things work for now ???? */
+  /* undoes the preceeding d2* */
+  NEXT = (NEXT >> 1) & 0x7FFF ;
+  if (TOP & 1)  NEXT = NEXT | 0x8000;
+  TOP =  (TOP >> 1)  & 0x7FFF ;
+  if (CY)  TOP = TOP | 0x8000 ;
+}
 
 /* .MDBO/---------------------------------------------------.MDNM/ */
 
@@ -1023,16 +1023,16 @@ void do_uslash_one_tick_tick()
 
 void do_uslash_tick()
 {
- /* really sleazy definition to make things work for now ???? */
- /* do nothing -- save the division up for the end! */
+  /* really sleazy definition to make things work for now ???? */
+  /* do nothing -- save the division up for the end! */
   TEST_EXIT; CLOCKS(1); }
 
 /* .MDBO/---------------------------------------------------.MDNM/ */
 
 void do_uslash_tick_tick()
 {
- /* really sleazy definition to make things work for now ???? */
- /* do all the division at once */
+  /* really sleazy definition to make things work for now ???? */
+  /* do all the division at once */
   unsigned LONG dividend;
   unsigned int divisor, quotient, remainder;
   dividend = ((unsigned LONG) TOP << 16) & 0xFFFF0000;
@@ -1078,7 +1078,7 @@ void do_zero_equal()
 /* Note: it is *very important* that this list be in correct order!!!
  *  We could use a statically initialized data structure in C, but sure
  *  enough someone will add an operation without properly updating the
- *  list, leading to a *real* nasty bug.  So instead, we'll do a 
+ *  list, leading to a *real* nasty bug.  So instead, we'll do a
  *  run-time initialization.
  *  Also, the 128 constant is intentionally used to generate a
  *  compile time error if NUMBER_OF_ROUTINES is changed without
@@ -1086,74 +1086,74 @@ void do_zero_equal()
 
 /* dispatch table for 1st clock cycle */
 void (*dispatch_vector_1[128]) () =
- { bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 16 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 32 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 48 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 64 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 80 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 96 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 112 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn   /* 128 */
+  { bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 16 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 32 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 48 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 64 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 80 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 96 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 112 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn   /* 128 */
   };
 
 /* dispatch table for 2nd clock cycle of 2-cycle instructions */
 void (*dispatch_vector_2[128]) () =
- { bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 16 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 32 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 48 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 64 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 80 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 96 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,  /* 112 */
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn,
-   bad_insn, bad_insn, bad_insn, bad_insn   /* 128 */
+  { bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 16 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 32 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 48 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 64 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 80 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 96 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,  /* 112 */
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn,
+    bad_insn, bad_insn, bad_insn, bad_insn   /* 128 */
   };
 
 void execute(register int inst)
@@ -1174,8 +1174,8 @@ void init_dispatch()
 #if DUMMY_LAST >= NUMBER_OF_ROUTINES
   Compilation error: Increase NUMBER_OF_ROUTINES & array initialization!!
 #endif
-/* ---------------- first clock routines */
-  dispatch_vector_1[(int) OP_CALL] = do_call;
+    /* ---------------- first clock routines */
+    dispatch_vector_1[(int) OP_CALL] = do_call;
   dispatch_vector_1[(int) OP_0BRANCH] = do_0branch;
   dispatch_vector_1[(int) OP_ALU] = do_alu;
   dispatch_vector_1[(int) OP_ASIC_STREAM_MAC] = do_asic_stream_mac;
@@ -1277,7 +1277,7 @@ void init_dispatch()
   dispatch_vector_1[(int) OP_USTORE] = do_ustore;
   dispatch_vector_1[(int) OP_ZERO_EQUAL] = do_zero_equal;
 
-/* ---------------- second clock routines */
+  /* ---------------- second clock routines */
   dispatch_vector_2[(int) OP_DDUP_STORE] = do_ddup_store_2;
   dispatch_vector_2[(int) OP_DDUP_STORE_WITH_ALU] = do_ddup_store_with_alu_2;
   dispatch_vector_2[(int) OP_DROP_LIT] = do_drop_lit_2;
@@ -1308,4 +1308,4 @@ void init_dispatch()
   dispatch_vector_2[(int) OP_UNDER_STORE_LIT] = do_under_store_lit_2;
   dispatch_vector_2[(int) OP_USTORE] = do_ustore_2;
 
- }
+}

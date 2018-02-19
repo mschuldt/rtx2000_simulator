@@ -40,59 +40,59 @@ struct sgttyb kstate;
 #define M_KEY  1
 #define M_LINE 2
 static lmode = M_ORIG;
- 
-initline() {
-        if (lmode != M_ORIG)
-          { printf("error in initline\n");   return; }
 
-        ioctl(0, TIOCGETP, &ostate);            /* save old state
-*/
- 
-        ioctl(0, TIOCGETP, &lstate);            /* base of line state
-*/
-        lstate.sg_flags &= ~(CBREAK|RAW);       /* Line editing on
-*/
-        lstate.sg_flags |= ECHO;                /* Echo
-*/
-        lstate.sg_flags |= CRMOD;               /* Accept CR for LF
-*/
- 
-        ioctl(0, TIOCGETP, &kstate);            /* base of key state
-*/
-        kstate.sg_flags |= CBREAK;              /* Wake up on each char
-*/
-        kstate.sg_flags &= ~ECHO;               /* Don't echo
-*/
-        kstate.sg_flags |= CRMOD;               /* Accept CR for LF
-*/
+initline() {
+  if (lmode != M_ORIG)
+    { printf("error in initline\n");   return; }
+
+  ioctl(0, TIOCGETP, &ostate);            /* save old state
+                                           */
+
+  ioctl(0, TIOCGETP, &lstate);            /* base of line state
+                                           */
+  lstate.sg_flags &= ~(CBREAK|RAW);       /* Line editing on
+                                           */
+  lstate.sg_flags |= ECHO;                /* Echo
+                                           */
+  lstate.sg_flags |= CRMOD;               /* Accept CR for LF
+                                           */
+
+  ioctl(0, TIOCGETP, &kstate);            /* base of key state
+                                           */
+  kstate.sg_flags |= CBREAK;              /* Wake up on each char
+                                           */
+  kstate.sg_flags &= ~ECHO;               /* Don't echo
+                                           */
+  kstate.sg_flags |= CRMOD;               /* Accept CR for LF
+                                           */
 }
- 
+
 linemode()
 {
-        initline();
-        if (lmode != M_LINE) {
-                ioctl(0, TCSETA, &lstate);
-                lmode = M_LINE;
-        }
+  initline();
+  if (lmode != M_LINE) {
+    ioctl(0, TCSETA, &lstate);
+    lmode = M_LINE;
+  }
 }
- 
+
 keymode()
 {
-        initline();
-        if (lmode != M_KEY) { 
-                ioctl(0, TCSETA, &kstate);
-                lmode = M_KEY;
-         } 
+  initline();
+  if (lmode != M_KEY) {
+    ioctl(0, TCSETA, &kstate);
+    lmode = M_KEY;
+  }
 }
- 
- 
+
+
 restoremode()
 {
-        initline();
-        if (lmode != M_ORIG) {
-                ioctl(0, TCSETA, &ostate);
-                lmode = M_ORIG;
-        }
+  initline();
+  if (lmode != M_ORIG) {
+    ioctl(0, TCSETA, &ostate);
+    lmode = M_ORIG;
+  }
 }
 
 
@@ -123,45 +123,45 @@ void warning_3(char *s, int page, int offset)
 {  fprintf(/*stderr*/stdout,"  WARNING: %s addr=%01X:%04X\n", s, page, offset);
 }
 
-#define preamble \
-   if (count > START_COUNT) \
-   { printf("%04X  insn=%04X ",address,instruction); \
+#define preamble                                                        \
+  if (count > START_COUNT)                                              \
+    { printf("%04X  insn=%04X ",address,instruction);                   \
       print_instruction(stdout, decode(instruction), instruction, CPR, PC); \
-   }
+    }
 
-#define epilog \
-   if (count > START_COUNT) \
-   { printf("  "); \
-     display_ds();  display_short_rs(); \
-     printf("\n"); \
-   }
+#define epilog                                  \
+  if (count > START_COUNT)                      \
+    { printf("  ");                             \
+      display_ds();  display_short_rs();        \
+      printf("\n");                             \
+    }
 
 
 void trace(int instruction, int address)
 {
 #if TRACE
-   preamble
+  preamble
 #else
-   address++;  /* eliminates unused parameter warning */
+    address++;  /* eliminates unused parameter warning */
 #endif
-   execute(instruction);
+  execute(instruction);
 #if TRACE
-   epilog
+  epilog
 #endif
-}
+    }
 
 
 void trace_2(int instruction, int address)
 {
 #if TRACE
-   if (count > START_COUNT) printf("         ");
+  if (count > START_COUNT) printf("         ");
 #endif
-   address++;  /* eliminates unused parameter warning */
-   execute_2(instruction);
+  address++;  /* eliminates unused parameter warning */
+  execute_2(instruction);
 #if TRACE
-   epilog
+  epilog
 #endif
-}
+    }
 
 void main(int argc, char *argv[])
 { FILE *rom_file;
@@ -181,7 +181,7 @@ void main(int argc, char *argv[])
 
   /* wipe RAM to ensure a real cold start */
   for (ram_ptr = &RAM[0] ; ram_ptr < &RAM[RAM_SIZE] ;  ram_ptr++ )
-   {  *ram_ptr = 0xA5A5 ; }
+    {  *ram_ptr = 0xA5A5 ; }
 
   init_dispatch();  init_state();
   which_chip = RTX2000;
@@ -197,46 +197,46 @@ void main(int argc, char *argv[])
 #endif
 #endif
 
- inst = long_fetch(CPR, PC);
- temp_pc = PC;
- INC_PC ;
+  inst = long_fetch(CPR, PC);
+  temp_pc = PC;
+  INC_PC ;
 
   for (count = 0 ; count < END_COUNT; count++ )
-  {
-   if (!STREAM && second_cycle)
-    { trace_2( inst, temp_pc ); }
-   else
-    { trace( inst, temp_pc ); }
+    {
+      if (!STREAM && second_cycle)
+        { trace_2( inst, temp_pc ); }
+      else
+        { trace( inst, temp_pc ); }
 
-   if(stream_mode)
-   { if(INDEX == 0)
-     { STREAM = FALSE;
-       stream_mode = FALSE;
-       rs_pop();
-       if (!second_cycle)
-       { inst = long_fetch(CPR, PC);
-         temp_pc = PC;
-         INC_PC;
-       }
-     }
-     else
-     { INDEX = (INDEX - 1) _MASKED_ ; }
-   }
-   else
-   { if (STREAM)
-     { /* enter streamed mode for following instruction */
-       stream_mode = TRUE;
-     }
-     if(!second_cycle)
-     { inst = long_fetch(CPR, PC);
-       temp_pc = PC;
-       INC_PC ;
-     }
-   }
+      if(stream_mode)
+        { if(INDEX == 0)
+            { STREAM = FALSE;
+              stream_mode = FALSE;
+              rs_pop();
+              if (!second_cycle)
+                { inst = long_fetch(CPR, PC);
+                  temp_pc = PC;
+                  INC_PC;
+                }
+            }
+          else
+            { INDEX = (INDEX - 1) _MASKED_ ; }
+        }
+      else
+        { if (STREAM)
+            { /* enter streamed mode for following instruction */
+              stream_mode = TRUE;
+            }
+          if(!second_cycle)
+            { inst = long_fetch(CPR, PC);
+              temp_pc = PC;
+              INC_PC ;
+            }
+        }
 #if INFINITE
-     count--;
+      count--;
 #endif
-  }
+    }
 #if COMMENT
 #ifndef TURBOC
   restoremode();

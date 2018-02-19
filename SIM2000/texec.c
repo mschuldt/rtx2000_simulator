@@ -18,11 +18,11 @@ void error(char *s)
 
 void trace(int instruction, int address)
 {
-   execute(instruction);
-   printf("%X  insn=%X ",address,instruction);
-   print_instruction(stdout, decode(instruction), instruction, CPR, PC);
-   display_ds();
-   printf("\n");
+  execute(instruction);
+  printf("%X  insn=%X ",address,instruction);
+  print_instruction(stdout, decode(instruction), instruction, CPR, PC);
+  display_ds();
+  printf("\n");
 }
 
 void main()

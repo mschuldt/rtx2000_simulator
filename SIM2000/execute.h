@@ -1,7 +1,7 @@
 /* EXECUTE.H  --  RTX 2000 Instruction Set Simulator */
 /* (C) Copyright 1990 Harris Semiconductor, all rights reserved */
 /* By: Phil Koopman Jr.     9/x/90 */
-       
+
 #define NUMBER_OF_ROUTINES 128
 /* Note: you *MUST* change the initialization statement for the array
  * if NUMBER_OF_ROUTINES is changed !!!!! */

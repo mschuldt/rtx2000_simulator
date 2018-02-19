@@ -9,5 +9,4 @@
  *     address = address of instruction (for branch computations
  */
 void print_instruction(FILE *outf, machine_op opr,
-      int instruction, int page, int address);
-
+                       int instruction, int page, int address);

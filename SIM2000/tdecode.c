@@ -20,13 +20,13 @@ void main()
 
   which_chip = RTX2001A;
   for (i = 0x7FFF; i <= 0xFFFE; i++)
-  { j = i;
-    printf("%05X ",j);
-    print_instruction(stdout, decode(j), j, 0, 0x9000);
-    printf("\n");
-  }
-   j = 0xFFFF;
-    printf("%05X ",j);
-    print_instruction(stdout, decode(j), j, 0, 0x9000);
-    printf("\n");
+    { j = i;
+      printf("%05X ",j);
+      print_instruction(stdout, decode(j), j, 0, 0x9000);
+      printf("\n");
+    }
+  j = 0xFFFF;
+  printf("%05X ",j);
+  print_instruction(stdout, decode(j), j, 0, 0x9000);
+  printf("\n");
 }

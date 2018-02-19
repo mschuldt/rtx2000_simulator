@@ -17,9 +17,9 @@
 
 
 int hostmode = FALSE;  /* when true, in process of talking to the host */
-   /*  0 = not in command mode */
-   /* -1 = processed escape character */
-   /* other = command character */
+/*  0 = not in command mode */
+/* -1 = processed escape character */
+/* other = command character */
 
 int FSM = 0 ;  /* FSM state variable: 0 is rest state */
 
@@ -30,7 +30,7 @@ char PAD[PAD_SIZE+1];  /* input/output buffer area */
 void erase_pad()
 { int i;
   for ( i = 0; i < PAD_SIZE; i++)
-   { PAD[i] = 0;}
+    { PAD[i] = 0;}
 }
 
 #define first_count data
@@ -45,130 +45,130 @@ int X_OPEN_FILE(int data)
 {
 
 #if NEVER
- int result;
- result = 0;
+  int result;
+  result = 0;
   switch(FSM)
-  { case 0: erase_pad();    break;
-    /* receive 2 byte count */
+    { case 0: erase_pad();    break;
+        /* receive 2 byte count */
     case 1: count = first_count;                             break;
     case 2: count = second_count;                             break;
     default:
-     if(count < 0 ) { error_1("bad FSM in x_open_file",FSM);  break ;}
-     if(count = 0 )
-     { file = fopen(PAD,"r");
-       result = fileno(fopen(PAD,"r")); }
-     else
-      {
-      }
+      if(count < 0 ) { error_1("bad FSM in x_open_file",FSM);  break ;}
+      if(count = 0 )
+        { file = fopen(PAD,"r");
+          result = fileno(fopen(PAD,"r")); }
+      else
+        {
+        }
 
-  } FSM++;
-: X-OPEN-FILE
-   PAD 80 ERASE
-   PAD number_RCV DDUP RCVS
-   OPEN-FILE  XMT ;
- #endif
- error_1("command not supported",data);
- return(0);
+    } FSM++;
+  : X-OPEN-FILE
+      PAD 80 ERASE
+      PAD number_RCV DDUP RCVS
+      OPEN-FILE  XMT ;
+#endif
+  error_1("command not supported",data);
+  return(0);
 }
 
 int X_CLOSE_FILE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x_close_file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x_close_file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_READ_FILE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_WRITE_FILE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_SEEK(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_CREATE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_DELETE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_LIST_FILE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_LIST(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_READ_LINE(int data)
 { error_1("command not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
- return(0);
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
+  return(0);
 }
 
 int X_COMMAND(int data)
 {
   error_1("dos commands not supported",data);
-/*  switch(FSM)
-  { case 0:
-    default:  error_1("bad FSM in x__file",FSM);
-  } FSM++;
-*/
+  /*  switch(FSM)
+      { case 0:
+      default:  error_1("bad FSM in x__file",FSM);
+      } FSM++;
+  */
   return(0);
 }
 
@@ -182,22 +182,22 @@ int BYE(int data)
 int host_read()
 { int data;
   data = 0;
-  
+
   switch(hostmode) {
-   case 0x20: /* openfile */ return(X_OPEN_FILE(data));
-   case 0x21: /* close    */ return(X_CLOSE_FILE(data));    
-   case 0x22: /* read     */ return(X_READ_FILE(data));    
-   case 0x23: /* write    */ return(X_WRITE_FILE(data));    
-   case 0x24: /* seek     */ return(X_SEEK(data));    
-   case 0x25: /* create   */ return(X_CREATE(data));    
-   case 0x26: /* delete   */ return(X_DELETE(data));    
-   case 0x2D: /* listfile */ return(X_LIST_FILE(data));    
-   case 0x2E: /* list     */ return(X_LIST(data));    
-   case 0x2F: /* rdline   */ return(X_READ_LINE(data));    
-   case 0x30: /* dos cmd  */ return(X_COMMAND(data));
-   case 0xFF: /* exit     */ return(BYE(data));
-   default:
-      error_1("unknown function in host program read",data);
+  case 0x20: /* openfile */ return(X_OPEN_FILE(data));
+  case 0x21: /* close    */ return(X_CLOSE_FILE(data));
+  case 0x22: /* read     */ return(X_READ_FILE(data));
+  case 0x23: /* write    */ return(X_WRITE_FILE(data));
+  case 0x24: /* seek     */ return(X_SEEK(data));
+  case 0x25: /* create   */ return(X_CREATE(data));
+  case 0x26: /* delete   */ return(X_DELETE(data));
+  case 0x2D: /* listfile */ return(X_LIST_FILE(data));
+  case 0x2E: /* list     */ return(X_LIST(data));
+  case 0x2F: /* rdline   */ return(X_READ_LINE(data));
+  case 0x30: /* dos cmd  */ return(X_COMMAND(data));
+  case 0xFF: /* exit     */ return(BYE(data));
+  default:
+    error_1("unknown function in host program read",data);
   }
   return(0);
 }
@@ -209,20 +209,20 @@ void host_write(int data)
   if (hostmode <= 0)  { hostmode = data;}
 
   switch(hostmode) {
-   case 0x20: /* openfile */ X_OPEN_FILE(data);    break;
-   case 0x21: /* close    */ X_CLOSE_FILE(data);    break;
-   case 0x22: /* read     */ X_READ_FILE(data);    break;
-   case 0x23: /* write    */ X_WRITE_FILE(data);    break;
-   case 0x24: /* seek     */ X_SEEK(data);    break;
-   case 0x25: /* create   */ X_CREATE(data);    break;
-   case 0x26: /* delete   */ X_DELETE(data);    break;
-   case 0x2D: /* listfile */ X_LIST_FILE(data);    break;
-   case 0x2E: /* list     */ X_LIST(data);    break;
-   case 0x2F: /* rdline   */ X_READ_LINE(data);    break;
-   case 0x30: /* dos cmd  */ X_COMMAND(data);    break;
-   case 0xFF: /* exit     */ BYE(data);    break;
-   default:
-      error_1("unknown function in host program write",data);
+  case 0x20: /* openfile */ X_OPEN_FILE(data);    break;
+  case 0x21: /* close    */ X_CLOSE_FILE(data);    break;
+  case 0x22: /* read     */ X_READ_FILE(data);    break;
+  case 0x23: /* write    */ X_WRITE_FILE(data);    break;
+  case 0x24: /* seek     */ X_SEEK(data);    break;
+  case 0x25: /* create   */ X_CREATE(data);    break;
+  case 0x26: /* delete   */ X_DELETE(data);    break;
+  case 0x2D: /* listfile */ X_LIST_FILE(data);    break;
+  case 0x2E: /* list     */ X_LIST(data);    break;
+  case 0x2F: /* rdline   */ X_READ_LINE(data);    break;
+  case 0x30: /* dos cmd  */ X_COMMAND(data);    break;
+  case 0xFF: /* exit     */ BYE(data);    break;
+  default:
+    error_1("unknown function in host program write",data);
   }
 
 }

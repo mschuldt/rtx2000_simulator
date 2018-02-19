@@ -49,23 +49,23 @@ extern int internal_regs[32];
 #define BYTE    ( (CR & 0x0004) ? 1 : 0 )
 #define CCY     ( (CR & 0x0002) ? 1 : 0 )
 #define CY      ( (CR & 0x0001) ? 1 : 0 )
-#define set_IL(value)    { if(value) { CR = CR | 0x8000; }  \
-                                else { CR = CR & 0x7FFF; }  }
+#define set_IL(value)    { if(value) { CR = CR | 0x8000; }      \
+    else { CR = CR & 0x7FFF; }  }
 #define set_ARCE(value)  { if(value) { CR = CR | 0x2000; }  /* 2010 only */ \
-                                else { CR = CR & 0xDFFF; }  }
+    else { CR = CR & 0xDFFF; }  }
 #define set_NMIM(value)  { if(value) { CR = CR | 0x0800; }  /* 2010 only */ \
-                                else { CR = CR & 0xF7FF; }  }
+    else { CR = CR & 0xF7FF; }  }
 /* note: set_SID actually sets bit 14 so RID will work */
-#define set_SID(value)   { if(value) { CR = CR | 0x4000; }  \
-                                else { CR = CR & 0xBFFF; }  }
-#define set_BOOT(value)  { if(value) { CR = CR | 0x0008; }  \
-                                else { CR = CR & 0xFFF7; }  }
-#define set_BYTE(value)  { if(value) { CR = CR | 0x0004; }  \
-                                else { CR = CR & 0xFFFB; }  }
-#define set_CCY(value)   { if(value) { CR = CR | 0x0002; }  \
-                                else { CR = CR & 0xFFFD; }  }
-#define set_CY(value)    { if(value) { CR = CR | 0x0001; }  \
-                                else { CR = CR & 0xFFFE; }  }
+#define set_SID(value)   { if(value) { CR = CR | 0x4000; }      \
+    else { CR = CR & 0xBFFF; }  }
+#define set_BOOT(value)  { if(value) { CR = CR | 0x0008; }      \
+    else { CR = CR & 0xFFF7; }  }
+#define set_BYTE(value)  { if(value) { CR = CR | 0x0004; }      \
+    else { CR = CR & 0xFFFB; }  }
+#define set_CCY(value)   { if(value) { CR = CR | 0x0002; }      \
+    else { CR = CR & 0xFFFD; }  }
+#define set_CY(value)    { if(value) { CR = CR | 0x0001; }      \
+    else { CR = CR & 0xFFFE; }  }
 #define set_CY_0  { CR = CR & 0xFFFE; } /* avoids unreachable code warning */
 #define set_CY_1  { CR = CR | 0x0001; } /* avoids unreachable code warning */
 
@@ -100,7 +100,7 @@ extern int internal_regs[32];
 #define set_DPRSEL_0  { IBC = IBC & 0xFFDF; } /* avoids unreachable code warning */
 #define set_DPRSEL_1  { IBC = IBC | 0x0020; } /* avoids unreachable code warning */
 #define set_DPRSEL(value)  { if(value) { IBC = IBC | 0x0020; }  \
-                                  else { IBC = IBC & 0xFFDF; }  }
+    else { IBC = IBC & 0xFFDF; }  }
 
 extern LONG clocks;
 
@@ -109,9 +109,9 @@ extern LONG clocks;
 #define MAX_STACK 255
 #define STACK_MASK 0x00FF   /* mask for stack pointer wrapping */
 typedef struct double_stack
-  {  int low;
-     int high;
-  } double_stack ;
+{  int low;
+  int high;
+} double_stack ;
 
 extern int data_stack[MAX_STACK+1];
 extern int dp ;  /* data stack pointer */
@@ -154,7 +154,3 @@ extern void rs_pop();
 extern void rs_push(int page, int data);
 extern void set_carry();
 extern void ustore(int offset, int data);
-
-
-
-
