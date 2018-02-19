@@ -6,4 +6,3 @@ extern int host_read();
 extern void host_write(int data);
 
 extern int hostmode;  /* when true, in process of talking to the host */
-

@@ -27,4 +27,3 @@ extern int which_chip;
 #else
 #define _MASKED_  & 0xFFFF  /* mask to 16 bits */
 #endif
-

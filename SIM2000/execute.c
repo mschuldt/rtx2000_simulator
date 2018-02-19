@@ -1309,5 +1309,3 @@ void init_dispatch()
   dispatch_vector_2[(int) OP_USTORE] = do_ustore_2;
 
  }
-
-
