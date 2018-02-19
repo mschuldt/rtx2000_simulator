@@ -133,4 +133,3 @@ VARIABLE sortlist   10004   CELL- ALLOT
    ;
 
 .( max 49) cr
-

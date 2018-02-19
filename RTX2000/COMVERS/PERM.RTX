@@ -227,4 +227,3 @@ VARIABLE pctr   4   CELL- ALLOT
  EXIT  [ 0022 ] LABEL     ( 51  top> empty )
    ;  ( END )   
 
-

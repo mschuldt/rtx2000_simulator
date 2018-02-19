@@ -62,4 +62,3 @@ load GNUTOOL.4
   + ;
 
 : FIBS  FOR  30 FIB DROP  NEXT ;
-

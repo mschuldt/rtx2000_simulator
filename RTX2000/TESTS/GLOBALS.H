@@ -908,4 +908,3 @@ printf("\n");
     printf("Floating point composite is %10.0f\n",floated/10.0);
 #endif
 }
-

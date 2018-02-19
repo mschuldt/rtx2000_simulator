@@ -24,4 +24,3 @@ void main()
     printf("  = %d",fib(input));
   }
  }
-

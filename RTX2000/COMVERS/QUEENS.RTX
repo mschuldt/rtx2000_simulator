@@ -397,4 +397,3 @@ VARIABLE tries   4   CELL- ALLOT
  [ 0025 DROP_INDEX ] R>DROP  ( 37  top> empty )
  EXIT  [ 0026 ] LABEL     ( 45  top> empty )
    ;  ( END )   
-

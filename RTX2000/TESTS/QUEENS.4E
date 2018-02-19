@@ -118,4 +118,3 @@ VARIABLE tries   4   CELL- ALLOT
  ;
 
 .( 2500 max ) cr
-

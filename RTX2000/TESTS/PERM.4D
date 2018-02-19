@@ -190,4 +190,3 @@ RECURSE \   Permute  ( CALL)    ( 48  top> empty )
  ( 45  top> empty )
 
 .( max 250) cr
-

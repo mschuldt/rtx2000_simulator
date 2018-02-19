@@ -403,4 +403,3 @@ VARIABLE sortlist   10004   CELL- ALLOT
  EXIT  [ 0036 ] LABEL     ( 62  top> empty )
 \     };
    ;  ( END )   
-

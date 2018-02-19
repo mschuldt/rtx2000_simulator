@@ -76,4 +76,3 @@ VARIABLE pctr   4   CELL- ALLOT
  ;
 
 .( max 250) cr
-
