@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "execute.h"
+#include "decode.h"
 #include "state.h"
 #include <stdio.h>
 
