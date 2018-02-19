@@ -5,6 +5,8 @@
 #ifndef HEXIN_H
 #define HEXIN_H
 
+#include <stdio.h>
+
 #define DEBUG_HEX 0  /* when 1, prints data read from .HEX file */
 
 extern void hex_input(FILE *in_file);

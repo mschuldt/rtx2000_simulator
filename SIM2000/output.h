@@ -12,6 +12,8 @@
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
+#include <stdio.h>
+
 void print_instruction(FILE *outf, machine_op opr,
                        int instruction, int page, int address);
 
