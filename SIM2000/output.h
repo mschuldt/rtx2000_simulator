@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 
+#include "decode.h"
+
 void print_instruction(FILE *outf, machine_op opr,
                        int instruction, int page, int address);
 
