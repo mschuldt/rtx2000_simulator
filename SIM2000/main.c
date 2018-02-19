@@ -5,10 +5,7 @@
 /* Driving routine.
  */
 
-#ifdef TURBOC
 #include <stdlib.h>
-#endif
-
 #include <stdio.h>
 #include "main.h"
 #include "state.h"

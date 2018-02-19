@@ -7,13 +7,8 @@
  */
 
 #include <stdio.h>
-
-#ifdef TURBOC
-#include <conio.h>
 #include <stdlib.h>
-#else
 #include <sys/ioctl.h>
-#endif
 
 #include "main.h"
 #include "state.h"

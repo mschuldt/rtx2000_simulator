@@ -7,10 +7,7 @@
  */
 
 #include <stdio.h>
-
-#ifdef TURBOC
 #include <stdlib.h>
-#endif
 
 #include "host.h"
 #include "main.h"
