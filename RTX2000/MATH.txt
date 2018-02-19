@@ -1,0 +1,104 @@
+\ Notes for RTX 2000 floating point
+\ (C) COPYRIGHT 1990 PHIL KOOPMAN JR./Harris Semiconductor
+
+: T+   ( t1 t2 -- t3 )
+                                     ( -- Dm1 e1 Dm2 e2 )   ( RS: -- )
+   >R  ROT  >R                       ( -- Dm1 Dm2 )         ( RS: -- e2 e1 )
+   >R OVER R> SWAP  OVER  AND  2*    ( -- Dm1 Dm2 flg )     ( RS: -- e2 e1 )
+   IF   \ Both inputs are non-zero   ( -- Dm1 Dm2 )         ( RS: -- e2 e1 )
+     R>                              ( -- Dm1 Dm2 e1 )      ( RS: -- e2 )
+     DUP R@ <                        ( -- Dm1 Dm2 e1 e1<e2? ) ( RS: -- e2 )
+     IF   ( t2 has bigger exponent ) ( -- Dm1 Dm2 e1 )      ( RS: -- e2 )
+        R@                           ( -- Dm1 Dm2 e1 e2 )   ( RS: -- e2 )
+        DOVER  D>R                   ( -- Dm1 Dm2 e1 e2 )   ( RS: -- e2 Dm2 )
+        D>R DSWAP DR>  SWAP          ( -- Dm2 Dm1 e2 e1 )   ( RS: -- e2 Dm2 )
+     ELSE ( t1 has bigger exponent ) ( -- Dm1 Dm2 e1 )      ( RS: -- e2 )
+        R>  OVER >R                  ( -- Dm1 Dm2 e1 e2 )   ( RS: -- e1 )
+        5 PICK 5 PICK  D>R           ( -- Dm1 Dm2 e1 e2 )   ( RS: -- e1 Dm1 )
+     THEN                            ( -- Dm4 Dm5 e4 e5 )   ( RS: -- e4 Dm4 )
+     2 PICK 5 PICK XOR 0<  >R   ( -- Dm4 Dm5 e4 e5 )    ( RS: -- e4 Dm4 sub?)
+     -  >R                      ( -- Dm4 Dm5 )   ( RS: -- e4 Dm4 sub? deltae )
+     ROT  2* LSR  -ROT          ( -- Dum4 Dm5 )  ( RS: -- e4 Dm4 sub? de )
+          2* LSR                ( -- Dum4 Dum5 ) ( RS: -- e4 Dm4 sub? de )
+     R>  32 MIN DLSRN           ( -- Dum4 Dum6 ) ( RS: -- e4 Dm4 sub?)
+     DDUP OR 0=
+     IF  \ too small to matter  ( -- Dum4 Dum6 ) ( RS: -- e4 Dm4 sub?)
+         DDROP  DDROP           ( -- )           ( RS: -- e4 Dm4 sub?)
+         R> DROP                ( -- )           ( RS: -- e4 Dm4 )
+         DR> R>  EXIT           ( -- Dm4 e4 )    ( RS: -- )
+     ELSE \ big enough to do it ( -- Dum4 Dum6 ) ( RS: -- e4 Dm4 sub?)
+       R>                       ( -- Dum4 Dum6 sub? )   ( RS: -- e4 Dm4)
+       IF  \ signs different, subtract ( -- Dum4 Dum6 ) ( RS: -- e4 Dm4)
+           DR> SWAP DROP 0<     ( -- Dum4 Dum6 Dm4<0 )  ( RS: -- e4)
+           IF DSWAP THEN        ( -- Dum7 Dum8 )        ( RS: -- e4)
+           DNEGATE  0 DADC 0=   ( -- Dm9  nwsgn )       ( RS: -- e4)
+           >R DABS R>           ( -- Dum9 nwsgn )       ( RS: -- e4)
+       ELSE  \ signs the same, do an add ( -- Dum4 Dum6 ) ( RS: -- e4 Dm4)
+           D+ DR> SWAP DROP 0<  ( -- Dum9 nwsgn )       ( RS: -- e4)
+       THEN                     ( -- Dum9 nwsgn )       ( RS: -- e4)
+       R> SWAP >R               ( -- Dum9 e4 )          ( RS: -- nwsgn )
+       UDNORMALIZE              ( -- Dum3 e3 )          ( RS: -- nwsgn )
+       R> IF TNEGATE EXIT THEN  ( -- Dm3 e3 )           ( RS: -- )
+       EXIT                     ( -- Dm3 e3 )           ( RS: -- )
+     THEN
+   ELSE  \ One input is zero    ( -- Dm1 Dm2 )          ( RS: -- e2 e1 )
+     DUP 2*                     ( -- Dm1 Dm2 m2<>0 )    ( RS: -- e2 e1 )
+     IF    \ Dm2 not zero       ( -- Dm1 Dm2 )       ( RS: -- e2 e1 )
+       D>R  DDROP DR>           ( -- Dm2 )           ( RS: -- e2 e1 )
+       R> DROP R>               ( -- Dm2 e2 )         ( RS: -- )
+       EXIT                     ( -- Dm2 e2 )         ( RS: -- )
+     ELSE  \ Dm2 is zero        ( -- Dm1 Dm2 )       ( RS: -- e2 e1 )
+       DDROP                    ( -- Dm1 )           ( RS: -- e2 e1 )
+       R> R> DROP               ( -- Dm1 e1 )         ( RS: -- )
+       EXIT                     ( -- Dm1 e1 )         ( RS: -- )
+     THEN
+   THEN
+   ;
+
+
+: T*   ( t1 t2 -- t3 )
+                              ( Dm1 e1 Dm2 e2 -- )
+       \ add exponents
+       >R ROT R> +            ( -- Dm1 Dm2 e3 )
+       >R                     ( -- Dm1 Dm2    )    ( RS: -- e3 )
+       \ compute sign of result
+       DUP >R SWAP >R  OVER >R  ROT >R  XOR 0<  R> R> R> R>
+       DDUP  XOR  0< -ROT     ( -- sgn Dm1 Dm2 )   ( RS: -- e3 )
+       \ compute product, discarding sign bits
+       D2*  DSWAP D2*         ( -- sgn Dum2 Dum1 )   ( RS: -- e3 )
+       DUM*  >R >R DDROP R> R>   ( -- sgn Dum3 )   ( RS: -- e3 )
+       \ either normalized, or shift right 1 bit
+       DUP 0<
+       IF
+          \ shift right and apply sign
+          ROT  DRRC  DROP     ( -- Dum3 )         ( RS: -- e3 )
+          R>  1+ EXIT         ( -- Dum3 e3 )
+       ELSE
+          \ apply sign
+          DLSL ROT DRRC  DROP  ( -- Dum3 )         ( RS: -- e3 )
+          R>  EXIT       ( -- Dum3 e3 )
+       THEN
+       ;
+
+: T/   ( t1 t2 -- t3 )
+                                ( -- Dm1 e1 Dm2 e2 )  ( RS: -- )
+   \ check for divide by zero
+   OVER 2* 0=                  ( -- Dm1 e1 Dm2 e2 =0? ) ( RS: -- )
+   IF  \ result of /0 is zero
+     DROP DDROP DROP DDROP  0 0 0  ( -- Dm2 e2 )        ( RS: -- )
+     EXIT                          ( -- Dm2 e2 )        ( RS: -- )
+   ELSE                         ( -- Dm1 e1 Dm2 e2 )  ( RS: -- )
+      >R  ROT  R>               ( -- Dm1 Dm2 e1 e2 )  ( RS: -- )
+      2 PICK  5 PICK  XOR >R    ( -- Dm1 Dm2 e1 e2 )  ( RS: -- sgn )
+      - >R                      ( -- Dm1 Dm2 )        ( RS: -- sgn e3 )
+      LSL  LSR                  ( -- Dm1 Dum2 )       ( RS: -- sgn e3 )
+      DSWAP  LSL LSR            ( -- Dum2 Dum1 )      ( RS: -- sgn e3 )
+      0 0 DSWAP                 ( -- Dum2 0. Dum1 )   ( RS: -- sgn e3 )
+      QLSR DROT                 ( -- Qum1 Dum2 )     ( RS: -- sgn e3 )
+      DUM/MOD                   ( -- Durem Duquot )   ( RS: -- sgn e3 )
+      D>R DDROP DR>             ( -- Duquot )        ( RS: -- sgn e3 )
+      R>                        ( -- uquot e3 )     ( RS: -- sgn )
+      1- UDNORMALIZE             ( -- Dum3 e3 )       ( RS: -- sgn )
+      R>                        ( -- Dum3 e3 sgn )   ( RS: -- )
+      ?TNEGATE EXIT                  ( -- Dm3 e3 )        ( RS: -- )
+   THEN  ;
