@@ -1,3 +1,3 @@
 #!/bin/bash
 
-SIM2000 APPFORTH.HEX
+sim2000 APPFORTH.HEX
