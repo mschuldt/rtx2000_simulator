@@ -2,6 +2,9 @@
 /* (C) Copyright 1990 Harris Semiconductor, all rights reserved */
 /* By: Phil Koopman Jr.     9/x/90 */
 
+#ifndef STATE_H
+#define STATE_H
+
 /* machine registers */
 extern int TOP;
 extern int NEXT;
@@ -154,3 +157,5 @@ extern void rs_pop();
 extern void rs_push(int page, int data);
 extern void set_carry();
 extern void ustore(int offset, int data);
+
+#endif

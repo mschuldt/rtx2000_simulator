@@ -2,6 +2,8 @@
 /* (C) Copyright 1990 Harris Semiconductor, all rights reserved */
 /* By: Phil Koopman Jr.     9/x/90 */
 
+#ifndef MAIN_H
+#define MAIN_H
 
 extern void error(char *s);
 extern void error_1(char *s, int n);
@@ -26,4 +28,6 @@ extern int which_chip;
 #define _MASKED_  /* nop */
 #else
 #define _MASKED_  & 0xFFFF  /* mask to 16 bits */
+#endif
+
 #endif

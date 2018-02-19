@@ -8,5 +8,11 @@
  *     instruction = 16-bit instruction value
  *     address = address of instruction (for branch computations
  */
+
+#ifndef OUTPUT_H
+#define OUTPUT_H
+
 void print_instruction(FILE *outf, machine_op opr,
                        int instruction, int page, int address);
+
+#endif 

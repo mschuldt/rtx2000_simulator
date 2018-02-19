@@ -7,6 +7,9 @@
  * the decoding subroutine.
  */
 
+#ifndef DECODE_H
+#define DECODE_H
+
 #define NIL 0
 
 typedef enum machine_op
@@ -127,3 +130,5 @@ extern machine_op decode(register int instruction);
  *  Output: 16-bit RTX branch target address
  */
 extern int target_addr(int instruction, int address);
+
+#endif

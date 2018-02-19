@@ -2,6 +2,11 @@
 /* (C) Copyright 1990 Harris Semiconductor, all rights reserved */
 /* By: Phil Koopman Jr.     9/x/90 */
 
+#ifndef HEXIN_H
+#define HEXIN_H
+
 #define DEBUG_HEX 0  /* when 1, prints data read from .HEX file */
 
 extern void hex_input(FILE *in_file);
+
+#endif
