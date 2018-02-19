@@ -6,7 +6,7 @@ EMPTY
 
 DECIMAL
 
-load GNUTOOL.4
+load gnutool.4th
 #REGS 100 - REG-ADDR $FFC0 AND  UBR!
 
 VARIABLE seed   4   CELL- ALLOT

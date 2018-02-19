@@ -2,10 +2,10 @@
 \ CESYS compiled version
 
 EMPTY
-: XY " DOS XY queens.4a" EVALUATE ;
+: XY " DOS XY queens.a.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE tries   4   CELL- ALLOT
 

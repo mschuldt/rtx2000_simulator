@@ -6,7 +6,7 @@ EMPTY
 : XY " DOS XY quick.hnd" EVALUATE ;
 
 DECIMAL
-\ load GNUTOOL.4
+\ load gnutool.4th
 load GNUinst.4
 cr
 

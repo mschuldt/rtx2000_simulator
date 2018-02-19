@@ -6,7 +6,7 @@ EMPTY
 : XY " DOS XY quick.RTX" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 #REGS 100 - REG-ADDR $FFC0 AND  UBR!
 \ #define sortelements 	 5000

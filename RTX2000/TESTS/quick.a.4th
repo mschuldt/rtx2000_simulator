@@ -2,10 +2,10 @@
 \ CESYS C version
 
 EMPTY
-: XY " DOS XY quick.4a" EVALUATE ;
+: XY " DOS XY quick.a.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
  100 REG-ADDR $FFC0 AND  UBR!
 

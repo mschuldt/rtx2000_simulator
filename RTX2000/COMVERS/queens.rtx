@@ -7,7 +7,7 @@ EMPTY
 : XY " DOS XY queens.RTX" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 \ #define true -1
 \ #define false 0

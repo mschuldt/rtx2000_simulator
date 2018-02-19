@@ -3,9 +3,9 @@
 \ Hand-changed to reflect best possible interblock analysis
 
 EMPTY
-: XY " DOS XY SIEVE.hnd " EVALUATE ;
+: XY " DOS XY sieve.hnd " EVALUATE ;
 
-\ load GNUTOOL.4
+\ load gnutool.4th
 load GNUinst.4
 
 \ char flags [size+1];

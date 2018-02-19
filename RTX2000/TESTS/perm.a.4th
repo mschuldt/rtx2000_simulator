@@ -2,10 +2,10 @@
 \ CESYS compiled
 
 EMPTY
-: XY " DOS XY PERM.4a" EVALUATE ;
+: XY " DOS XY perm.4a" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE permarray   24   CELL- ALLOT
 VARIABLE pctr   4   CELL- ALLOT

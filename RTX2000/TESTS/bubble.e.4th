@@ -2,10 +2,10 @@
 \ Improved source code assembler based on GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY BUBBLE.4e" EVALUATE ;
+: XY " DOS XY bubble.e.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 
 VARIABLE seed   4   CELL- ALLOT

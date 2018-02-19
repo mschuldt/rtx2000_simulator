@@ -2,10 +2,10 @@
 \ GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY bBUBBLE.4" EVALUATE ;
+: XY " DOS XY bbubble.4" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE seed   4   CELL- ALLOT
 

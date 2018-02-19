@@ -2,10 +2,10 @@
 \ GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY bPERM.4" EVALUATE ;
+: XY " DOS XY bperm.4" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE permarray   24   CELL- ALLOT
 VARIABLE pctr   4   CELL- ALLOT

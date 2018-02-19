@@ -5,10 +5,10 @@
 \ CESYS C generated code
 
 EMPTY
-: XY " DOS XY BUBBLE.ces" EVALUATE ;
+: XY " DOS XY bubble.ces" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 \ int seed ;
 

@@ -2,10 +2,10 @@
 \ GNU C 2020/3000
 
 EMPTY
-: XY " DOS XY BUBBLE.4c" EVALUATE ;
+: XY " DOS XY bubble.c.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE seed   4   CELL- ALLOT
 VARIABLE top   4   CELL- ALLOT

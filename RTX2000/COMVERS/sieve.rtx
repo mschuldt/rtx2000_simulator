@@ -1,9 +1,9 @@
 \ /* Eratosthenes Siee Prime Number Program in C from Byte January 1983 */
 
 EMPTY
-: XY " DOS XY SIEVE.rtx " EVALUATE ;
+: XY " DOS XY sieve.rtx " EVALUATE ;
 
-load GNUTOOL.4
+load gnutool.4th
 
 \ char flags [size+1];
 VARIABLE flags   8192   CELL- ALLOT

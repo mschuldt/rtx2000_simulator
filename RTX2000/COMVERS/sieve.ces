@@ -2,9 +2,9 @@
 \ CESYS output modified for AppForth
 
 EMPTY
-: XY " DOS XY SIEVE.ces " EVALUATE ;
+: XY " DOS XY sieve.ces " EVALUATE ;
 
-load GNUTOOL.4
+load gnutool.4th
 
 \ char flags [size+1];
 VARIABLE flags   8192   CELL- ALLOT

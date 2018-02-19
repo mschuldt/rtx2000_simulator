@@ -2,9 +2,9 @@
 \ GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY SIEVE.4b" EVALUATE ;
+: XY " DOS XY sieve.b.4th" EVALUATE ;
 
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE flags   8192   CELL- ALLOT
 

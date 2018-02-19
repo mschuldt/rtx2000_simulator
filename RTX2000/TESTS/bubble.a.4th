@@ -2,10 +2,10 @@
 \ CESYS C generated code
 
 EMPTY
-: XY " DOS XY BUBBLE.4a" EVALUATE ;
+: XY " DOS XY bubble.a.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE seed   4   CELL- ALLOT
 VARIABLE top   4   CELL- ALLOT

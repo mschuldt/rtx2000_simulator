@@ -2,10 +2,10 @@
 \ GNU C  2020/3000
 
 EMPTY
-: XY " DOS XY quick.4c" EVALUATE ;
+: XY " DOS XY quick.c.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 #REGS 100 - REG-ADDR $FFC0 AND  UBR!
 

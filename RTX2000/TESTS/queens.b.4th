@@ -2,10 +2,10 @@
 \ GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY queens.4b" EVALUATE ;
+: XY " DOS XY queens.b.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE tries   4   CELL- ALLOT
 

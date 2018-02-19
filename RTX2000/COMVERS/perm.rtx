@@ -3,10 +3,10 @@
 \ /* modified for reasonable 16-bit operation */
 
 EMPTY
-: XY " DOS XY PERM.RTX" EVALUATE ;
+: XY " DOS XY perm.RTX" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 \ int    permarray[permrange+1];
 \ int    pctr;

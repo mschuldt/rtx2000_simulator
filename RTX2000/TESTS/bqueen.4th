@@ -5,7 +5,7 @@ EMPTY
 : XY " DOS XY bqueen.4" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 #REGS 100 - REG-ADDR $FFC0 AND  UBR!
 

@@ -2,9 +2,9 @@
 \ GNU C  2020/3000
 
 EMPTY
-: XY " DOS XY SIEVE.4c " EVALUATE ;
+: XY " DOS XY sieve.c.4th " EVALUATE ;
 
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE flags   8192   CELL- ALLOT
 

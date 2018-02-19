@@ -2,10 +2,10 @@
 \ Improved source code GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY quick.4D" EVALUATE ;
+: XY " DOS XY quick.d.4TH" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 #REGS 100 - REG-ADDR $FFC0 AND  UBR!
 

@@ -5,10 +5,10 @@
 \ CESYS compiled
 
 EMPTY
-: XY " DOS XY PERM.ces" EVALUATE ;
+: XY " DOS XY perm.ces" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 \ int    permarray[permrange+1];
 \ int    pctr;

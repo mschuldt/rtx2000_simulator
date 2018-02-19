@@ -3,10 +3,10 @@
 \ /* modified for reasonable 16-bit operation */
 
 EMPTY
-: XY " DOS XY PERM.1OP" EVALUATE ;
+: XY " DOS XY perm.1OP" EVALUATE ;
 
 DECIMAL
-\ load GNUTOOL.4
+\ load gnutool.4th
 load GNUinst.4
 
 \ int    permarray[permrange+1];

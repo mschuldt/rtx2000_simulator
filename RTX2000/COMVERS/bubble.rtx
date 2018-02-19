@@ -3,10 +3,10 @@
 \ /* modified for reasonable 16-bit operation */
 
 EMPTY
-: XY " DOS XY BUBBLE.RTX" EVALUATE ;
+: XY " DOS XY bubble.rtx" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 \ int seed ;
 

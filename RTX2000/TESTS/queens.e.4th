@@ -2,10 +2,10 @@
 \ Improved hand-done assembler source code GNU C for RTX 2000
 
 EMPTY
-: XY " DOS XY queens.4e" EVALUATE ;
+: XY " DOS XY queens.e.4th" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
 VARIABLE tries   4   CELL- ALLOT
 

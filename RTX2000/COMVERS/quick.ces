@@ -8,7 +8,7 @@ EMPTY
 : XY " DOS XY quick.ces" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 
  100 REG-ADDR $FFC0 AND  UBR!
 \ #define sortelements 	 5000

@@ -5,7 +5,7 @@ EMPTY
 : XY " DOS XY btowers.4" EVALUATE ;
 
 DECIMAL
-load GNUTOOL.4
+load gnutool.4th
 VARIABLE movesdone   4   CELL- ALLOT
 
 VARIABLE freelist   4   CELL- ALLOT

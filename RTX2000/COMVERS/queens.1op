@@ -7,7 +7,7 @@ EMPTY
 : XY " DOS XY queens.1OP" EVALUATE ;
 
 DECIMAL
-\ load GNUTOOL.4
+\ load gnutool.4th
 load GNUINST.4
 
 \ #define true -1
