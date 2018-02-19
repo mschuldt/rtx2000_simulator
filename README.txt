@@ -1,11 +1,21 @@
 RTX2000 Simulator
 
-Files from:
+Build and run on Ubuntu:
+ cd SIM2000
+ make
+ ./run
+
+
+It appears this simulator contains support for the RTX2000, RTX2001A, and RTX2010.
+To set the chip type set the which_chip variable in main.c before building.
+
+
+This program has been ported to GNU/Linux. Files originally from:
   http://users.ece.cmu.edu/~koopman/forth/RTX2000_SIMULATOR.ZIP
   http://users.ece.cmu.edu/~koopman/forth/RTX2000_APPFORTH.ZIP
 
-====== The README from the SIM2000 directory follows ============
 
+======= The text from SIM2000/README.1ST follows =============
 
                                                       10/24/97
 
